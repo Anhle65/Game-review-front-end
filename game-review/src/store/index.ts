@@ -16,18 +16,18 @@ const useStore = create<GameState>((set) => ({
         return {games: games}
     }),
     editGame: (game: Game, newGamename) => set((state) => {
-        const temp = state.games.map(u=>u.gameId === game.gameId ?
-            ({...u, title: newGamename} as Game): u)
+        const temp = state.games.map((g: Game) =>g.gameId === game.gameId ?
+            ({...g, title: newGamename} as Game): g)
         setLocalStorage('games', temp)
         return {
-            games: state.games.map(u => u.gameId === game.gameId ?
-                ({ ...u, title: newGamename} as Game) : u)
+            games: state.games.map((g: Game) => g.gameId === game.gameId ?
+                ({ ...g, title: newGamename} as Game) : g)
         }
     }),
     removeGame: (game: Game) => set((state) => {
-        setLocalStorage('games', state.games.filter(u=>u.gameId !== game.gameId))
+        setLocalStorage('games', state.games.filter(g=>g.gameId !== game.gameId))
         return {
-            games: state.games.filter(u=>u.gameId !== game.gameId)
+            games: state.games.filter(g=>g.gameId !== game.gameId)
         }
     })
 }))
