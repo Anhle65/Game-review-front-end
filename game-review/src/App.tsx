@@ -3,6 +3,11 @@ import logo from './logo.svg';
 import './App.css';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import NotFound from "./components/NotFound";
+import Games from "./components/Games";
+import GameList from "./components/GameList";
+import {rootUrl} from "./base.routes";
+import GameListObject from "./components/GameListObject";
+import Game from "./components/Game";
 
 function App() {
   return (
@@ -10,9 +15,9 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path="/" element={<NotFound />} />
-            <Route path="/games" element={<NotFound />} />
-            <Route path="/games/:id" element={<NotFound />} />
+            <Route path={rootUrl + "/"} element={<GameList />} />
+            <Route path={rootUrl + "/games"} element={<Games />} />
+            <Route path={rootUrl + "/games/:id"} element={<Game />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
