@@ -1,5 +1,5 @@
 type Game = {
-    id: number;
+    gameId: number;
     title: string;
     description: string;
     creation_date: string;
