@@ -4,22 +4,24 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 
 interface IGameProps {
     game: Game
+    genres: Genre[]
 }
 const GameListObject = (props: IGameProps) => {
     const [game] = React.useState<Game> (props.game);
+    const [genres] = React.useState<Genre[]>(props.genres);
     const [gamename, setgamename] = React.useState("");
-    const [imageUrl, setImageUrl] = React.useState<string>("");
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
+    const gameGenre = genres.find(g => g.genreId === game.genreId);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
@@ -41,15 +43,9 @@ const GameListObject = (props: IGameProps) => {
                 editGameFromStore(game, gamename);
             })
     }
-    const getGameImage = () => {
-        axios.get('http://localhost:4941'+rootUrl+'/games/' + game.gameId + '/image')
-            .then(() => {
-                editGameFromStore(game, gamename);
-            })
-    }
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "328px",
+        height: "500px",
         width: "300px",
         margin: "10px",
         padding: "0px"
@@ -58,16 +54,28 @@ const GameListObject = (props: IGameProps) => {
         <Card sx={gameCardStyles}>
             <CardMedia
                 component="img"
-                height="200"
+                height="300"
                 width="200"
                 sx={{objectFit:"cover"}}
-                image={game.image_filename}
+                image="https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"
                 alt="Auction hero"
             />
             <CardContent>
-                <Typography variant="h4">
-                    {game.gameId} {game.title}
+                <Typography variant="h6">
+                    {game.title}
                 </Typography>
+                <Stack direction="row" spacing={2} justifyContent="center">
+                    <Typography variant="subtitle2" align="left">
+                        Genres: {gameGenre?.name}
+                        <br/>
+                        Creator: {game.creatorFirstName} {game.creatorLastName}
+                        <br/>
+                        Created on : {game.creationDate}
+                    </Typography>
+                    <Typography variant="h6" align="right">
+                        ${game.price}
+                    </Typography>
+                </Stack>
             </CardContent>
             <CardActions>
                 <IconButton onClick={() => {setOpenEditDialog(true)}}>
