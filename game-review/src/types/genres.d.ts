@@ -1,4 +1,4 @@
 type Genre = {
-    id: number;
+    genreId: number;
     name: string;
 }

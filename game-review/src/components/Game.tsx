@@ -12,14 +12,17 @@ import {useParams} from "react-router-dom";
 const Game = () => {
     const {id} = useParams();
     const [game] = React.useState<Game> ({
-        creation_date: "",
-        creator_id: 0,
-        description: "",
-        genre_id: 0,
-        image_filename: "",
+        creationDate: "",
+        creatorFirstName: "",
+        creatorId: 0,
+        creatorLastName: "",
+        gameId: 0,
+        genreId: 0,
+        platformIds: "",
         price: 0,
-        title: "",
-        gameId:0});
+        rating: 0,
+        title: ""
+    });
     const [gamename, setgamename] = React.useState("");
     const [imageUrl, setImageUrl] = React.useState<string>("");
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -67,7 +70,7 @@ const Game = () => {
                 height="200"
                 width="200"
                 sx={{objectFit:"cover"}}
-                image={game.image_filename}
+                image="Null"
                 alt="Auction hero"
             />
             <CardContent>
