@@ -4,7 +4,7 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Paper
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Paper, Avatar
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
@@ -183,14 +183,7 @@ const Game = () => {
                             }}>
                                 <Typography variant="subtitle1">
                                     Creator: {game.creatorFirstName} {game.creatorLastName}
-                                <CardMedia
-                                    component="img"
-                                    height="150"
-                                    width="100"
-                                    sx={{objectFit: "cover"}}
-                                    image={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
-                                    alt="Auction hero"
-                                />
+                                    <Avatar alt="Creator Image" src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                                 </Typography>
                             </div>
                         </Stack>
