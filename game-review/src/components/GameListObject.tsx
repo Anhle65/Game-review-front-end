@@ -25,6 +25,9 @@ const GameListObject = (props: IGameProps) => {
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
     const gameGenre = genres.find(g => g.genreId === game.genreId);
+    const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
+                                                .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
+    const platformsName = allPlatforms.join(', ');
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
@@ -67,7 +70,7 @@ const GameListObject = (props: IGameProps) => {
                 })
         }
         getPlatforms();
-    }, [platforms])
+    }, [])
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "500px",
@@ -96,7 +99,7 @@ const GameListObject = (props: IGameProps) => {
                     <Typography variant="subtitle2" align="left">
                         Genres: {gameGenre?.name}
                         <br/>
-                        Platforms: {}
+                        Platforms: {platformsName}
                         <br/>
                         Creator: {game.creatorFirstName} {game.creatorLastName}
                         <br/>
