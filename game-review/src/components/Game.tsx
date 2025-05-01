@@ -4,14 +4,15 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import {useParams} from "react-router-dom";
 const Game = () => {
     const {id} = useParams();
-    const [game] = React.useState<Game> ({
+    const [game, setGame] = React.useState<Game> ({
+        numberOfOwners: 0, numberOfWishlists: 0,
         creationDate: "",
         creatorFirstName: "",
         creatorId: 0,
@@ -21,14 +22,20 @@ const Game = () => {
         platformIds: "",
         price: 0,
         rating: 0,
-        title: ""
+        title: "",
+        description: ""
     });
+
     const [gamename, setgamename] = React.useState("");
-    const [imageUrl, setImageUrl] = React.useState<string>("");
+    const [image, setImage] = React.useState("");
+    const [creatorImage, setCreatorImage] = React.useState("");
+    const [genres, setGenre] = React.useState<Array<Genre>> ([]);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
+    const genreName = genres.find(g => g.genreId === game.genreId)
+
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
@@ -50,33 +57,99 @@ const Game = () => {
                 editGameFromStore(game, gamename);
             })
     }
-    const getGameImage = () => {
-        axios.get('http://localhost:4941'+rootUrl+'/games/' + id + '/image')
-            .then(() => {
-                editGameFromStore(game, gamename);
-            })
-    }
+    React.useEffect(() => {
+            const getGame = () => {
+                axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
+                    .then((response) => {
+                        setGame(response.data);
+                    })
+            }
+            getGame();
+        }, [setGame]
+    )
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId.toString() + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setCreatorImage(imgUrl);
+            }).catch((error) => {
+            console.error("Failed to load image", error);
+        });
+    }, [game.creatorId]);
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "328px",
-        width: "300px",
+        height: "900px",
+        width: "800px",
         margin: "10px",
         padding: "0px"
     }
+
+    React.useEffect(() => {
+        const getGenres = () => {
+            axios.get('http://localhost:4941'+rootUrl+'/games/genres')
+                .then((response) => {
+                    setGenre(response.data);
+                })
+        }
+        getGenres();
+    }, [genreName]);
+
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941'+rootUrl+'/games/' + id + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setImage(imgUrl);
+            }).catch((error) => {
+            console.error("Failed to load image", error);
+        });
+    }, [id]);
     return(
         <Card sx={gameCardStyles}>
             <CardMedia
                 component="img"
-                height="200"
+                height="500"
                 width="200"
                 sx={{objectFit:"cover"}}
-                image="Null"
+                image={image}
                 alt="Auction hero"
             />
             <CardContent>
-                <Typography variant="h4">
-                    {game.gameId} {game.title}
+                <Typography variant="h2" >
+                    {game.title}
                 </Typography>
+                <Typography variant="h6" align="left">
+                    Description: {game.description}
+                </Typography>
+                <Stack direction="row" spacing={2}>
+                    <Typography variant="subtitle1" align="left">
+                        Genres: {genreName?.name}
+                        <br/>
+                        Creator: {game.creatorFirstName} {game.creatorLastName}
+                        <br/>
+                        Created on: {game.creationDate}
+                        <br/>
+                        Number users add in wishlist: {game.numberOfWishlists}
+                        <br/>
+                        Number users owned: {game.numberOfOwners}
+                        <br/>
+                        Rating: {game.rating}
+                    </Typography>
+                    <CardMedia
+                        component="img"
+                        height="50"
+                        width="50"
+                        sx={{objectFit:"cover"}}
+                        image={creatorImage}
+                        alt="Auction hero"
+                    />
+                    <Typography variant="h6" align="right">
+                        ${game.price}
+                    </Typography>
+                </Stack>
             </CardContent>
             <CardActions>
                 <IconButton onClick={() => {setOpenEditDialog(true)}}>
