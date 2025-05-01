@@ -4,10 +4,11 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Link
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
+import {NavLink} from "react-router-dom";
 
 interface IGameProps {
     game: Game
@@ -19,6 +20,7 @@ const GameListObject = (props: IGameProps) => {
     const [gamename, setgamename] = React.useState("");
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
+    const [image, setImage] = React.useState("");
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
     const gameGenre = genres.find(g => g.genreId === game.genreId);
@@ -43,6 +45,17 @@ const GameListObject = (props: IGameProps) => {
                 editGameFromStore(game, gamename);
             })
     }
+    React.useEffect(() => {
+        axios.get('http://localhost:4941'+rootUrl+'/games/' + game.gameId + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setImage(imgUrl);
+        }).catch((error) => {
+            console.error("Failed to load image", error);
+        });
+    }, [game.gameId]);
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "500px",
@@ -57,12 +70,15 @@ const GameListObject = (props: IGameProps) => {
                 height="300"
                 width="200"
                 sx={{objectFit:"cover"}}
-                image="https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"
+                // image="https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"
+                image={image}
                 alt="Auction hero"
             />
             <CardContent>
                 <Typography variant="h6">
-                    {game.title}
+                    <NavLink to={rootUrl+'/games/' + game.gameId} end>
+                        {game.title}
+                    </NavLink>
                 </Typography>
                 <Stack direction="row" spacing={2} justifyContent="center">
                     <Typography variant="subtitle2" align="left">
