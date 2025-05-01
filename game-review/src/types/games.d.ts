@@ -8,7 +8,7 @@ type Game = {
     creatorFirstName: string;
     creatorLastName: string;
     rating: number;
-    platformIds: string;
+    platformIds: number[];
     description: string;
     numberOfWishlists: number;
     numberOfOwners: number;
