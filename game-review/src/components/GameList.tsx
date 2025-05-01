@@ -7,6 +7,10 @@ import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {useNavigate} from "react-router-dom";
+import {alpha, styled} from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
+import SearchIcon from "@mui/icons-material/Search";
 const GameList = () => {
     const games = useGameStore(state => state.games);
     const genres = useGameStore(state => state.genres);
@@ -15,6 +19,7 @@ const GameList = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
+    const navigate = useNavigate();
 
     React.useEffect(() => {
             const getGames = () => {
@@ -45,6 +50,47 @@ const GameList = () => {
         }
         getGenres()
     },[setGenres])
+    const Search = styled('div')(({ theme }) => ({
+        position: 'relative',
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.common.white, 0.25),
+        },
+        marginLeft: 0,
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            marginLeft: theme.spacing(1),
+            width: 'auto',
+        },
+    }));
+
+    const SearchIconWrapper = styled('div')(({ theme }) => ({
+        padding: theme.spacing(0, 2),
+        height: '100%',
+        position: 'absolute',
+        pointerEvents: 'none',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }));
+
+    const StyledInputBase = styled(InputBase)(({ theme }) => ({
+        color: 'inherit',
+        width: '100%',
+        '& .MuiInputBase-input': {
+            padding: theme.spacing(1, 1, 1, 0),
+            // vertical padding + font size from searchIcon
+            paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+            transition: theme.transitions.create('width'),
+            [theme.breakpoints.up('sm')]: {
+                width: '12ch',
+                '&:focus': {
+                    width: '20ch',
+                },
+            },
+        },
+    }));
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game} genres={genres}/>);
     const card: CSS.Properties = {
         padding: "10px",
@@ -58,8 +104,20 @@ const GameList = () => {
             justifyContent: 'center',
             alignItems: 'center',
         }}>
+            <Stack direction="row" spacing={2}>
             <Paper elevation={3} style={card}>
                 <h1>GameList </h1>
+                <Stack direction="row" spacing={2}>
+                    <Search>
+                        <SearchIconWrapper>
+                            <SearchIcon />
+                        </SearchIconWrapper>
+                        <StyledInputBase
+                            placeholder="Search…"
+                            inputProps={{ 'aria-label': 'search' }}
+                        />
+                    </Search>
+                </Stack>
                 <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
                     {errorFlag ? (
                         <Alert severity="error">
@@ -87,6 +145,7 @@ const GameList = () => {
                     />
                 </div>
             </Paper>
+            </Stack>
         </div>
 )
 
