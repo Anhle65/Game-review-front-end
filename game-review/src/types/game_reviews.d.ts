@@ -1,8 +1,8 @@
-type Game_review = {
-    id: number;
-    game_id: number;
-    user_id: number;
-    rating: number;
-    review: string;
-    timestamp: string;
+type Review = {
+    reviewerId: number,
+    rating: number,
+    review: string,
+    reviewerFirstName: string,
+    reviewerLastName: string,
+    timestamp: string
 }
