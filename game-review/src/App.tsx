@@ -15,8 +15,8 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path={rootUrl + "/"} element={<GameList />} />
-            <Route path={rootUrl + "/games"} element={<Games />} />
+            <Route path={rootUrl + "/"} element={<Game />} />
+            <Route path={rootUrl + "/games"} element={<GameList />} />
             <Route path={rootUrl + "/games/:id"} element={<Game />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
