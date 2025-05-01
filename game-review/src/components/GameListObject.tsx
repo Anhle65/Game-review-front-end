@@ -17,6 +17,7 @@ interface IGameProps {
 const GameListObject = (props: IGameProps) => {
     const [game] = React.useState<Game> (props.game);
     const [genres] = React.useState<Genre[]>(props.genres);
+    const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const [gamename, setgamename] = React.useState("");
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
@@ -56,6 +57,17 @@ const GameListObject = (props: IGameProps) => {
             console.error("Failed to load image", error);
         });
     }, [game.gameId]);
+    React.useEffect(() => {
+        const getPlatforms = ()=> {
+            axios.get('http://localhost:4941'+rootUrl+'/games/platforms/')
+                .then((response) => {
+                    setPlatforms(response.data);
+                }, (error)=>{
+                    console.error("Failed to get platforms", error);
+                })
+        }
+        getPlatforms();
+    }, [platforms])
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "500px",
@@ -83,6 +95,8 @@ const GameListObject = (props: IGameProps) => {
                 <Stack direction="row" spacing={2} justifyContent="center">
                     <Typography variant="subtitle2" align="left">
                         Genres: {gameGenre?.name}
+                        <br/>
+                        Platforms: {}
                         <br/>
                         Creator: {game.creatorFirstName} {game.creatorLastName}
                         <br/>
