@@ -4,7 +4,7 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Link
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Link, Avatar
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
@@ -24,6 +24,7 @@ const GameListObject = (props: IGameProps) => {
     const [image, setImage] = React.useState("");
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
+    const [creatorImage, setCreatorImage] = React.useState("");
     const gameGenre = genres.find(g => g.genreId === game.genreId);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
                                                 .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
@@ -49,6 +50,18 @@ const GameListObject = (props: IGameProps) => {
                 editGameFromStore(game, gamename);
             })
     }
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId.toString() + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setCreatorImage(imgUrl);
+            }).catch((error) => {
+            console.error("Failed to load image", error);
+        });
+    }, [game.creatorId]);
+
     React.useEffect(() => {
         axios.get('http://localhost:4941'+rootUrl+'/games/' + game.gameId + '/image', {
             responseType: 'blob',
@@ -105,9 +118,12 @@ const GameListObject = (props: IGameProps) => {
                         <br/>
                         Created on : {game.creationDate}
                     </Typography>
-                    <Typography variant="h6" align="right">
-                        ${game.price}
-                    </Typography>
+                    <div>
+                        <Typography variant="h6" align="right">
+                            ${game.price}
+                        </Typography>
+                        <Avatar alt="Creator Image" src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                    </div>
                 </Stack>
             </CardContent>
             <CardActions>
