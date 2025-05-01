@@ -9,6 +9,10 @@ type Game = {
     creatorLastName: string;
     rating: number;
     platformIds: string;
+    description: string;
+    numberOfWishlists: number;
+    numberOfOwners: number;
+    rating: number;
 }
 type Game_platforms = {
     id: number;
