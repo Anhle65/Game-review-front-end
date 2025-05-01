@@ -68,7 +68,7 @@ const Game = () => {
                     })
             }
             getGame();
-        }, [game]
+        }, []
     )
     React.useEffect(()=> {
         const getReviews = () => {
@@ -89,7 +89,7 @@ const Game = () => {
             }).catch((error) => {
             console.error("Failed to load image", error);
         });
-    }, [game.creatorId]);
+    }, []);
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "1600px",
@@ -105,7 +105,7 @@ const Game = () => {
                 })
         }
         getGenres();
-    }, [genreName]);
+    }, []);
     React.useEffect(() => {
         const getPlatforms = ()=> {
             axios.get('http://localhost:4941'+rootUrl+'/games/platforms/')
@@ -127,7 +127,7 @@ const Game = () => {
             }).catch((error) => {
             console.error("Failed to load image", error);
         });
-    }, [id]);
+    }, []);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
