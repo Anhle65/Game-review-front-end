@@ -65,7 +65,7 @@ const Game = () => {
                     })
             }
             getGame();
-        }, [setGame]
+        }, [game]
     )
     React.useEffect(()=> {
         axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId.toString() + '/image', {
@@ -80,7 +80,7 @@ const Game = () => {
     }, [game.creatorId]);
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "900px",
+        height: "1600px",
         width: "800px",
         margin: "10px",
         padding: "0px"
@@ -111,7 +111,7 @@ const Game = () => {
         <Card sx={gameCardStyles}>
             <CardMedia
                 component="img"
-                height="500"
+                height="700"
                 width="200"
                 sx={{objectFit:"cover"}}
                 image={image}
@@ -124,7 +124,7 @@ const Game = () => {
                 <Typography variant="h6" align="left">
                     Description: {game.description}
                 </Typography>
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} margin="5px">
                     <Typography variant="subtitle1" align="left">
                         Genres: {genreName?.name}
                         <br/>
@@ -137,18 +137,17 @@ const Game = () => {
                         Number users owned: {game.numberOfOwners}
                         <br/>
                         Rating: {game.rating}
+                        <br/>
+                        ${game.price}
                     </Typography>
                     <CardMedia
                         component="img"
-                        height="50"
-                        width="50"
+                        height="250"
+                        width="100"
                         sx={{objectFit:"cover"}}
-                        image={creatorImage}
+                        image={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                         alt="Auction hero"
                     />
-                    <Typography variant="h6" align="right">
-                        ${game.price}
-                    </Typography>
                 </Stack>
             </CardContent>
             <CardActions>
