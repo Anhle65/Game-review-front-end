@@ -1,4 +1,4 @@
 type Platform = {
-    id: number;
+    platformId: number;
     name: string;
 }
