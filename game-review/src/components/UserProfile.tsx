@@ -14,8 +14,8 @@ import MenuItem from '@mui/material/MenuItem';
 import {useNavigate, useParams} from "react-router-dom";
 import {rootUrl} from "../base.routes";
 import GameList from "./GameList";
-import {alpha, styled} from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
+import axios from "axios";
+import {Stack} from "@mui/material";
 
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
@@ -24,6 +24,7 @@ function UserProfile() {
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
+    const [userImage, setUserImage] = React.useState("");
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
@@ -44,11 +45,34 @@ function UserProfile() {
         setAnchorElUser(null);
         navigate(rootUrl+'/games');
     }
-
+    const handleLogout = async () =>{
+        const token = localStorage.getItem("token");
+        console.log('authToken: ' + token);
+        await axios.post('http://localhost:4941'+rootUrl+'/users/logout', {},
+            {
+                headers: {
+                    "X-Authorization": token
+                },
+                timeout: 10000
+            });
+        navigate(rootUrl+'/games');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+    }
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + id + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setUserImage(imgUrl);
+            }).catch((error) => {
+            console.error("Failed to load image", error);
+        });
+    }, []);
     return (
         <><AppBar position="static">
             <Container maxWidth="xl">
@@ -81,10 +105,15 @@ function UserProfile() {
                             sx={{display: {xs: 'block', md: 'none'}}}
                         >
                             <MenuItem onClick={handleCreateGame}>Dashboard</MenuItem>
-                            <MenuItem onClick={handleCreateGame}>New Game</MenuItem>
+                            <MenuItem onClick={handleCreateGame}>Create Game</MenuItem>
+                            <MenuItem onClick={handleCreateGame}>My Game</MenuItem>
                         </Menu>
                     </Box>
                     <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
+                        <Stack direction="row" spacing={2} sx={{
+                            justifyContent: "space-around",
+                            alignItems: "center",
+                        }}>
                         <Button
                             onClick={handleCreateGame}
                             sx={{my: 2, color: 'white', display: 'block'}}
@@ -97,11 +126,18 @@ function UserProfile() {
                         >
                             New Game
                         </Button>
+                        <Button
+                            onClick={handleCreateGame}
+                            sx={{my: 2, color: 'white', display: 'block'}}
+                        >
+                            My Game
+                        </Button>
+                        </Stack>
                     </Box>
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg"/>
+                                <Avatar alt="User Image" src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -120,11 +156,9 @@ function UserProfile() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography sx={{textAlign: 'center'}}>{setting}</Typography>
-                                </MenuItem>
-                            ))}
+                            <MenuItem onClick={handleCreateGame}>Profile</MenuItem>
+                            <MenuItem onClick={handleCreateGame}>Edit Information</MenuItem>
+                            <MenuItem onClick={handleLogout}>Log out</MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
