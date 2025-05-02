@@ -8,6 +8,10 @@ import GameList from "./components/GameList";
 import {rootUrl} from "./base.routes";
 import GameListObject from "./components/GameListObject";
 import Game from "./components/Game";
+import Login from "./components/Login";
+import UserProfile from "./components/UserProfile";
+import NewGame from "./components/NewGame";
+import UserRegister from "./components/UserRegister";
 
 function App() {
   return (
@@ -17,7 +21,11 @@ function App() {
           <Routes>
             <Route path={rootUrl + "/"} element={<Game />} />
             <Route path={rootUrl + "/games"} element={<GameList />} />
+            <Route path={rootUrl + "/games/create"} element={<NewGame />} />
             <Route path={rootUrl + "/games/:id"} element={<Game />} />
+            <Route path={rootUrl + "/users/:id"} element={<UserProfile />} />
+            <Route path={rootUrl + "/users/login"} element={<Login />} />
+            <Route path={rootUrl + "/users/register"} element={<UserRegister />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
