@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form, Alert, Button } from 'react-bootstrap';
 import {Card, CardActions, CardContent, IconButton, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
-import { useForm } from "react-hook-form";
 import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
@@ -83,28 +82,29 @@ const Login = () => {
             <Card sx={loginCardStyles}>
                 <CardContent >
                 <form>
-                    <Stack direction="column" spacing={2}  sx={{
+                    <Stack direction="column" spacing={2} sx={{
                         justifyContent: "space-around",
                         alignItems: "center",
                     }}>
-                    <div className="login-form">
-                        <label htmlFor="email">Email address:</label>
-                        <input type="email" className="form-control" id="email" onChange={updateEmailState} />
-                    </div>
-                    <div className="login-form">
-                        <label htmlFor="pwd">Password:</label>
-                        <input type={pwFormType} className="form-control" id="pwd" onChange={updatePasswordState} />
-                    </div>
-                    <div className="checkbox">
-                        <label><input type="checkbox" checked={showPassword} onChange={() => setShowPassword(prev => !prev)}/> Show password</label>
-                    </div>
-                    <input type={"submit"} style={{ backgroundColor: "#a1eafb" }} onClick={(e) => {
-                        e.preventDefault(); // ❗ Prevent form from refreshing the page
-                        onSubmit();
-                    }} value="Login"/>
+                        <div className="login-form">
+                            <label htmlFor="email">Email address:</label>
+                            <input type="email" className="form-control" id="email" onChange={updateEmailState}/>
+                        </div>
+                        <div className="login-form">
+                            <label htmlFor="pwd">Password:</label>
+                            <input type={pwFormType} className="form-control" id="pwd" onChange={updatePasswordState}/>
+                        </div>
+                        <div className="checkbox">
+                            <label><input type="checkbox" checked={showPassword}
+                                          onChange={() => setShowPassword(prev => !prev)}/> Show password</label>
+                        </div>
+                        <button type="button" className="btn btn-success" onClick={(e) => {
+                            e.preventDefault(); // Prevent form from refreshing the page
+                            onSubmit();
+                        }}>Log In</button>
                         <Typography variant="subtitle2" align="center">
                             No account yet?
-                            <NavLink to={rootUrl+'/users/register'} end>
+                            <NavLink to={rootUrl + '/users/register'} end>
                                 Register
                             </NavLink>
                         </Typography>
