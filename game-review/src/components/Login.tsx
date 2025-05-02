@@ -42,6 +42,8 @@ const Login = () => {
             setErrorFlag(false);
             setError('');
             const {userId, token} = response.data;
+            localStorage.setItem('token', token);
+            localStorage.setItem('userId', userId);
             console.log(userId);
             navigate(rootUrl + '/users/' + userId);
         } catch(error:any) {
