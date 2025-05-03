@@ -1,58 +1,42 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import {useNavigate, useParams} from "react-router-dom";
-import {rootUrl} from "../base.routes";
-import GameList from "./GameList";
+import React from "react";
 import axios from "axios";
-import {Stack} from "@mui/material";
+import {rootUrl} from "../base.routes";
+import {useParams} from "react-router-dom";
+import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
+import CSS from "csstype";
 
-function UserProfile() {
+const UserProfile = () => {
     const {id} = useParams();
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-    const navigate = useNavigate();
+    const [authId, setAuthId] = React.useState('');
+    const [fName, setfName] = React.useState('');
+    const [lName, setlName] = React.useState('');
+    const [email, setEmail] = React.useState('');
     const [userImage, setUserImage] = React.useState("");
-    const [key, setKey] = React.useState(0);
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCreateGame = () => {
-        setAnchorElUser(null);
-        navigate(rootUrl+'/games/create');
-    }
-    const handleLogout = async () =>{
-        const token = localStorage.getItem("token");
-        console.log('authToken: ' + token);
-        await axios.post('http://localhost:4941'+rootUrl+'/users/logout', {},
-            {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem('userId');
+    React.useEffect(()=> {
+        if (userId) {
+            setAuthId(userId);
+        }
+        const getUser = () => {
+            axios.get('http://localhost:4941' + rootUrl + "/users/" + id, {
                 headers: {
                     "X-Authorization": token
                 },
                 timeout: 10000
-            });
-        navigate(rootUrl+'/games');
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-    }
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null);
-    };
+            })
+                .then((response) => {
+                    setfName(response.data.firstName);
+                    setlName(response.data.lastName);
+                    if (response.data.email) {
+                        setEmail(response.data.email);
+                    }
+                })
+        }
+        getUser();
+    },[id])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + id + '/image', {
+        axios.get('http://localhost:4941' + rootUrl + '/users/' + id + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -61,85 +45,43 @@ function UserProfile() {
             }).catch((error) => {
             console.error("Failed to load image", error);
         });
-    }, [id]);
-    const handleDashboardClick = () => {
-        console.log('key:' + key)
-        setKey(prev => prev + 1);
-    };
-    return (
-        <>
-            <AppBar position="static">
-                <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
-                            <IconButton
-                                size="large"
-                                aria-label="account of current user"
-                                aria-controls="menu-appbar"
-                                aria-haspopup="true"
-                                onClick={handleOpenNavMenu}
-                                color="inherit"
-                            >
-                                <MenuIcon/>
-                            </IconButton>
-                        </Box>
-                        <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                            <Stack direction="row" spacing={2} sx={{
-                                justifyContent: "space-around",
-                                alignItems: "center",
-                            }}>
-                            <Button
-                                onClick={handleDashboardClick}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                Dashboard
-                            </Button>
-                            <Button
-                                onClick={handleCreateGame}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                New Game
-                            </Button>
-                            <Button
-                                onClick={handleCreateGame}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                My Game
-                            </Button>
-                            </Stack>
-                        </Box>
-                        <Box sx={{flexGrow: 0}}>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                    <Avatar alt="User Image" src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
-                                </IconButton>
-                            </Tooltip>
-                            <Menu
-                                sx={{mt: '45px'}}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
-                            >
-                                <MenuItem onClick={handleCreateGame}>Profile</MenuItem>
-                                <MenuItem onClick={handleCreateGame}>Edit Information</MenuItem>
-                                <MenuItem onClick={handleLogout}>Log out</MenuItem>
-                            </Menu>
-                        </Box>
-                    </Toolbar>
-                </Container>
-            </AppBar>
-            <GameList key={key}/>
+
+    }, []);
+    const cardInformationStyles: CSS.Properties = {
+        display: "inline-block",
+        height: "1000px",
+        width: "800px",
+        margin: "10px",
+        padding: "0px"
+    }
+    return(
+        <><h1>Profile</h1>
+            <Card sx={cardInformationStyles}>
+                <CardContent>
+                    <Stack direction="row" spacing={2} sx={{
+                        justifyContent: "space-around",
+                        alignItems: "center",
+                    }}>
+                        <Typography variant="h5" align="left">
+                            {email && (
+                                <>
+                                    Email: {email}
+                                    <br />
+                                </>
+                            )}
+                            First Name: {fName}
+                            <br/>
+                            Last Name: {lName}
+                        </Typography>
+                        <div>
+                            <Avatar alt="User Image"
+                                    sx={{ width: 120, height: 120 }}
+                                    src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                        </div>
+                    </Stack>
+                </CardContent>
+            </Card>
         </>
-    );
+    )
 }
 export default UserProfile;
