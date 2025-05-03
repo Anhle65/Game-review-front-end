@@ -21,7 +21,6 @@ const LogInNavBar = () => {
     const [userImage, setUserImage] = React.useState("");
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
-    const [key, setKey] = React.useState(0);
     const loginId = localStorage.getItem('userId');
 
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -43,6 +42,7 @@ const LogInNavBar = () => {
                 timeout: 10000
             });
         navigate(rootUrl+'/games');
+        window.location.reload();
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
     }
@@ -76,8 +76,7 @@ const LogInNavBar = () => {
         });
     }, []);
     const handleDashboardClick = () => {
-        console.log('key:' + key)
-        setKey(prev => prev + 1);
+        navigate(rootUrl+'/games');
     };
     const handleProfileClick = () => {
         navigate(rootUrl+'/users/'+id+"/profile");
