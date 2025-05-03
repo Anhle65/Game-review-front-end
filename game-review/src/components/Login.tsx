@@ -44,7 +44,7 @@ const Login = () => {
             localStorage.setItem('token', token);
             localStorage.setItem('userId', userId);
             console.log(userId);
-            navigate(rootUrl + '/games/users/' + userId);
+            navigate(rootUrl + '/games/user/' + userId);
         } catch(error:any) {
             console.log(error);
             console.log(email);
