@@ -19,7 +19,6 @@ const GameList = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
-    const navigate = useNavigate();
 
     React.useEffect(() => {
             const getGames = () => {

@@ -4,7 +4,7 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Link, Avatar
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Avatar
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";

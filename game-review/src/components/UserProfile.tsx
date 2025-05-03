@@ -3,7 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
@@ -16,8 +15,6 @@ import {rootUrl} from "../base.routes";
 import GameList from "./GameList";
 import axios from "axios";
 import {Stack} from "@mui/material";
-
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function UserProfile() {
     const {id} = useParams();
@@ -33,17 +30,9 @@ function UserProfile() {
         setAnchorElUser(event.currentTarget);
     };
 
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
-    };
-
     const handleCreateGame = () => {
         setAnchorElUser(null);
         navigate(rootUrl+'/games/create');
-    }
-    const handleDashboard = () => {
-        setAnchorElUser(null);
-        navigate(rootUrl+'/games');
     }
     const handleLogout = async () =>{
         const token = localStorage.getItem("token");
@@ -74,7 +63,7 @@ function UserProfile() {
         });
     }, [id]);
     const handleDashboardClick = () => {
-        {console.log('key:' + key)}
+        console.log('key:' + key)
         setKey(prev => prev + 1);
     };
     return (

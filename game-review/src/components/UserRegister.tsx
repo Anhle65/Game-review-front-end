@@ -1,10 +1,10 @@
 import React, {useState} from "react";
-import {NavLink, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
-import {Card, CardContent, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Stack} from "@mui/material";
 
 const UserRegister = () => {
     const [email, setEmail] = useState('');
