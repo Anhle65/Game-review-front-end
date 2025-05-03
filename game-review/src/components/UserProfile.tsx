@@ -25,7 +25,7 @@ function UserProfile() {
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const [userImage, setUserImage] = React.useState("");
-
+    const [key, setKey] = React.useState(0);
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -72,98 +72,105 @@ function UserProfile() {
             }).catch((error) => {
             console.error("Failed to load image", error);
         });
-    }, []);
+    }, [id]);
+    const handleDashboardClick = () => {
+        {console.log('key:' + key)}
+        setKey(prev => prev + 1);
+    };
     return (
-        <><AppBar position="static">
-            <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
-                        <IconButton
-                            size="large"
-                            aria-label="account of current user"
-                            aria-controls="menu-appbar"
-                            aria-haspopup="true"
-                            onClick={handleOpenNavMenu}
-                            color="inherit"
-                        >
-                            <MenuIcon/>
-                        </IconButton>
-                        <Menu
-                            id="menu-appbar"
-                            anchorEl={anchorElNav}
-                            anchorOrigin={{
-                                vertical: 'bottom',
-                                horizontal: 'left',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'left',
-                            }}
-                            open={Boolean(anchorElNav)}
-                            onClose={handleCloseNavMenu}
-                            sx={{display: {xs: 'block', md: 'none'}}}
-                        >
-                            <MenuItem onClick={handleCreateGame}>Dashboard</MenuItem>
-                            <MenuItem onClick={handleCreateGame}>Create Game</MenuItem>
-                            <MenuItem onClick={handleCreateGame}>My Game</MenuItem>
-                        </Menu>
-                    </Box>
-                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                        <Stack direction="row" spacing={2} sx={{
-                            justifyContent: "space-around",
-                            alignItems: "center",
-                        }}>
-                        <Button
-                            onClick={handleCreateGame}
-                            sx={{my: 2, color: 'white', display: 'block'}}
-                        >
-                            Dashboard
-                        </Button>
-                        <Button
-                            onClick={handleCreateGame}
-                            sx={{my: 2, color: 'white', display: 'block'}}
-                        >
-                            New Game
-                        </Button>
-                        <Button
-                            onClick={handleCreateGame}
-                            sx={{my: 2, color: 'white', display: 'block'}}
-                        >
-                            My Game
-                        </Button>
-                        </Stack>
-                    </Box>
-                    <Box sx={{flexGrow: 0}}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="User Image" src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+        <>
+            <AppBar position="static">
+                <Container maxWidth="xl">
+                    <Toolbar disableGutters>
+                        <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'none'}}}>
+                            <IconButton
+                                size="large"
+                                aria-label="account of current user"
+                                aria-controls="menu-appbar"
+                                aria-haspopup="true"
+                                onClick={handleOpenNavMenu}
+                                color="inherit"
+                            >
+                                <MenuIcon/>
                             </IconButton>
-                        </Tooltip>
-                        <Menu
-                            sx={{mt: '45px'}}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            <MenuItem onClick={handleCreateGame}>Profile</MenuItem>
-                            <MenuItem onClick={handleCreateGame}>Edit Information</MenuItem>
-                            <MenuItem onClick={handleLogout}>Log out</MenuItem>
-                        </Menu>
-                    </Box>
-                </Toolbar>
-            </Container>
-        </AppBar><GameList/></>
+                            {/*<Menu*/}
+                            {/*    id="menu-appbar"*/}
+                            {/*    anchorEl={anchorElNav}*/}
+                            {/*    anchorOrigin={{*/}
+                            {/*        vertical: 'bottom',*/}
+                            {/*        horizontal: 'left',*/}
+                            {/*    }}*/}
+                            {/*    keepMounted*/}
+                            {/*    transformOrigin={{*/}
+                            {/*        vertical: 'top',*/}
+                            {/*        horizontal: 'left',*/}
+                            {/*    }}*/}
+                            {/*    open={Boolean(anchorElNav)}*/}
+                            {/*    onClose={handleCloseNavMenu}*/}
+                            {/*    sx={{display: {xs: 'block', md: 'none'}}}*/}
+                            {/*>*/}
+                                <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
+                                <MenuItem onClick={handleCreateGame}>Create Game</MenuItem>
+                                <MenuItem onClick={handleCreateGame}>My Game</MenuItem>
+                            {/*</Menu>*/}
+                        </Box>
+                        <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
+                            <Stack direction="row" spacing={2} sx={{
+                                justifyContent: "space-around",
+                                alignItems: "center",
+                            }}>
+                            <Button
+                                onClick={handleCreateGame}
+                                sx={{my: 2, color: 'white', display: 'block'}}
+                            >
+                                Dashboard
+                            </Button>
+                            <Button
+                                onClick={handleCreateGame}
+                                sx={{my: 2, color: 'white', display: 'block'}}
+                            >
+                                New Game
+                            </Button>
+                            <Button
+                                onClick={handleCreateGame}
+                                sx={{my: 2, color: 'white', display: 'block'}}
+                            >
+                                My Game
+                            </Button>
+                            </Stack>
+                        </Box>
+                        <Box sx={{flexGrow: 0}}>
+                            <Tooltip title="Open settings">
+                                <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
+                                    <Avatar alt="User Image" src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                                </IconButton>
+                            </Tooltip>
+                            <Menu
+                                sx={{mt: '45px'}}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                <MenuItem onClick={handleCreateGame}>Profile</MenuItem>
+                                <MenuItem onClick={handleCreateGame}>Edit Information</MenuItem>
+                                <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                            </Menu>
+                        </Box>
+                    </Toolbar>
+                </Container>
+            </AppBar>
+            <GameList key={key}/>
+        </>
     );
 }
 export default UserProfile;
