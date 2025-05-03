@@ -1,10 +1,10 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
-import {Card, CardContent, Stack} from "@mui/material";
+import {Card, CardContent, Stack, Typography} from "@mui/material";
 
 const UserRegister = () => {
     const [email, setEmail] = useState('');
@@ -76,7 +76,7 @@ const UserRegister = () => {
                 const {userId, token} = response.data;
                 localStorage.setItem('token', token);
                 localStorage.setItem('userId', userId);
-                navigate(rootUrl + '/users/' + userId);
+                navigate(rootUrl + '/games/');
             }
         } catch(error:any) {
             console.log(error);
@@ -162,6 +162,12 @@ const UserRegister = () => {
                                 onSubmit();
                             }}>Create account
                             </button>
+                            <Typography variant="subtitle2" align="center">
+                                Already had account?
+                                <NavLink to={rootUrl + '/users/login'} end>
+                                    Login
+                                </NavLink>
+                            </Typography>
                         </Stack>
                     </form>
                 </CardContent>
