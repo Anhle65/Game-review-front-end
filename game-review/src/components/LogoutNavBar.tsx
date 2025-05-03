@@ -5,11 +5,10 @@ import {Stack} from "@mui/material";
 import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
 import React from "react";
-import GameList from "./GameList";
-import {rootUrl} from "../base.routes";
 import {useNavigate} from "react-router-dom";
+import {rootUrl} from "../base.routes";
 
-const LogoutUser = () => {
+const LogoutNavBar = () => {
     const navigate = useNavigate();
     const handleSignUp = () => {
         navigate(rootUrl+'/users/register');
@@ -17,11 +16,11 @@ const LogoutUser = () => {
     const handleLogIn = () => {
         navigate(rootUrl+'/users/login');
     }
-    return(
-        <><AppBar position="static">
+    return (
+        <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
+                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>
                         <Stack direction="row" spacing={2} sx={{
                             justifyContent: "space-around",
                             alignItems: "center",
@@ -42,7 +41,7 @@ const LogoutUser = () => {
                     </Box>
                 </Toolbar>
             </Container>
-        </AppBar><GameList/></>
+        </AppBar>
     )
 }
-export default LogoutUser;
+export default LogoutNavBar;
