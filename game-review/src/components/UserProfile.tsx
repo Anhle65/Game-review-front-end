@@ -93,26 +93,6 @@ function UserProfile() {
                             >
                                 <MenuIcon/>
                             </IconButton>
-                            {/*<Menu*/}
-                            {/*    id="menu-appbar"*/}
-                            {/*    anchorEl={anchorElNav}*/}
-                            {/*    anchorOrigin={{*/}
-                            {/*        vertical: 'bottom',*/}
-                            {/*        horizontal: 'left',*/}
-                            {/*    }}*/}
-                            {/*    keepMounted*/}
-                            {/*    transformOrigin={{*/}
-                            {/*        vertical: 'top',*/}
-                            {/*        horizontal: 'left',*/}
-                            {/*    }}*/}
-                            {/*    open={Boolean(anchorElNav)}*/}
-                            {/*    onClose={handleCloseNavMenu}*/}
-                            {/*    sx={{display: {xs: 'block', md: 'none'}}}*/}
-                            {/*>*/}
-                                <MenuItem onClick={handleDashboardClick}>Dashboard</MenuItem>
-                                <MenuItem onClick={handleCreateGame}>Create Game</MenuItem>
-                                <MenuItem onClick={handleCreateGame}>My Game</MenuItem>
-                            {/*</Menu>*/}
                         </Box>
                         <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
                             <Stack direction="row" spacing={2} sx={{
@@ -120,7 +100,7 @@ function UserProfile() {
                                 alignItems: "center",
                             }}>
                             <Button
-                                onClick={handleCreateGame}
+                                onClick={handleDashboardClick}
                                 sx={{my: 2, color: 'white', display: 'block'}}
                             >
                                 Dashboard
