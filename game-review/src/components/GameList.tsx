@@ -11,6 +11,8 @@ import {useNavigate} from "react-router-dom";
 import {alpha, styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import LogInNavBar from "./LogInNavBar";
+import LogoutNavBar from "./LogoutNavBar";
 const GameList = () => {
     const games = useGameStore(state => state.games);
     const genres = useGameStore(state => state.genres);
@@ -19,7 +21,7 @@ const GameList = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
-
+    const userId = localStorage.getItem('userId');
     React.useEffect(() => {
             const getGames = () => {
                 axios.get('http://localhost:4941' +rootUrl+'/games')
@@ -63,7 +65,10 @@ const GameList = () => {
             width: 'auto',
         },
     }));
-
+    const handlePaginationClick = (value: number) => {
+        setCurrentPage(value);
+        window.scrollTo({top:0});
+    }
     const SearchIconWrapper = styled('div')(({ theme }) => ({
         padding: theme.spacing(0, 2),
         height: '100%',
@@ -99,6 +104,17 @@ const GameList = () => {
         width: "fit-content"
     }
     return (
+        <>
+            {userId && (
+                <>
+                    <LogInNavBar />
+                </>
+            )}
+            {!userId && (
+                <>
+                    <LogoutNavBar />
+                </>
+            )}
         <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -135,7 +151,7 @@ const GameList = () => {
                     <Pagination
                         count={Math.ceil(games.length / 9)}
                         showFirstButton showLastButton
-                        onChange={(event, value) => setCurrentPage(value)}
+                        onChange={(event, value) => handlePaginationClick(value)}
                         renderItem={(item) => (
                             <PaginationItem
                                 slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
@@ -147,6 +163,7 @@ const GameList = () => {
             </Paper>
             </Stack>
         </div>
+        </>
 )
 
 }
