@@ -12,6 +12,7 @@ import Login from "./components/Login";
 import UserProfile from "./components/UserProfile";
 import NewGame from "./components/NewGame";
 import UserRegister from "./components/UserRegister";
+import LogoutUser from "./components/LogoutUser";
 
 function App() {
   return (
@@ -20,7 +21,7 @@ function App() {
         <div>
           <Routes>
             <Route path={rootUrl + "/"} element={<Game />} />
-            <Route path={rootUrl + "/games"} element={<GameList />} />
+            <Route path={rootUrl + "/games"} element={<LogoutUser />} />
             <Route path={rootUrl + "/games/create"} element={<NewGame />} />
             <Route path={rootUrl + "/games/:id"} element={<Game />} />
             <Route path={rootUrl + "/users/:id"} element={<UserProfile />} />

@@ -11,17 +11,6 @@ import {useNavigate} from "react-router-dom";
 import {alpha, styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
-import Container from "@mui/material/Container";
-import Toolbar from "@mui/material/Toolbar";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import Avatar from "@mui/material/Avatar";
-import Menu from "@mui/material/Menu";
-import AppBar from "@mui/material/AppBar";
 const GameList = () => {
     const games = useGameStore(state => state.games);
     const genres = useGameStore(state => state.genres);
@@ -102,12 +91,7 @@ const GameList = () => {
             },
         },
     }));
-    const handleSignUp = () => {
-        navigate(rootUrl+'/users/register');
-    }
-    const handleLogIn = () => {
-        navigate(rootUrl+'/users/login');
-    }
+
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game} genres={genres}/>);
     const card: CSS.Properties = {
         padding: "10px",
@@ -121,31 +105,6 @@ const GameList = () => {
             justifyContent: 'center',
             alignItems: 'center',
         }}>
-            <AppBar position="absolute">
-                <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-                            <Stack direction="row" spacing={2} sx={{
-                                justifyContent: "space-around",
-                                alignItems: "center",
-                            }}>
-                                <Button
-                                    onClick={handleLogIn}
-                                    sx={{my: 2, color: 'white', display: 'block'}}
-                                >
-                                    Log-in
-                                </Button>
-                                <Button
-                                    onClick={handleSignUp}
-                                    sx={{my: 2, color: 'white', display: 'block'}}
-                                >
-                                    Sign-up
-                                </Button>
-                            </Stack>
-                        </Box>
-                    </Toolbar>
-                </Container>
-            </AppBar>
             <Stack direction="row" spacing={2}>
             <Paper elevation={3} style={card}>
                 {/*<h1> </h1>*/}
