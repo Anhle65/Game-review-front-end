@@ -9,8 +9,10 @@ import {
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import {useParams} from "react-router-dom";
+import LogInNavBar from "./LogInNavBar";
+import LogoutNavBar from "./LogoutNavBar";
 const Game = () => {
-    const {id} = useParams();
+    const {id, uid} = useParams();
     const [game, setGame] = React.useState<Game> ({
         numberOfOwners: 0, numberOfWishlists: 0,
         creationDate: "",
@@ -35,6 +37,7 @@ const Game = () => {
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
     const genreName = genres.find(g => g.genreId === game.genreId)
+    const userId = localStorage.getItem('userId');
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
@@ -135,17 +138,26 @@ const Game = () => {
         width: "fit-content"
     }
     return(
+        <>
+        {userId && (
+            <>
+                <LogInNavBar />
+            </>
+        )}
+        {!userId && (
+            <>
+                <LogoutNavBar />
+            </>
+        )}
         <div style={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
         }}>
-            <Paper>
+            {/*<Paper>*/}
                 <Card sx={card}>
                     <CardMedia
                         component="img"
-                        height="500"
-                        width="200"
                         sx={{objectFit:"cover"}}
                         image={image}
                         alt="Auction hero"
@@ -158,21 +170,19 @@ const Game = () => {
                             Description: {game.description}
                         </Typography>
                         <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between",
-                            alignItems: "center",}}>
+                            alignItems: "center"}}>
                             <Typography variant="subtitle1" align="left">
-                                Genres: {genreName?.name}
+                                Genre: {genreName?.name}
                                 <br/>
                                 Created on: {game.creationDate}
                                 <br/>
-                                Number users add in wishlist: {game.numberOfWishlists}
+                                Number of wishlisters: {game.numberOfWishlists}
                                 <br/>
-                                Number users owned: {game.numberOfOwners}
+                                Number of owners: {game.numberOfOwners}
                                 <br/>
                                 Platforms: {platformsName}
                                 <br/>
                                 Rating: {game.rating}
-                                <br/>
-                                ${game.price}
                                 <br/>
                                 Number of reviews: {gameReviews.length}
                             </Typography>
@@ -181,10 +191,19 @@ const Game = () => {
                                 justifyContent: 'center',
                                 alignItems: 'center'
                             }}>
+                                <Stack direction="column" spacing={2} margin="2px" sx={{justifyContent: "space-between",
+                                    alignItems: "center"}}>
                                 <Typography variant="subtitle1">
                                     Creator: {game.creatorFirstName} {game.creatorLastName}
-                                    <Avatar alt="Creator Image" src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                                    <Avatar alt="Creator Image"
+                                            sx={{ width: 100, height: 100 }}
+                                            src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+
                                 </Typography>
+                                    <Typography variant="h3">
+                                        ${game.price}
+                                    </Typography>
+                                </Stack>
                             </div>
                         </Stack>
                     </CardContent>
@@ -245,8 +264,9 @@ const Game = () => {
                 </DialogActions>
             </Dialog>
                 </Card>
-            </Paper>
+            {/*</Paper>*/}
         </div>
+            </>
     )
 }
 export default Game
