@@ -43,7 +43,12 @@ const UserProfile = () => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setUserImage(imgUrl);
             }).catch((error) => {
-            console.error("Failed to load image", error);
+                console.log(userImage)
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    console.error("Failed to load image", error);
+                }
+            }
         });
 
     }, []);
