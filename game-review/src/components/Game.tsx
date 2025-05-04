@@ -12,7 +12,7 @@ import {useParams} from "react-router-dom";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 const Game = () => {
-    const {id, uid} = useParams();
+    const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
         numberOfOwners: 0, numberOfWishlists: 0,
         creationDate: "",
@@ -71,7 +71,7 @@ const Game = () => {
                     })
             }
             getGame();
-        }, []
+        }, [id]
     )
     React.useEffect(()=> {
         const getReviews = () => {
@@ -81,18 +81,19 @@ const Game = () => {
                 })
         }
         getReviews();
-    },[])
+    },[id])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId.toString() + '/image', {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
+                console.log(game.creatorId);
                 const imgUrl = URL.createObjectURL(response.data);
                 setCreatorImage(imgUrl);
             }).catch((error) => {
             console.error("Failed to load image", error);
         });
-    }, []);
+    }, [game.creatorId]);
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "1600px",
@@ -128,7 +129,11 @@ const Game = () => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setImage(imgUrl);
             }).catch((error) => {
-            console.error("Failed to load image", error);
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    console.error("Failed to load image", error);
+                }
+            }
         });
     }, []);
     const card: CSS.Properties = {
@@ -207,6 +212,8 @@ const Game = () => {
                             </div>
                         </Stack>
                     </CardContent>
+                    {parseInt(userId as string,10) === game.creatorId && (
+                        <>
                     <CardActions>
                         <IconButton onClick={() => {
                             setOpenEditDialog(true)}}>
@@ -263,6 +270,8 @@ const Game = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+                        </>
+                    )}
                 </Card>
             {/*</Paper>*/}
         </div>
