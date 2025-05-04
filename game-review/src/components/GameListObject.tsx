@@ -51,14 +51,21 @@ const GameListObject = (props: IGameProps) => {
             })
     }
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId.toString() + '/image', {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setCreatorImage(imgUrl);
             }).catch((error) => {
-            console.error("Failed to load image", error);
+
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    console.error("Failed to load image", error);
+                }
+            } else {
+                setCreatorImage('');
+            }
         });
     }, [game.creatorId]);
 
@@ -70,7 +77,12 @@ const GameListObject = (props: IGameProps) => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setImage(imgUrl);
         }).catch((error) => {
-            console.error("Failed to load image", error);
+            setImage('');
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    console.error("Failed to load image", error);
+                }
+            }
         });
     }, [game.gameId]);
     React.useEffect(() => {
