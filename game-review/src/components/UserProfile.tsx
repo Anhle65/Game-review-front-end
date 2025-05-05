@@ -4,9 +4,9 @@ import {rootUrl} from "../base.routes";
 import {useParams} from "react-router-dom";
 import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
+import LogInNavBar from "./LogInNavBar";
 
 const UserProfile = () => {
-    const {id} = useParams();
     const [authId, setAuthId] = React.useState('');
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
@@ -15,11 +15,8 @@ const UserProfile = () => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem('userId');
     React.useEffect(()=> {
-        if (userId) {
-            setAuthId(userId);
-        }
         const getUser = () => {
-            axios.get('http://localhost:4941' + rootUrl + "/users/" + id, {
+            axios.get('http://localhost:4941' + rootUrl + "/users/" + userId, {
                 headers: {
                     "X-Authorization": token
                 },
@@ -34,9 +31,9 @@ const UserProfile = () => {
                 })
         }
         getUser();
-    },[id])
+    },[userId])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + id + '/image', {
+        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -51,7 +48,7 @@ const UserProfile = () => {
             }
         });
 
-    }, []);
+    }, [userId]);
     const cardInformationStyles: CSS.Properties = {
         display: "inline-block",
         height: "1000px",
@@ -60,7 +57,8 @@ const UserProfile = () => {
         padding: "0px"
     }
     return(
-        <><h1>Profile</h1>
+        <>
+            <LogInNavBar/>
             <Card sx={cardInformationStyles}>
                 <CardContent>
                     <Stack direction="row" spacing={2} sx={{
