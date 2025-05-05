@@ -21,15 +21,16 @@ import {
     Avatar,
     Pagination, PaginationItem, Alert, AlertTitle
 } from "@mui/material";
-import {Delete, Edit} from "@mui/icons-material";
+import {Add, Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
-import {useParams} from "react-router-dom";
+import { useNavigate, useParams} from "react-router-dom";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import GameListObject from "./GameListObject";
 import GameReviewObject from "./GameReviewObject";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import {Form} from "react-bootstrap";
 const Game = () => {
     const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
@@ -46,6 +47,9 @@ const Game = () => {
         title: "",
         description: ""
     });
+    const token = localStorage.getItem('token');
+    const rating = [1,2,3,4,5,6,7,8,9,10];
+    const navigate = useNavigate();
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
@@ -54,6 +58,7 @@ const Game = () => {
     const [creatorImage, setCreatorImage] = React.useState("");
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+    const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const deleteGameFromStore = useGameStore(state => state.removeGame);
     const editGameFromStore = useGameStore(state => state.editGame);
@@ -63,12 +68,35 @@ const Game = () => {
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
     const platformsName = allPlatforms.join(', ');
+    const [inputComment, setInputComment] = React.useState('');
+    const [inputRating, setInputRating] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
+    const handleAddReviewDialogClose = () => {
+        setOpenAddReviewDialog(false);
+    }
+    const handleInputComment = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputComment(event.target.value);
+    };
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);
+    }
+    const onSubmitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        event.preventDefault();
+        console.log(event.target);
+        try {
+            const response = await axios.post("http://localhost:4941" + rootUrl + '/games/:id/reviews',{},{
+                headers: {
+                    "X-Authorization": token
+                }
+            })
+
+            // console.log(event.target);
+        } catch (error) {
+
+        }
     }
     const handleEditDialogClose = () => {
         setOpenEditDialog(false);
@@ -92,6 +120,14 @@ const Game = () => {
                 editGameFromStore(game, gamename);
             })
     }
+
+    const handleAddReview = () => {
+        if (userId) {
+            navigate(rootUrl + "/games/" + id + "/review/");
+        } else {
+            navigate(rootUrl + "/users/login/");
+        }
+    }
     React.useEffect(() => {
             const getGame = () => {
                 axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
@@ -112,24 +148,19 @@ const Game = () => {
         getReviews();
     },[id])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId + '/image', {
-            responseType: 'blob',
-        })
-            .then((response) => {
-                console.log(game.creatorId);
-                const imgUrl = URL.createObjectURL(response.data);
-                setCreatorImage(imgUrl);
-            }).catch((error) => {
-            console.error("Failed to load image", error);
-        });
+        if(game.creatorId !== 0) {
+            axios.get('http://localhost:4941' + rootUrl + '/users/' + game.creatorId + '/image', {
+                responseType: 'blob',
+            })
+                .then((response) => {
+                    console.log(game.creatorId);
+                    const imgUrl = URL.createObjectURL(response.data);
+                    setCreatorImage(imgUrl);
+                }).catch((error) => {
+                console.error("Failed to load image", error);
+            });
+        }
     }, [game.creatorId]);
-    const gameCardStyles: CSS.Properties = {
-        display: "inline-block",
-        height: "1600px",
-        width: "800px",
-        margin: "10px",
-        padding: "0px"
-    }
     React.useEffect(() => {
         const getGenres = () => {
             axios.get('http://localhost:4941'+rootUrl+'/games/genres')
@@ -190,67 +221,120 @@ const Game = () => {
             justifyContent: 'center',
             alignItems: 'center',
         }}>
-            {/*<Paper>*/}
-                <Card sx={card}>
-                    <CardMedia
-                        component="img"
-                        sx={{objectFit:"cover"}}
-                        image={image}
-                        alt="Auction hero"
-                    />
-                    <CardContent>
-                        <Typography variant="h2" >
-                            {game.title}
+            <Card sx={card}>
+                <CardMedia
+                    component="img"
+                    sx={{objectFit:"cover"}}
+                    image={image}
+                    alt="Auction hero"
+                />
+                <CardContent>
+                    <Typography variant="h2" >
+                        {game.title}
+                    </Typography>
+                    <Typography variant="h6" align="left">
+                        Description: {game.description}
+                    </Typography>
+                    <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between",
+                        alignItems: "center"}}>
+                        <Typography variant="subtitle1" align="left">
+                            Genre: {genreName?.name}
+                            <br/>
+                            Created on: {game.creationDate}
+                            <br/>
+                            Number of wishlisters: {game.numberOfWishlists}
+                            <br/>
+                            Number of owners: {game.numberOfOwners}
+                            <br/>
+                            Platforms: {platformsName}
+                            <br/>
+                            Rating: {game.rating}
+                            <br/>
+                            Number of reviews: {gameReviews.length}
                         </Typography>
-                        <Typography variant="h6" align="left">
-                            Description: {game.description}
-                        </Typography>
-                        <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between",
-                            alignItems: "center"}}>
-                            <Typography variant="subtitle1" align="left">
-                                Genre: {genreName?.name}
-                                <br/>
-                                Created on: {game.creationDate}
-                                <br/>
-                                Number of wishlisters: {game.numberOfWishlists}
-                                <br/>
-                                Number of owners: {game.numberOfOwners}
-                                <br/>
-                                Platforms: {platformsName}
-                                <br/>
-                                Rating: {game.rating}
-                                <br/>
-                                Number of reviews: {gameReviews.length}
-                            </Typography>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center'
-                            }}>
-                                <Stack direction="column" spacing={2} margin="2px" sx={{justifyContent: "space-between",
-                                    alignItems: "center"}}>
-                                <Typography variant="subtitle1">
-                                    Creator: {game.creatorFirstName} {game.creatorLastName}
-                                    <Avatar alt="Creator Image"
-                                            sx={{ width: 100, height: 100 }}
-                                            src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}>
+                            <Stack direction="column" spacing={2} margin="2px" sx={{justifyContent: "space-between",
+                                alignItems: "center"}}>
+                            <Typography variant="subtitle1">
+                                Creator: {game.creatorFirstName} {game.creatorLastName}
+                                <Avatar alt="Creator Image"
+                                        sx={{ width: 100, height: 100 }}
+                                        src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
 
+                            </Typography>
+                                <Typography variant="h3">
+                                    ${game.price}
                                 </Typography>
-                                    <Typography variant="h3">
-                                        ${game.price}
-                                    </Typography>
-                                </Stack>
-                            </div>
-                        </Stack>
-                        <div style={{display: "inline-block"}}>
-                            {errorFlag ? (
-                                <Alert severity="error">
-                                    <AlertTitle>Error</AlertTitle>
-                                    {errorMessage}
-                                </Alert>
-                            ) : null}
-                            {gameReview_rows()}
+                            </Stack>
                         </div>
+                    </Stack>
+                    <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between"}}>
+                        <Typography variant="h6">
+                            Reviews:
+                        </Typography>
+                            {parseInt(userId as string,10) !== game.creatorId && (
+                            <IconButton size="medium" color="info" onClick={() =>
+                                {if (!userId) setOpenAddReviewDialog(true)
+                                else navigate(rootUrl+"/games/create")}}>
+                                <Add/> Write a review
+                            </IconButton>
+                        )}
+
+                    </Stack>
+                    <br/>
+                    <div style={{display: "inline-block", justifyContent: 'left', alignItems: 'left'}}>
+                        {errorFlag ? (
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                {errorMessage}
+                            </Alert>
+                        ) : null}
+                        {gameReview_rows()}
+                    </div>
+                    <Form>
+                        {/*<fieldset disabled>*/}
+                        <Form.Group className="mb-3">
+                            <Form.Label htmlFor="textInput">Comment: </Form.Label>
+                            <Form.Control id="textInput" as="textarea" rows={3} placeholder="Comment" onChange={handleInputComment}/>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label htmlFor="select">Rating: </Form.Label>
+                            <Form.Select id="select">
+                                {rating.map(i =>
+                                    <option value={i}>
+                                        {i}
+                                    </option>
+                                )}
+                            </Form.Select>
+                        </Form.Group>
+                        <Button type="submit" onClick={(e) => onSubmitForm(e)}>Submit</Button>
+                        {/*</fieldset>*/}
+                    </Form>
+                    <Dialog
+                        open={openAddReviewDialog}
+                        onClose={handleAddReviewDialogClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title">
+                            Write a review
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                You need to log in to write review for this game.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleAddReviewDialogClose}>Cancel</Button>
+                            <Button variant="outlined" color="success" onClick={handleAddReview} autoFocus>
+                                Login
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    {gameReviews.length > 3 && (
                         <div style={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -268,69 +352,69 @@ const Game = () => {
                                 )}
                             />
                         </div>
-                    </CardContent>
-                    {parseInt(userId as string,10) === game.creatorId && (
-                        <>
-                            <CardActions>
-                                <IconButton onClick={() => {
-                                    setOpenEditDialog(true)}}>
-                                    <Edit/>
-                                </IconButton>
-                                <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
-                                    <Delete/>
-                                </IconButton>
-                            </CardActions>
-                            <Dialog
-                                open={openDeleteDialog}
-                                onClose={handleDeleteDialogClose}
-                                aria-labelledby="alert-dialog-title"
-                                aria-describedby="alert-dialog-description">
-                                <DialogTitle id="alert-dialog-title">
-                                    {"Delete game?"}
-                                </DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText id="alert-dialog-description">
-                                        Are you sure you want to delete this game?
-                                    </DialogContentText>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                                    <Button variant="outlined" color="error" onClick={() => {
-                                        if(game) deleteGame()
-                                        handleDeleteDialogClose();
-                                    }} autoFocus>
-                                        Delete
-                                    </Button>
-                                </DialogActions>
-                            </Dialog>
-                            <Dialog
-                                open={openEditDialog}
-                                onClose={handleEditDialogClose}
-                                aria-labelledby="alert-dialog-title"
-                                aria-describedby="alert-dialog-description">
-                                <DialogTitle id="alert-dialog-title">
-                                    {`Renaming "${game?.title}" to:`}
-                                </DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText id="alert-dialog-description">
-                                        <TextField id="outlined-basic" label="Title" variant="outlined"
-                                                   value={gamename} onChange={updateGamenameState} />
-                                    </DialogContentText>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                    <Button variant="outlined" color="error" onClick={() => {
-                                        if (game) editGame()
-                                        handleEditDialogClose();
-                                    }} autoFocus>
-                                        Save changes
-                                    </Button>
-                                </DialogActions>
-                            </Dialog>
-                        </>
                     )}
-                </Card>
-            {/*</Paper>*/}
+                </CardContent>
+                {parseInt(userId as string,10) === game.creatorId && (
+                    <>
+                        <CardActions>
+                            <IconButton onClick={() => {
+                                setOpenEditDialog(true)}}>
+                                <Edit/>
+                            </IconButton>
+                            <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
+                                <Delete/>
+                            </IconButton>
+                        </CardActions>
+                        <Dialog
+                            open={openDeleteDialog}
+                            onClose={handleDeleteDialogClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                                {"Delete game?"}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    Are you sure you want to delete this game?
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                                <Button variant="outlined" color="error" onClick={() => {
+                                    if(game) deleteGame()
+                                    handleDeleteDialogClose();
+                                }} autoFocus>
+                                    Delete
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                        <Dialog
+                            open={openEditDialog}
+                            onClose={handleEditDialogClose}
+                            aria-labelledby="alert-dialog-title"
+                            aria-describedby="alert-dialog-description">
+                            <DialogTitle id="alert-dialog-title">
+                                {`Renaming "${game?.title}" to:`}
+                            </DialogTitle>
+                            <DialogContent>
+                                <DialogContentText id="alert-dialog-description">
+                                    <TextField id="outlined-basic" label="Title" variant="outlined"
+                                               value={gamename} onChange={updateGamenameState} />
+                                </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleEditDialogClose}>Cancel</Button>
+                                <Button variant="outlined" color="error" onClick={() => {
+                                    if (game) editGame()
+                                    handleEditDialogClose();
+                                }} autoFocus>
+                                    Save changes
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </>
+                )}
+            </Card>
         </div>
             </>
     )
