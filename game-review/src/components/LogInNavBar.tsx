@@ -76,7 +76,11 @@ const LogInNavBar = () => {
         });
     }, []);
     const handleDashboardClick = () => {
-        navigate(rootUrl+'/games');
+        if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
+            window.location.reload();
+        } else {
+            navigate(rootUrl+'/games');
+        }
     };
     const handleProfileClick = () => {
         navigate(rootUrl+'/users/'+id+"/profile");
