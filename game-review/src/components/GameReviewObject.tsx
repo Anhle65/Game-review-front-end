@@ -40,7 +40,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
         <Card sx={gameReviewCardStyles}>
             <CardContent>
                 <Stack direction="row" spacing={2} justifyContent="center">
-                    <Typography variant="h6" align="left">
+                    <Typography variant="h6" component="div" align="left">
                         {gameReview.reviewerFirstName} {gameReview.reviewerLastName}
                         <br/>
                         <Typography variant="subtitle2" align="left">
