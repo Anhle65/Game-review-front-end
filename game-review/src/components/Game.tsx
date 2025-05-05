@@ -21,12 +21,11 @@ import {
     Avatar,
     Pagination, PaginationItem, Alert, AlertTitle
 } from "@mui/material";
-import {Add, Delete, Edit} from "@mui/icons-material";
+import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import { useNavigate, useParams} from "react-router-dom";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
-import GameListObject from "./GameListObject";
 import GameReviewObject from "./GameReviewObject";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
@@ -177,7 +176,6 @@ const Game = () => {
                 responseType: 'blob',
             })
                 .then((response) => {
-                    console.log(game.creatorId);
                     const imgUrl = URL.createObjectURL(response.data);
                     setCreatorImage(imgUrl);
                 }).catch((error) => {
@@ -220,7 +218,7 @@ const Game = () => {
             }
         });
     }, []);
-    const gameReview_rows = () => gameReviews.slice((currentPage - 1) * 3, currentPage * 3).map((rv: Review) => <GameReviewObject key={rv.reviewerId} gameReview={rv} />);
+    const gameReview_rows = () => gameReviews.slice((currentPage - 1) * 3, currentPage * 3).map((rv: Review) => <GameReviewObject key={`${game.gameId}-${rv.reviewerId}`} gameReview={rv} />);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
@@ -355,7 +353,7 @@ const Game = () => {
                         <Form.Group className="mb-3">
                             <Form.Label htmlFor="select">Rating: </Form.Label>
                             <Form.Select id="select" onChange={(e)=> setInputRating(parseInt(e.target.value, 10))}>
-                                <option selected>Choose...</option>
+                                <option value = "Choose...">Choose...</option>
                                 {rating.map(i =>
                                     <option value={i}>
                                         {i}

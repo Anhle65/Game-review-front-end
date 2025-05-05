@@ -3,8 +3,23 @@ import {useGameStore} from "../store";
 import axios from "axios";
 import CSS from 'csstype';
 import {
-    Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Avatar
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
+    IconButton,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Button,
+    TextField,
+    Stack,
+    Avatar,
+    Alert,
+    AlertTitle
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
@@ -12,11 +27,13 @@ import {NavLink} from "react-router-dom";
 
 interface IGameProps {
     game: Game
-    genres: Genre[]
 }
 const GameListObject = (props: IGameProps) => {
+
     const [game] = React.useState<Game> (props.game);
-    const [genres] = React.useState<Genre[]>(props.genres);
+    const [genres, setGenres] = React.useState<Genre[]>([]);
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const [gamename, setgamename] = React.useState("");
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -57,18 +74,34 @@ const GameListObject = (props: IGameProps) => {
             .then((response) => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setCreatorImage(imgUrl);
+                setErrorFlag(false);
+                setErrorMessage("");
             }).catch((error) => {
-
-            if (axios.isAxiosError(error)) {
-                if (error.response?.status !== 404) {
-                    console.error("Failed to load image", error);
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status !== 404) {
+                        console.error("Failed to load image", error);
+                    }
+                } else {
+                    setErrorFlag(true);
+                    setErrorMessage(error.toString());
+                    setCreatorImage('');
                 }
-            } else {
-                setCreatorImage('');
-            }
-        });
+            });
     }, [game.creatorId]);
-
+    React.useEffect(() => {
+        const getGenres = () => {
+            axios.get('http://localhost:4941' +rootUrl+'/games/genres')
+                .then((response) => {
+                    setGenres(response.data)
+                    setErrorFlag(false);
+                    setErrorMessage("");
+                }, (error) => {
+                    setErrorFlag(true);
+                    setErrorMessage(error.toString() + " defaulting to old users changes app may not work as expected")
+                })
+        }
+        getGenres()
+    },[setGenres])
     React.useEffect(() => {
         axios.get('http://localhost:4941'+rootUrl+'/games/' + game.gameId + '/image', {
             responseType: 'blob',
@@ -104,13 +137,19 @@ const GameListObject = (props: IGameProps) => {
         padding: "0px"
     }
     return(
+        <>
+            {errorFlag ? (
+                <Alert severity="error">
+                    <AlertTitle>Error</AlertTitle>
+                    {errorMessage}
+                </Alert>
+            ) : null}
         <Card sx={gameCardStyles}>
             <CardMedia
                 component="img"
                 height="300"
                 width="200"
                 sx={{objectFit:"cover"}}
-                // image="https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"
                 image={image}
                 alt="Auction hero"
             />
@@ -194,6 +233,7 @@ const GameListObject = (props: IGameProps) => {
                 </DialogActions>
             </Dialog>
         </Card>
+        </>
     )
 }
 export default GameListObject

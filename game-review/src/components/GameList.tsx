@@ -7,17 +7,13 @@ import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import {useNavigate} from "react-router-dom";
 import {alpha, styled} from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 const GameList = () => {
-    const games = useGameStore(state => state.games);
-    const genres = useGameStore(state => state.genres);
-    const setGames = useGameStore(state => state.setGames);
-    const setGenres = useGameStore(state => state.setGenres);
+    const [games, setGames] = React.useState<Game[]>([]);
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -37,20 +33,6 @@ const GameList = () => {
             getGames();
         }, [setGames]
     )
-    React.useEffect(() => {
-        const getGenres = () => {
-            axios.get('http://localhost:4941' +rootUrl+'/games/genres')
-                .then((response) => {
-                    setGenres(response.data)
-                    setErrorFlag(false);
-                    setErrorMessage("");
-                }, (error) => {
-                    setErrorFlag(true);
-                    setErrorMessage(error.toString() + " defaulting to old users changes app may not work as expected")
-                })
-        }
-        getGenres()
-    },[setGenres])
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
         borderRadius: theme.shape.borderRadius,
@@ -96,7 +78,7 @@ const GameList = () => {
         },
     }));
 
-    const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game} genres={genres}/>);
+    const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
