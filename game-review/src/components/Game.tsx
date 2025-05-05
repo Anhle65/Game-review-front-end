@@ -3,14 +3,33 @@ import {useGameStore} from "../store";
 import axios from "axios";
 import CSS from 'csstype';
 import {
-    Card, CardActions, CardContent, CardMedia, IconButton, Typography,
-    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Stack, Paper, Avatar
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
+    IconButton,
+    Typography,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Button,
+    TextField,
+    Stack,
+    Paper,
+    Avatar,
+    Pagination, PaginationItem, Alert, AlertTitle
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import {useParams} from "react-router-dom";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
+import GameListObject from "./GameListObject";
+import GameReviewObject from "./GameReviewObject";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 const Game = () => {
     const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
@@ -27,6 +46,8 @@ const Game = () => {
         title: "",
         description: ""
     });
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
     const [gamename, setgamename] = React.useState("");
     const [image, setImage] = React.useState("");
@@ -42,14 +63,22 @@ const Game = () => {
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
     const platformsName = allPlatforms.join(', ');
+    const [currentPage, setCurrentPage] = React.useState(1);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
+    }
+    const handlePaginationClick = (value: number) => {
+        setCurrentPage(value);
     }
     const handleEditDialogClose = () => {
         setOpenEditDialog(false);
     }
     const deleteGame = () => {
-        axios.delete('http://localhost:4941'+rootUrl+'/games/' + id)
+        console.log("Game id: " + id);
+        axios.delete('http://localhost:4941'+rootUrl+'/games/' + id, {
+            headers: {
+                "X-Authorization": localStorage.getItem('token')
+            }})
             .then(() => {
                 deleteGameFromStore(game);
             })
@@ -136,9 +165,11 @@ const Game = () => {
             }
         });
     }, []);
+    const gameReview_rows = () => gameReviews.slice((currentPage - 1) * 3, currentPage * 3).map((rv: Review) => <GameReviewObject key={rv.reviewerId} gameReview={rv} />);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
+        maxWidth: "50%",
         display: "block",
         width: "fit-content"
     }
@@ -211,65 +242,91 @@ const Game = () => {
                                 </Stack>
                             </div>
                         </Stack>
+                        <div style={{display: "inline-block"}}>
+                            {errorFlag ? (
+                                <Alert severity="error">
+                                    <AlertTitle>Error</AlertTitle>
+                                    {errorMessage}
+                                </Alert>
+                            ) : null}
+                            {gameReview_rows()}
+                        </div>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <Pagination
+                                count={Math.ceil(gameReviews.length / 3)}
+                                showFirstButton showLastButton
+                                onChange={(event, value) => handlePaginationClick(value)}
+                                renderItem={(item) => (
+                                    <PaginationItem
+                                        slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
+                                        {...item}
+                                    />
+                                )}
+                            />
+                        </div>
                     </CardContent>
                     {parseInt(userId as string,10) === game.creatorId && (
                         <>
-                    <CardActions>
-                        <IconButton onClick={() => {
-                            setOpenEditDialog(true)}}>
-                            <Edit/>
-                        </IconButton>
-                        <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
-                            <Delete/>
-                        </IconButton>
-                    </CardActions>
-                    <Dialog
-                        open={openDeleteDialog}
-                        onClose={handleDeleteDialogClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">
-                            {"Delete game?"}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                Are you sure you want to delete this game?
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                            <Button variant="outlined" color="error" onClick={() => {
-                                if(game) deleteGame()
-                                handleDeleteDialogClose();
-                            }} autoFocus>
-                                Delete
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-                    <Dialog
-                        open={openEditDialog}
-                        onClose={handleEditDialogClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">
-                    {`Renaming "${game?.title}" to:`}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        <TextField id="outlined-basic" label="Title" variant="outlined"
-                                   value={gamename} onChange={updateGamenameState} />
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button variant="outlined" color="error" onClick={() => {
-                        if (game) editGame()
-                        handleEditDialogClose();
-                    }} autoFocus>
-                        Save changes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                            <CardActions>
+                                <IconButton onClick={() => {
+                                    setOpenEditDialog(true)}}>
+                                    <Edit/>
+                                </IconButton>
+                                <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
+                                    <Delete/>
+                                </IconButton>
+                            </CardActions>
+                            <Dialog
+                                open={openDeleteDialog}
+                                onClose={handleDeleteDialogClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">
+                                    {"Delete game?"}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        Are you sure you want to delete this game?
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                                    <Button variant="outlined" color="error" onClick={() => {
+                                        if(game) deleteGame()
+                                        handleDeleteDialogClose();
+                                    }} autoFocus>
+                                        Delete
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
+                            <Dialog
+                                open={openEditDialog}
+                                onClose={handleEditDialogClose}
+                                aria-labelledby="alert-dialog-title"
+                                aria-describedby="alert-dialog-description">
+                                <DialogTitle id="alert-dialog-title">
+                                    {`Renaming "${game?.title}" to:`}
+                                </DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText id="alert-dialog-description">
+                                        <TextField id="outlined-basic" label="Title" variant="outlined"
+                                                   value={gamename} onChange={updateGamenameState} />
+                                    </DialogContentText>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={handleEditDialogClose}>Cancel</Button>
+                                    <Button variant="outlined" color="error" onClick={() => {
+                                        if (game) editGame()
+                                        handleEditDialogClose();
+                                    }} autoFocus>
+                                        Save changes
+                                    </Button>
+                                </DialogActions>
+                            </Dialog>
                         </>
                     )}
                 </Card>
