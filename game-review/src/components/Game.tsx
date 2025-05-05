@@ -68,7 +68,7 @@ const Game = () => {
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
     const platformsName = allPlatforms.join(', ');
-    const [inputComment, setInputComment] = React.useState('');
+    const [inputComment, setInputComment] = React.useState(' ');
     const [inputRating, setInputRating] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
     const handleDeleteDialogClose = () => {
@@ -79,23 +79,47 @@ const Game = () => {
     }
     const handleInputComment = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputComment(event.target.value);
+        setErrorFlag(false);
     };
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);
     }
-    const onSubmitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        event.preventDefault();
-        console.log(event.target);
+    const onSubmitForm = async () => {
+        console.log("Rating number: "+inputRating);
+        console.log("Comment: "+inputComment);
+        if(!userId) {
+
+        }
         try {
-            const response = await axios.post("http://localhost:4941" + rootUrl + '/games/:id/reviews',{},{
-                headers: {
-                    "X-Authorization": token
-                }
-            })
-
-            // console.log(event.target);
+            if (inputRating === 0 || isNaN(inputRating)) {
+                setErrorFlag(true);
+                setErrorMessage("Please give a rating number");
+            } else {
+                await axios.post("http://localhost:4941" + rootUrl + '/games/' + id + '/reviews', {
+                    "rating": inputRating,
+                    "review": inputComment
+                }, {
+                    headers: {
+                        "X-Authorization": token
+                    }
+                })
+                window.location.reload();
+            }
         } catch (error) {
-
+            setErrorFlag(true);
+            if(axios.isAxiosError(error)) {
+                if (error.response?.status === 403) {
+                    if (parseInt(userId as string,10) === game.creatorId) {
+                        setErrorMessage("Cannot post a review on your own game.")
+                    } else
+                        setErrorMessage("Cannot post more than one review on a game.");
+                }
+                if (error.response?.status === 400) {
+                    setErrorMessage("Rating is between 1 to 10");
+                }
+            } else {
+                setErrorMessage("Unexpected error");
+            }
         }
     }
     const handleEditDialogClose = () => {
@@ -200,7 +224,7 @@ const Game = () => {
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
-        maxWidth: "50%",
+        maxWidth: "60%",
         display: "block",
         width: "fit-content"
     }
@@ -249,8 +273,6 @@ const Game = () => {
                             Platforms: {platformsName}
                             <br/>
                             Rating: {game.rating}
-                            <br/>
-                            Number of reviews: {gameReviews.length}
                         </Typography>
                         <div style={{
                             display: 'flex',
@@ -272,54 +294,19 @@ const Game = () => {
                             </Stack>
                         </div>
                     </Stack>
-                    <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between"}}>
-                        <Typography variant="h6">
-                            Reviews:
-                        </Typography>
-                            {parseInt(userId as string,10) !== game.creatorId && (
-                            <IconButton size="medium" color="info" onClick={() =>
-                                {if (!userId) setOpenAddReviewDialog(true)
-                                else navigate(rootUrl+"/games/create")}}>
-                                <Add/> Write a review
-                            </IconButton>
-                        )}
-
-                    </Stack>
+                    <Typography variant="h6" align="left">
+                        Reviews({gameReviews.length}):
+                    </Typography>
                     <br/>
                     <div style={{display: "inline-block", justifyContent: 'left', alignItems: 'left'}}>
-                        {errorFlag ? (
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
-                                {errorMessage}
-                            </Alert>
-                        ) : null}
                         {gameReview_rows()}
                     </div>
-                    <Form>
-                        {/*<fieldset disabled>*/}
-                        <Form.Group className="mb-3">
-                            <Form.Label htmlFor="textInput">Comment: </Form.Label>
-                            <Form.Control id="textInput" as="textarea" rows={3} placeholder="Comment" onChange={handleInputComment}/>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label htmlFor="select">Rating: </Form.Label>
-                            <Form.Select id="select">
-                                {rating.map(i =>
-                                    <option value={i}>
-                                        {i}
-                                    </option>
-                                )}
-                            </Form.Select>
-                        </Form.Group>
-                        <Button type="submit" onClick={(e) => onSubmitForm(e)}>Submit</Button>
-                        {/*</fieldset>*/}
-                    </Form>
                     <Dialog
                         open={openAddReviewDialog}
                         onClose={handleAddReviewDialogClose}
                         aria-labelledby="alert-dialog-title"
                         aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">
+                        <DialogTitle id="alert-dialog-title" color="warning">
                             Write a review
                         </DialogTitle>
                         <DialogContent>
@@ -353,6 +340,39 @@ const Game = () => {
                             />
                         </div>
                     )}
+                    {errorFlag ? (
+                        <Alert severity="error">
+                            <AlertTitle>Error</AlertTitle>
+                            {errorMessage}
+                        </Alert>
+                    ) : null}
+                    <Form>
+                        {/*<fieldset disabled>*/}
+                        <Form.Group className="mb-3">
+                            <Form.Label htmlFor="textInput">Comment: </Form.Label>
+                            <Form.Control id="textInput" as="textarea" rows={3} placeholder="Comment" onChange={handleInputComment}/>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label htmlFor="select">Rating: </Form.Label>
+                            <Form.Select id="select" onChange={(e)=> setInputRating(parseInt(e.target.value, 10))}>
+                                <option selected>Choose...</option>
+                                {rating.map(i =>
+                                    <option value={i}>
+                                        {i}
+                                    </option>
+                                )}
+                                {/*{console.log("Rating: "+inputRating)}*/}
+                            </Form.Select>
+                        </Form.Group>
+                        <Button type="submit" onClick={(e) => {
+                            e.preventDefault()
+                            if (!userId)
+                                setOpenAddReviewDialog(true)
+                            else
+                                onSubmitForm()
+                        }}>Post review</Button>
+                        {/*</fieldset>*/}
+                    </Form>
                 </CardContent>
                 {parseInt(userId as string,10) === game.creatorId && (
                     <>
