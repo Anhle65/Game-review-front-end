@@ -35,7 +35,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
                     setReviewerImage('');
                 }
             })
-    })
+    }, [])
     return(
         <Card sx={gameReviewCardStyles}>
             <CardContent>
