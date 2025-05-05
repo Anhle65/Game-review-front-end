@@ -16,6 +16,13 @@ const LogoutNavBar = () => {
     const handleLogIn = () => {
         navigate(rootUrl+'/users/login');
     }
+    const handleDashboardClick = () => {
+        if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
+            window.location.reload();
+        } else {
+            navigate(rootUrl+'/games');
+        }
+    };
     return (
         <AppBar position="static">
             <Container maxWidth="xl">
@@ -25,6 +32,12 @@ const LogoutNavBar = () => {
                             justifyContent: "space-around",
                             alignItems: "center",
                         }}>
+                            <Button
+                                onClick={handleDashboardClick}
+                                sx={{my: 2, color: 'white', display: 'block'}}
+                            >
+                                Dashboard
+                            </Button>
                             <Button
                                 onClick={handleLogIn}
                                 sx={{my: 2, color: 'white', display: 'block'}}

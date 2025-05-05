@@ -5,6 +5,8 @@ import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {Card, CardContent, Stack, Typography} from "@mui/material";
+import LogInNavBar from "./LogInNavBar";
+import LogoutNavBar from "./LogoutNavBar";
 
 const UserRegister = () => {
     const [email, setEmail] = useState('');
@@ -120,59 +122,63 @@ const UserRegister = () => {
         backgroundColor: "lightcyan",
     }
     return (
-        <div className="signup-form-container">
-            <h2 className="signup-title">Register</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
-            <Card sx={signUpCardStyles}>
-                <CardContent >
-                    <form>
-                        <Stack direction="column" spacing={2} sx={{
-                            justifyContent: "space-around",
-                            alignItems: "center",
-                        }}>
-                            <div className="signup-form">
-                                <label htmlFor="fname">First Name:</label>
-                                <input type="text" className="form-control" id="fname" onChange={updateFnameState}/>
-                            </div>
-                            <div className="signup-form">
-                                <label htmlFor="lname">Last Name:</label>
-                                <input type="text" className="form-control" id="lname" onChange={updateLnameState}/>
-                            </div>
-                            <div className="signup-form">
-                                <label htmlFor="email">Email address:</label>
-                                <input type="email" className="form-control" id="email" onChange={updateEmailState}/>
-                            </div>
-                            <div className="signup-form">
-                                <label htmlFor="pwd">Password:</label>
-                                <input type={pwFormType} className="form-control" id="pwd"
-                                       onChange={updatePasswordState}/>
-                            </div>
-                            <div className="signup-form">
-                                <label htmlFor="cfpwd">Confirm password:</label>
-                                <input type={pwFormType} className="form-control" id="cfpwd"
-                                       onChange={updateConfirmPasswordState}/>
-                            </div>
+        <><LogoutNavBar/>
+            <div className="signup-form-container">
+                <h2 className="signup-title">Register</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Card sx={signUpCardStyles}>
+                    <CardContent>
+                        <form>
+                            <Stack direction="column" spacing={2} sx={{
+                                justifyContent: "space-around",
+                                alignItems: "center",
+                            }}>
+                                <div className="signup-form">
+                                    <label htmlFor="fname">First Name:</label>
+                                    <input type="text" className="form-control" id="fname" onChange={updateFnameState}/>
+                                </div>
+                                <div className="signup-form">
+                                    <label htmlFor="lname">Last Name:</label>
+                                    <input type="text" className="form-control" id="lname" onChange={updateLnameState}/>
+                                </div>
+                                <div className="signup-form">
+                                    <label htmlFor="email">Email address:</label>
+                                    <input type="email" className="form-control" id="email"
+                                           onChange={updateEmailState}/>
+                                </div>
+                                <div className="signup-form">
+                                    <label htmlFor="pwd">Password:</label>
+                                    <input type={pwFormType} className="form-control" id="pwd"
+                                           onChange={updatePasswordState}/>
+                                </div>
+                                <div className="signup-form">
+                                    <label htmlFor="cfpwd">Confirm password:</label>
+                                    <input type={pwFormType} className="form-control" id="cfpwd"
+                                           onChange={updateConfirmPasswordState}/>
+                                </div>
 
-                            <div className="checkbox">
-                                <label><input type="checkbox" checked={showPassword}
-                                              onChange={() => setShowPassword(prev => !prev)}/> Show password</label>
-                            </div>
-                            <button type="button" className="btn btn-success" onClick={(e) => {
-                                e.preventDefault(); // Prevent form from refreshing the page
-                                onSubmit();
-                            }}>Create account
-                            </button>
-                            <Typography variant="subtitle2" align="center">
-                                Already had account?
-                                <NavLink to={rootUrl + '/users/login'} end>
-                                    Login
-                                </NavLink>
-                            </Typography>
-                        </Stack>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                                <div className="checkbox">
+                                    <label><input type="checkbox" checked={showPassword}
+                                                  onChange={() => setShowPassword(prev => !prev)}/> Show
+                                        password</label>
+                                </div>
+                                <button type="button" className="btn btn-success" onClick={(e) => {
+                                    e.preventDefault(); // Prevent form from refreshing the page
+                                    onSubmit();
+                                }}>Create account
+                                </button>
+                                <Typography variant="subtitle2" align="center">
+                                    Already had account?
+                                    <NavLink to={rootUrl + '/users/login'} end>
+                                        Login
+                                    </NavLink>
+                                </Typography>
+                            </Stack>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }
 export default UserRegister;

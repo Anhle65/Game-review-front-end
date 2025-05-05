@@ -5,6 +5,7 @@ import CSS from "csstype";
 import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
+import LogoutNavBar from "./LogoutNavBar";
 
 
 const Login = () => {
@@ -76,43 +77,49 @@ const Login = () => {
         backgroundColor: "lightcyan",
     }
     return (
-        <div className="login-form-container">
-            <h2 className="login-title">Login</h2>
-            {error && <Alert variant="danger">{error}</Alert>}
-            <Card sx={loginCardStyles}>
-                <CardContent >
-                <form>
-                    <Stack direction="column" spacing={2} sx={{
-                        justifyContent: "space-around",
-                        alignItems: "center",
-                    }}>
-                        <div className="login-form">
-                            <label htmlFor="email">Email address:</label>
-                            <input type="email" className="form-control" id="email" onChange={updateEmailState}/>
-                        </div>
-                        <div className="login-form">
-                            <label htmlFor="pwd">Password:</label>
-                            <input type={pwFormType} className="form-control" id="pwd" onChange={updatePasswordState}/>
-                        </div>
-                        <div className="checkbox">
-                            <label><input type="checkbox" checked={showPassword}
-                                          onChange={() => setShowPassword(prev => !prev)}/> Show password</label>
-                        </div>
-                        <button type="button" className="btn btn-success" onClick={(e) => {
-                            e.preventDefault(); // Prevent form from refreshing the page
-                            onSubmit();
-                        }}>Log In</button>
-                        <Typography variant="subtitle2" align="center">
-                            No account yet?
-                            <NavLink to={rootUrl + '/users/register'} end>
-                                Register
-                            </NavLink>
-                        </Typography>
-                    </Stack>
-                </form>
-                </CardContent>
-            </Card>
-        </div>
+        <><LogoutNavBar/>
+            <div className="login-form-container">
+                <h2 className="login-title">Login</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+                <Card sx={loginCardStyles}>
+                    <CardContent>
+                        <form>
+                            <Stack direction="column" spacing={2} sx={{
+                                justifyContent: "space-around",
+                                alignItems: "center",
+                            }}>
+                                <div className="login-form">
+                                    <label htmlFor="email">Email address:</label>
+                                    <input type="email" className="form-control" id="email"
+                                           onChange={updateEmailState}/>
+                                </div>
+                                <div className="login-form">
+                                    <label htmlFor="pwd">Password:</label>
+                                    <input type={pwFormType} className="form-control" id="pwd"
+                                           onChange={updatePasswordState}/>
+                                </div>
+                                <div className="checkbox">
+                                    <label><input type="checkbox" checked={showPassword}
+                                                  onChange={() => setShowPassword(prev => !prev)}/> Show
+                                        password</label>
+                                </div>
+                                <button type="button" className="btn btn-success" onClick={(e) => {
+                                    e.preventDefault(); // Prevent form from refreshing the page
+                                    onSubmit();
+                                }}>Log In
+                                </button>
+                                <Typography variant="subtitle2" align="center">
+                                    No account yet?
+                                    <NavLink to={rootUrl + '/users/register'} end>
+                                        Register
+                                    </NavLink>
+                                </Typography>
+                            </Stack>
+                        </form>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }
 
