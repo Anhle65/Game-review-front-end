@@ -18,6 +18,7 @@ const UserRegister = () => {
     const [errorFlag, setErrorFlag] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [pwFormType, setPwFormType] = React.useState('');
+    const [image, setImage] = React.useState('');
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -29,6 +30,9 @@ const UserRegister = () => {
         setErrorFlag(false);
     }
 
+    const handleUploadImage = () => {
+        setImage('');
+    }
     const updateFnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFname(event.target.value)
         setError('');
@@ -115,7 +119,7 @@ const UserRegister = () => {
     };
     const signUpCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "600px",
+        height: "700px",
         width: "300px",
         margin: "10px",
         padding: "0px",
@@ -162,6 +166,8 @@ const UserRegister = () => {
                                                   onChange={() => setShowPassword(prev => !prev)}/> Show
                                         password</label>
                                 </div>
+                                <label>Upload image: </label>
+                                <input type="file"  onChange={handleUploadImage}/>
                                 <button type="button" className="btn btn-success" onClick={(e) => {
                                     e.preventDefault(); // Prevent form from refreshing the page
                                     onSubmit();
