@@ -7,6 +7,7 @@ import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
+import LogInNavBar from "./LogInNavBar";
 
 
 const Login = () => {
@@ -18,6 +19,8 @@ const Login = () => {
     const [pwFormType, setPwFormType] = React.useState('');
     const navigate = useNavigate();
     const authorization = useUserStore();
+    const token = authorization.token;
+    const userId = authorization.userId;
 
     React.useEffect(() => {
         setPwFormType(showPassword ? 'text' : 'password');
@@ -33,40 +36,45 @@ const Login = () => {
         setErrorFlag(false);
     }
     const onSubmit = async () => {
-        try {
-            const response = await
-                axios.post("http://localhost:4941"+rootUrl + '/users/login', {
-                    email: email,
-                    password: password
-                }, {
-                    timeout: 10000
-                });
-            setErrorFlag(false);
-            setError('');
-            const {userId, token} = response.data;
-            authorization.setAuthorization(userId, token);
-            console.log(userId);
-            navigate(rootUrl + '/games/user/' + userId);
-        } catch(error:any) {
-            console.log(error);
-            console.log(email);
-            console.log(password);
-            setErrorFlag(true);
-            if (axios.isAxiosError(error)) {
-                if (error.response?.status === 400) {
-                    if(password.length < 6 || password.length > 64) {
-                        setError("Password length must be from 6 to 64 characters");
-                    } else
-                        setError("Invalid email");
-                } else{
-                    if (error.response?.status === 401) {
-                        setError("Wrong email or password");
-                    } else
-                        setError("Failed to login");
+        if (!token) {
+            try {
+                const response = await
+                    axios.post("http://localhost:4941" + rootUrl + '/users/login', {
+                        email: email,
+                        password: password
+                    }, {
+                        timeout: 10000
+                    });
+                setErrorFlag(false);
+                setError('');
+                const {userId, token} = response.data;
+                authorization.setAuthorization(userId, token);
+                console.log(userId);
+                navigate(rootUrl + '/games/user/' + userId);
+            } catch (error: any) {
+                console.log(error);
+                console.log(email);
+                console.log(password);
+                setErrorFlag(true);
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 400) {
+                        if (password.length < 6 || password.length > 64) {
+                            setError("Password length must be from 6 to 64 characters");
+                        } else
+                            setError("Invalid email");
+                    } else {
+                        if (error.response?.status === 401) {
+                            setError("Wrong email or password");
+                        } else
+                            setError("Failed to login");
+                    }
+                } else {
+                    setError("Unexpected error");
                 }
-            } else {
-                setError("Unexpected error");
             }
+        } else {
+            setErrorFlag(true);
+            setError('You need to logout first to login again');
         }
     };
     const loginCardStyles: CSS.Properties = {
@@ -78,7 +86,17 @@ const Login = () => {
         backgroundColor: "lightcyan",
     }
     return (
-        <><LogoutNavBar/>
+        <>
+            {userId && token && (
+                <>
+                    <LogInNavBar />
+                </>
+            )}
+            {!userId || !token  && (
+                <>
+                    <LogoutNavBar />
+                </>
+            )}
             <div className="login-form-container">
                 <h2 className="login-title">Login</h2>
                 {error && <Alert variant="danger">{error}</Alert>}

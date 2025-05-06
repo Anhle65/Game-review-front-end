@@ -29,7 +29,7 @@ const LogInNavBar = () => {
 
     const handleCreateGame = () => {
         setAnchorElUser(null);
-        navigate(rootUrl+'/games/create');
+        navigate(rootUrl+'/users/'+userId+'/edit');
     }
     const handleLogout = async () =>{
         const token = localStorage.getItem("token");
