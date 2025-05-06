@@ -1,12 +1,25 @@
-import React, {useState} from "react";
+import React, { useState} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
-import {Card, CardContent, Stack, Typography} from "@mui/material";
-import LogInNavBar from "./LogInNavBar";
+import {
+    Card,
+    CardContent,
+    FormControl,
+    InputAdornment,
+    InputLabel,
+    OutlinedInput,
+    Stack,
+    Typography
+} from "@mui/material";
 import LogoutNavBar from "./LogoutNavBar";
+import {useUserStore} from "../store";
+import LogInNavBar from "./LogInNavBar";
+import Avatar from "@mui/material/Avatar";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
+import IconButton from '@mui/material/IconButton';
 
 const UserRegister = () => {
     const [email, setEmail] = useState('');
@@ -19,6 +32,9 @@ const UserRegister = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [pwFormType, setPwFormType] = React.useState('');
     const [image, setImage] = React.useState('');
+    const authorization = useUserStore();
+    const token = authorization.token;
+    const userId = authorization.userId;
     const navigate = useNavigate();
 
     React.useEffect(() => {
@@ -30,9 +46,10 @@ const UserRegister = () => {
         setErrorFlag(false);
     }
 
-    const handleUploadImage = () => {
-        setImage('');
-    }
+    // const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     console.log(e.target.files);
+    //     ;
+    // }
     const updateFnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFname(event.target.value)
         setError('');
@@ -43,6 +60,7 @@ const UserRegister = () => {
         setError('');
         setErrorFlag(false);
     }
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
     const updatePasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value)
         setError('');
@@ -53,80 +71,100 @@ const UserRegister = () => {
         setError('');
         setErrorFlag(false);
     }
-    const onSubmit = async () => {
-        try {
-            if(password !== confirmPassword) {
-                setErrorFlag(true);
-                setError('Password and confirm password is not matched');
-            } else {
-             await axios.post("http://localhost:4941"+rootUrl + '/users/register', {
-                    firstName: fname,
-                    lastName: lname,
-                    email: email,
-                    password: password
-                }, {
-                    timeout: 10000
-                });
-                setErrorFlag(false);
-                setError('');
-                console.log(email);
-                console.log('fname'+fname);
-                console.log('lname'+lname);
+    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
 
-                const response = await axios.post("http://localhost:4941"+rootUrl + '/users/login', {
-                    email: email,
-                    password: password
-                }, {
-                    timeout: 10000
-                });
-                const {userId, token} = response.data;
-                localStorage.setItem('token', token);
-                localStorage.setItem('userId', userId);
-                navigate(rootUrl + '/games/');
-            }
-        } catch(error:any) {
-            console.log(error);
-            console.log('fname:'+fname);
-            console.log('lname:'+lname);
-            console.log(email);
-            console.log(password);
-            setErrorFlag(true);
-            if (axios.isAxiosError(error)) {
-                if (error.response?.status === 400) {
-                    if(fname.length < 6 || fname.length > 64) {
-                        setError("Fist name length must be from 6 to 64 characters");
-                    } else {
-                        if (lname.length < 6 || lname.length > 64) {
-                            setError("Last name length must be from 6 to 64 characters");
+    const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+    };
+    const onSubmit = async () => {
+        if (!token) {
+            try {
+                if (password !== confirmPassword) {
+                    setErrorFlag(true);
+                    setError('Password and confirm password is not matched');
+                } else {
+                    await axios.post("http://localhost:4941" + rootUrl + '/users/register', {
+                        firstName: fname,
+                        lastName: lname,
+                        email: email,
+                        password: password
+                    }, {
+                        timeout: 10000
+                    });
+                    setErrorFlag(false);
+                    setError('');
+                    console.log(email);
+                    console.log('fname' + fname);
+                    console.log('lname' + lname);
+
+                    const response = await axios.post("http://localhost:4941" + rootUrl + '/users/login', {
+                        email: email,
+                        password: password
+                    }, {
+                        timeout: 10000
+                    });
+                    const {userId, token} = response.data;
+                    authorization.setAuthorization(userId, token);
+                    navigate(rootUrl + '/games/');
+                }
+            } catch (error: any) {
+                console.log(error);
+                console.log('fname:' + fname);
+                console.log('lname:' + lname);
+                console.log(email);
+                console.log(password);
+                setErrorFlag(true);
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 400) {
+                        if (fname.length < 6 || fname.length > 64) {
+                            setError("Fist name length must be from 6 to 64 characters");
                         } else {
-                            if(password.length < 6 || password.length > 64) {
-                                setError("Password length must be from 6 to 64 characters");
+                            if (lname.length < 6 || lname.length > 64) {
+                                setError("Last name length must be from 6 to 64 characters");
                             } else {
-                                setError("Invalid email");
+                                if (password.length < 6 || password.length > 64) {
+                                    setError("Password length must be from 6 to 64 characters");
+                                } else {
+                                    setError("Invalid email");
+                                }
                             }
                         }
+                    } else {
+                        if (error.response?.status === 403) {
+                            setError("Email is already used");
+                        } else
+                            setError("Internal Server Error");
                     }
-                } else{
-                    if (error.response?.status === 403) {
-                        setError("Email is already used");
-                    } else
-                        setError("Internal Server Error");
+                } else {
+                    setError("Unexpected error");
                 }
-            } else {
-                setError("Unexpected error");
             }
+        } else {
+            setErrorFlag(true);
+            setError('You need to logout first to register');
         }
     };
     const signUpCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "700px",
-        width: "300px",
+        height: "800px",
+        width: "500px",
         margin: "10px",
         padding: "0px",
         backgroundColor: "lightcyan",
     }
     return (
-        <><LogoutNavBar/>
+        <>{userId && token && (
+            <>
+                <LogInNavBar />
+            </>
+        )}
+            {!userId || !token  && (
+                <>
+                    <LogoutNavBar />
+                </>
+            )}
             <div className="signup-form-container">
                 <h2 className="signup-title">Register</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
@@ -150,24 +188,60 @@ const UserRegister = () => {
                                     <input type="email" className="form-control" id="email"
                                            onChange={updateEmailState}/>
                                 </div>
-                                <div className="signup-form">
-                                    <label htmlFor="pwd">Password:</label>
-                                    <input type={pwFormType} className="form-control" id="pwd"
-                                           onChange={updatePasswordState}/>
-                                </div>
-                                <div className="signup-form">
-                                    <label htmlFor="cfpwd">Confirm password:</label>
-                                    <input type={pwFormType} className="form-control" id="cfpwd"
-                                           onChange={updateConfirmPasswordState}/>
-                                </div>
-
-                                <div className="checkbox">
-                                    <label><input type="checkbox" checked={showPassword}
-                                                  onChange={() => setShowPassword(prev => !prev)}/> Show
-                                        password</label>
-                                </div>
+                                    <FormControl variant="outlined">
+                                    <InputLabel htmlFor="outlined-adornment-password" >Password</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        onChange={updatePasswordState}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label={
+                                                        showPassword ? 'hide the password' : 'display the password'
+                                                    }
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    onMouseUp={handleMouseUpPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                        label="Password"
+                                    />
+                                    </FormControl>
+                                <FormControl variant="outlined">
+                                    <InputLabel htmlFor="outlined-adornment-cornfirmpassword" >Confirm Password</InputLabel>
+                                    <OutlinedInput
+                                        id="outlined-adornment-cornfirmpassword"
+                                        type={showPassword ? 'text' : 'password'}
+                                        onChange={updateConfirmPasswordState}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label={
+                                                        showPassword ? 'hide the password' : 'display the password'
+                                                    }
+                                                    onClick={handleClickShowPassword}
+                                                    onMouseDown={handleMouseDownPassword}
+                                                    onMouseUp={handleMouseUpPassword}
+                                                    edge="end"
+                                                >
+                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                        label="Confirm Password"
+                                    />
+                                </FormControl>
                                 <label>Upload image: </label>
-                                <input type="file"  onChange={handleUploadImage}/>
+                                <input type="file"  onChange={(e) => {
+                                    if (e.target.files)
+                                        setImage(URL.createObjectURL(e.target.files[0]))
+                                    }}/>
+                                <Avatar alt="User Image" sx={{ width: 100, height: 100 }} src={image.length !== 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                                 <button type="button" className="btn btn-success" onClick={(e) => {
                                     e.preventDefault(); // Prevent form from refreshing the page
                                     onSubmit();
