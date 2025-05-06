@@ -2,7 +2,6 @@ import React from "react";
 import axios from "axios";
 import CSS from 'csstype';
 import {Alert, AlertTitle, Pagination, PaginationItem, Paper, Stack} from "@mui/material";
-import {useGameStore} from "../store";
 import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,12 +11,15 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
+import {useUserStore} from "../store";
 const GameList = () => {
     const [games, setGames] = React.useState<Game[]>([]);
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
-    const userId = localStorage.getItem('userId');
+    const authorization = useUserStore();
+    const userId = authorization.userId;
+    const token = authorization.token;
     React.useEffect(() => {
             const getGames = () => {
                 axios.get('http://localhost:4941' +rootUrl+'/games')

@@ -1,5 +1,4 @@
 import React from "react";
-import {useGameStore} from "../store";
 import axios from "axios";
 import CSS from 'csstype';
 import {
@@ -39,8 +38,8 @@ const GameListObject = (props: IGameProps) => {
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [image, setImage] = React.useState("");
-    const deleteGameFromStore = useGameStore(state => state.removeGame);
-    const editGameFromStore = useGameStore(state => state.editGame);
+    // const deleteGameFromStore = useGameStore(state => state.removeGame);
+    // const editGameFromStore = useGameStore(state => state.editGame);
     const [creatorImage, setCreatorImage] = React.useState("");
     const gameGenre = genres.find(g => g.genreId === game.genreId);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
@@ -55,7 +54,7 @@ const GameListObject = (props: IGameProps) => {
     const deleteGame = () => {
         axios.delete('http://localhost:4941'+rootUrl+'/games/' + game.gameId)
             .then(() => {
-                deleteGameFromStore(game);
+                // deleteGameFromStore(game);
             })
     }
     const updateGamenameState = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +63,7 @@ const GameListObject = (props: IGameProps) => {
     const editGame = () => {
         axios.put('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
             .then(() => {
-                editGameFromStore(game, gamename);
+                // editGameFromStore(game, gamename);
             })
     }
     React.useEffect(()=> {

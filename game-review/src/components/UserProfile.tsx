@@ -1,21 +1,21 @@
 import React from "react";
 import axios from "axios";
 import {rootUrl} from "../base.routes";
-import {useParams} from "react-router-dom";
 import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
 import LogInNavBar from "./LogInNavBar";
+import {useUserStore} from "../store";
 
 const UserProfile = () => {
-    const [authId, setAuthId] = React.useState('');
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [userImage, setUserImage] = React.useState("");
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem('userId');
+    const authorization = useUserStore();
+    const userId = authorization.userId;
+    const token = authorization.token;
     React.useEffect(()=> {
-        const getUser = () => {
+        if(token && userId) {
             axios.get('http://localhost:4941' + rootUrl + "/users/" + userId, {
                 headers: {
                     "X-Authorization": token
@@ -25,13 +25,10 @@ const UserProfile = () => {
                 .then((response) => {
                     setfName(response.data.firstName);
                     setlName(response.data.lastName);
-                    if (response.data.email) {
-                        setEmail(response.data.email);
-                    }
+                    setEmail(response.data.email);
                 })
         }
-        getUser();
-    },[userId])
+    },[userId, token])
     React.useEffect(()=> {
         axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
@@ -66,12 +63,8 @@ const UserProfile = () => {
                         alignItems: "center",
                     }}>
                         <Typography variant="h5" align="left">
-                            {email && (
-                                <>
-                                    Email: {email}
-                                    <br />
-                                </>
-                            )}
+                            Email: {email}
+                            <br />
                             First Name: {fName}
                             <br/>
                             Last Name: {lName}

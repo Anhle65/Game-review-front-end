@@ -6,6 +6,7 @@ import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 import LogoutNavBar from "./LogoutNavBar";
+import {useUserStore} from "../store";
 
 
 const Login = () => {
@@ -16,6 +17,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [pwFormType, setPwFormType] = React.useState('');
     const navigate = useNavigate();
+    const authorization = useUserStore();
 
     React.useEffect(() => {
         setPwFormType(showPassword ? 'text' : 'password');
@@ -42,8 +44,7 @@ const Login = () => {
             setErrorFlag(false);
             setError('');
             const {userId, token} = response.data;
-            localStorage.setItem('token', token);
-            localStorage.setItem('userId', userId);
+            authorization.setAuthorization(userId, token);
             console.log(userId);
             navigate(rootUrl + '/games/user/' + userId);
         } catch(error:any) {

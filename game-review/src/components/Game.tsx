@@ -1,5 +1,4 @@
 import React from "react";
-import {useGameStore} from "../store";
 import axios from "axios";
 import CSS from 'csstype';
 import {
@@ -17,7 +16,6 @@ import {
     Button,
     TextField,
     Stack,
-    Paper,
     Avatar,
     Pagination, PaginationItem, Alert, AlertTitle
 } from "@mui/material";
@@ -30,6 +28,7 @@ import GameReviewObject from "./GameReviewObject";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {Form} from "react-bootstrap";
+import {useUserStore} from "../store";
 const Game = () => {
     const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
@@ -46,7 +45,9 @@ const Game = () => {
         title: "",
         description: ""
     });
-    const token = localStorage.getItem('token');
+    const authorization = useUserStore();
+    const userId = authorization.userId;
+    const token = authorization.token;
     const rating = [1,2,3,4,5,6,7,8,9,10];
     const navigate = useNavigate();
     const [errorFlag, setErrorFlag] = React.useState(false);
@@ -59,10 +60,8 @@ const Game = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
-    const deleteGameFromStore = useGameStore(state => state.removeGame);
-    const editGameFromStore = useGameStore(state => state.editGame);
     const genreName = genres.find(g => g.genreId === game.genreId)
-    const userId = localStorage.getItem('userId');
+    // const userId = localStorage.getItem('userId');
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
@@ -131,7 +130,7 @@ const Game = () => {
                 "X-Authorization": localStorage.getItem('token')
             }})
             .then(() => {
-                deleteGameFromStore(game);
+                // deleteGameFromStore(game);
             })
     }
     const updateGamenameState = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,7 +139,7 @@ const Game = () => {
     const editGame = () => {
         axios.put('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
             .then(() => {
-                editGameFromStore(game, gamename);
+                // editGameFromStore(game, gamename);
             })
     }
 

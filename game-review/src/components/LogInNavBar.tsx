@@ -10,19 +10,19 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import AppBar from "@mui/material/AppBar";
 import * as React from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {rootUrl} from "../base.routes";
 import axios from "axios";
+import {useUserStore} from "../store";
 
 const LogInNavBar = () => {
-    let {id} = useParams();
+    const authorization = useUserStore();
+    const userId = authorization.userId;
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const [userImage, setUserImage] = React.useState("");
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
-    const loginId = localStorage.getItem('userId');
-
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -43,17 +43,13 @@ const LogInNavBar = () => {
             });
         navigate(rootUrl+'/games');
         window.location.reload();
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
+        authorization.removeAuthorization();
     }
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
     React.useEffect(()=> {
-        if(id !== loginId && loginId) {
-            id = loginId;
-        }
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + id + '/image', {
+        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -64,10 +60,7 @@ const LogInNavBar = () => {
         });
     }, []);
     React.useEffect(()=> {
-        if(id !== loginId && loginId) {
-            id = loginId;
-        }
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + id)
+        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId)
             .then((response) => {
                 setfName(response.data.firstName);
                 setlName(response.data.lastName);
@@ -83,7 +76,11 @@ const LogInNavBar = () => {
         }
     };
     const handleProfileClick = () => {
-        navigate(rootUrl+'/users/'+id+"/profile");
+        if (window.location.pathname.endsWith('profile/') || window.location.pathname.endsWith('profile')) {
+            window.location.reload();
+        } else {
+            navigate(rootUrl+'/users/'+ userId +'/profile');
+        }
     }
     return(
         <AppBar position="static">
