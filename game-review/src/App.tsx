@@ -10,6 +10,7 @@ import UserRegister from "./components/UserRegister";
 import UserProfile from "./components/UserProfile";
 
 import GameList from "./components/GameList";
+import EditUserProfile from "./components/EditUserProfile";
 function App() {
   return (
     <div className="App">
@@ -22,6 +23,7 @@ function App() {
             <Route path={rootUrl + "/games/:id"} element={<Game />} />
             <Route path={rootUrl + "/games/user/:id"} element={<GameList />} />
             <Route path={rootUrl + "/users/:id/profile"} element={<UserProfile />} />
+            <Route path={rootUrl + "/users/:id/edit"} element={<EditUserProfile />} />
             <Route path={rootUrl + "/users/login"} element={<Login />} />
             <Route path={rootUrl + "/users/register"} element={<UserRegister />} />
             <Route path="*" element={<NotFound />} />
