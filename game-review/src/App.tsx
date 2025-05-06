@@ -17,15 +17,15 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path={rootUrl + "/"} element={<Game />} />
-            <Route path={rootUrl + "/games"} element={<GameList />} />
-            <Route path={rootUrl + "/games/create"} element={<NewGame />} />
-            <Route path={rootUrl + "/games/:id"} element={<Game />} />
-            <Route path={rootUrl + "/games/user/:id"} element={<GameList />} />
-            <Route path={rootUrl + "/users/:id/profile"} element={<UserProfile />} />
-            <Route path={rootUrl + "/users/:id/edit"} element={<EditUserProfile />} />
-            <Route path={rootUrl + "/users/login"} element={<Login />} />
-            <Route path={rootUrl + "/users/register"} element={<UserRegister />} />
+            <Route path="/" element={<GameList />} />
+            <Route path="/games" element={<GameList />} />
+            <Route path="/games/create" element={<NewGame />} />
+            <Route path="/games/:id" element={<Game />} />
+            <Route path="/games/user/:id" element={<GameList />} />
+            <Route path="/users/:id/profile" element={<UserProfile />} />
+            <Route path="/users/:id/edit" element={<EditUserProfile />} />
+            <Route path="/users/login" element={<Login />} />
+            <Route path="/users/register" element={<UserRegister />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

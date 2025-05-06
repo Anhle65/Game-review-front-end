@@ -29,7 +29,7 @@ const LogInNavBar = () => {
 
     const handleCreateGame = () => {
         setAnchorElUser(null);
-        navigate(rootUrl+'/users/'+userId+'/edit');
+        navigate('/users/'+userId+'/edit');
     }
     const handleLogout = async () =>{
         const token = localStorage.getItem("token");
@@ -41,7 +41,7 @@ const LogInNavBar = () => {
                 },
                 timeout: 10000
             });
-        navigate(rootUrl+'/games');
+        navigate('/games');
         window.location.reload();
         authorization.removeAuthorization();
     }
@@ -72,14 +72,14 @@ const LogInNavBar = () => {
         if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
             window.location.reload();
         } else {
-            navigate(rootUrl+'/games');
+            navigate('/games');
         }
     };
     const handleProfileClick = () => {
         if (window.location.pathname.endsWith('profile/') || window.location.pathname.endsWith('profile')) {
             window.location.reload();
         } else {
-            navigate(rootUrl+'/users/'+ userId +'/profile');
+            navigate('/users/'+ userId +'/profile');
         }
     }
     return(

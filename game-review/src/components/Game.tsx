@@ -145,9 +145,9 @@ const Game = () => {
 
     const handleAddReview = () => {
         if (userId) {
-            navigate(rootUrl + "/games/" + id + "/review/");
+            navigate("/games/" + id + "/review/");
         } else {
-            navigate(rootUrl + "/users/login/");
+            navigate("/users/login/");
         }
     }
     React.useEffect(() => {

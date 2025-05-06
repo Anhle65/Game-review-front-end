@@ -107,7 +107,7 @@ const UserRegister = () => {
                     });
                     const {userId, token} = response.data;
                     authorization.setAuthorization(userId, token);
-                    navigate(rootUrl + '/games/');
+                    navigate('/games/');
                 }
             } catch (error: any) {
                 console.log(error);
@@ -249,7 +249,7 @@ const UserRegister = () => {
                                 </button>
                                 <Typography variant="subtitle2" align="center">
                                     Already had account?
-                                    <NavLink to={rootUrl + '/users/login'} end>
+                                    <NavLink to={'/users/login'} end>
                                         Login
                                     </NavLink>
                                 </Typography>

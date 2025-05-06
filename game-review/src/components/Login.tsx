@@ -50,7 +50,7 @@ const Login = () => {
                 const {userId, token} = response.data;
                 authorization.setAuthorization(userId, token);
                 console.log(userId);
-                navigate(rootUrl + '/games/user/' + userId);
+                navigate('/games/user/' + userId);
             } catch (error: any) {
                 console.log(error);
                 console.log(email);
@@ -129,7 +129,7 @@ const Login = () => {
                                 </button>
                                 <Typography variant="subtitle2" align="center">
                                     No account yet?
-                                    <NavLink to={rootUrl + '/users/register'} end>
+                                    <NavLink to={'/users/register'} end>
                                         Register
                                     </NavLink>
                                 </Typography>

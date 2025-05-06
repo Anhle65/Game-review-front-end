@@ -154,7 +154,7 @@ const GameListObject = (props: IGameProps) => {
             />
             <CardContent>
                 <Typography variant="h6">
-                    <NavLink to={rootUrl+'/games/' + game.gameId} end>
+                    <NavLink to={'/games/' + game.gameId} end>
                         {game.title}
                     </NavLink>
                 </Typography>

@@ -6,21 +6,20 @@ import Button from "@mui/material/Button";
 import AppBar from "@mui/material/AppBar";
 import React from "react";
 import {useNavigate} from "react-router-dom";
-import {rootUrl} from "../base.routes";
 
 const LogoutNavBar = () => {
     const navigate = useNavigate();
     const handleSignUp = () => {
-        navigate(rootUrl+'/users/register');
+        navigate('/users/register');
     }
     const handleLogIn = () => {
-        navigate(rootUrl+'/users/login');
+        navigate('/users/login');
     }
     const handleDashboardClick = () => {
         if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
             window.location.reload();
         } else {
-            navigate(rootUrl+'/games');
+            navigate('/games');
         }
     };
     return (
