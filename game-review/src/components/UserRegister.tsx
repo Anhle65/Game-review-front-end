@@ -12,6 +12,7 @@ import {
     InputLabel,
     OutlinedInput,
     Stack,
+    TextField,
     Typography
 } from "@mui/material";
 import LogoutNavBar from "./LogoutNavBar";
@@ -32,10 +33,12 @@ const UserRegister = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [pwFormType, setPwFormType] = React.useState('');
     const [image, setImage] = React.useState('');
+    const [imageFile, setImageFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
     const token = authorization.token;
     const userId = authorization.userId;
     const navigate = useNavigate();
+    const formData = new FormData();
 
     React.useEffect(() => {
         setPwFormType(showPassword ? 'text' : 'password');
@@ -51,12 +54,12 @@ const UserRegister = () => {
     //     ;
     // }
     const updateFnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFname(event.target.value)
+        setFname(event.target.value.trim())
         setError('');
         setErrorFlag(false);
     }
     const updateLnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLname(event.target.value)
+        setLname(event.target.value.trim())
         setError('');
         setErrorFlag(false);
     }
@@ -79,6 +82,11 @@ const UserRegister = () => {
         event.preventDefault();
     };
     const onSubmit = async () => {
+        console.log(imageFile);
+        if(imageFile) {
+            formData.append("image", imageFile);
+        }
+        console.log(formData);
         if (!token) {
             try {
                 if (password !== confirmPassword) {
@@ -107,6 +115,14 @@ const UserRegister = () => {
                     });
                     const {userId, token} = response.data;
                     authorization.setAuthorization(userId, token);
+                    console.log("userId:", userId);
+                    console.log("token:", token);
+                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                        formData,
+                    { headers: {
+                            "X-Authorization": token,
+                        }
+                    })
                     navigate('/games/');
                 }
             } catch (error: any) {
@@ -118,11 +134,11 @@ const UserRegister = () => {
                 setErrorFlag(true);
                 if (axios.isAxiosError(error)) {
                     if (error.response?.status === 400) {
-                        if (fname.length < 6 || fname.length > 64) {
-                            setError("Fist name length must be from 6 to 64 characters");
+                        if (fname.length < 1) {
+                            setError("Fist name can not be null");
                         } else {
-                            if (lname.length < 6 || lname.length > 64) {
-                                setError("Last name length must be from 6 to 64 characters");
+                            if (lname.length < 1) {
+                                setError("Last name can not be null");
                             } else {
                                 if (password.length < 6 || password.length > 64) {
                                     setError("Password length must be from 6 to 64 characters");
@@ -155,12 +171,12 @@ const UserRegister = () => {
         backgroundColor: "lightcyan",
     }
     return (
-        <>{userId && token && (
+        <>{(userId && token) && (
             <>
                 <LogInNavBar />
             </>
         )}
-            {!userId || !token  && (
+            {(!userId || !token)  && (
                 <>
                     <LogoutNavBar />
                 </>
@@ -175,19 +191,27 @@ const UserRegister = () => {
                                 justifyContent: "space-around",
                                 alignItems: "center",
                             }}>
-                                <div className="signup-form">
-                                    <label htmlFor="fname">First Name:</label>
-                                    <input type="text" className="form-control" id="fname" onChange={updateFnameState}/>
-                                </div>
-                                <div className="signup-form">
-                                    <label htmlFor="lname">Last Name:</label>
-                                    <input type="text" className="form-control" id="lname" onChange={updateLnameState}/>
-                                </div>
-                                <div className="signup-form">
-                                    <label htmlFor="email">Email address:</label>
-                                    <input type="email" className="form-control" id="email"
-                                           onChange={updateEmailState}/>
-                                </div>
+                                <TextField
+                                    required
+                                    id="first-name-required"
+                                    label="First name"
+                                    onChange={updateFnameState}
+                                />
+                                <TextField
+                                    required
+                                    id="last-name-required"
+                                    // defaultValue="Smith"
+                                    onChange={updateLnameState}
+                                    label="Last name"
+                                />
+                                <TextField
+                                    required
+                                    type="text"
+                                    id="email-required"
+                                    label="Email"
+                                    // defaultValue="abc@example.com"
+                                    onChange={updateEmailState}
+                                />
                                     <FormControl variant="outlined">
                                     <InputLabel htmlFor="outlined-adornment-password" >Password</InputLabel>
                                     <OutlinedInput
@@ -237,9 +261,11 @@ const UserRegister = () => {
                                     />
                                 </FormControl>
                                 <label>Upload image: </label>
-                                <input type="file"  onChange={(e) => {
-                                    if (e.target.files)
-                                        setImage(URL.createObjectURL(e.target.files[0]))
+                                <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
+                                    if (e.target.files) {
+                                        setImage(URL.createObjectURL(e.target.files[0]));
+                                        setImageFile(e.target.files[0]);
+                                    }
                                     }}/>
                                 <Avatar alt="User Image" sx={{ width: 100, height: 100 }} src={image.length !== 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                                 <button type="button" className="btn btn-success" onClick={(e) => {
