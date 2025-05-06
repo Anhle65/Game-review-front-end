@@ -31,6 +31,10 @@ const LogInNavBar = () => {
         setAnchorElUser(null);
         navigate('/users/'+userId+'/edit');
     }
+
+    const handleMyGameClick = () => {
+        navigate('/users/'+userId+'/myGames');
+    }
     const handleLogout = async () =>{
         const token = localStorage.getItem("token");
         console.log('authToken: ' + token);
@@ -104,7 +108,7 @@ const LogInNavBar = () => {
                                 New Game
                             </Button>
                             <Button
-                                onClick={handleCreateGame}
+                                onClick={handleMyGameClick}
                                 sx={{my: 2, color: 'white', display: 'block'}}
                             >
                                 My Game
