@@ -17,11 +17,11 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path="/" element={<GameList />} />
-            <Route path="/games" element={<GameList />} />
+            <Route path="/" element={<GameList params={{}}/>} />
+            <Route path="/games" element={<GameList params={{}}/>} />
             <Route path="/games/create" element={<NewGame />} />
             <Route path="/games/:id" element={<Game />} />
-            <Route path="/games/user/:id" element={<GameList />} />
+            <Route path="/games/user/:id" element={<GameList params={{}}/>} />
             <Route path="/users/:id/profile" element={<UserProfile />} />
             <Route path="/users/:id/edit" element={<EditUserProfile />} />
             <Route path="/users/:id/myGames" element={<UserGames />} />

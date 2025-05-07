@@ -12,7 +12,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
-const GameList = () => {
+
+type GameListProps = {
+    params: Record<string, string | number | boolean | any[]>;
+};
+const GameList = ({params}: GameListProps) => {
     const [games, setGames] = React.useState<Game[]>([]);
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
@@ -20,9 +24,27 @@ const GameList = () => {
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
+    const filterParams = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+            value.forEach((v) => filterParams.append(key, String(v)));
+        } else {
+            filterParams.append(key, String(value));
+        }
+    });
+
+    let url = `http://localhost:4941${rootUrl}/games`;
+    if (filterParams.toString()) {
+        url += `?${filterParams.toString()}`;
+    }
     React.useEffect(() => {
+        console.log("Input params: ", filterParams);
+        console.log("New url: ", url);
             const getGames = () => {
-                axios.get('http://localhost:4941' +rootUrl+'/games')
+                axios.get(url,{headers: {
+                    "X-Authorization": token
+                    }})
                     .then((response) => {
                         setErrorFlag(false);
                         setGames(response.data['games']);
