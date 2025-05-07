@@ -31,7 +31,7 @@ const UserRegister = () => {
     const [error, setError] = useState('');
     const [errorFlag, setErrorFlag] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [pwFormType, setPwFormType] = React.useState('');
+    const [showCfPassword, setShowCfPassword] = useState(false);
     const [image, setImage] = React.useState('');
     const [imageFile, setImageFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
@@ -39,20 +39,12 @@ const UserRegister = () => {
     const userId = authorization.userId;
     const navigate = useNavigate();
     const formData = new FormData();
-
-    React.useEffect(() => {
-        setPwFormType(showPassword ? 'text' : 'password');
-    }, [ showPassword ]);
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
         setError('');
         setErrorFlag(false);
     }
 
-    // const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     console.log(e.target.files);
-    //     ;
-    // }
     const updateFnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFname(event.target.value.trim())
         setError('');
@@ -64,6 +56,7 @@ const UserRegister = () => {
         setErrorFlag(false);
     }
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleClickShowCfPassword = () => setShowCfPassword((show) => !show);
     const updatePasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value)
         setError('');
@@ -81,12 +74,11 @@ const UserRegister = () => {
     const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
+
     const onSubmit = async () => {
-        console.log(imageFile);
-        if(imageFile) {
-            formData.append("image", imageFile);
-        }
-        console.log(formData);
+        setErrorFlag(false);
+        setError('');
+        console.log("mage data: ",imageFile);
         if (!token) {
             try {
                 if (password !== confirmPassword) {
@@ -118,9 +110,10 @@ const UserRegister = () => {
                     console.log("userId:", userId);
                     console.log("token:", token);
                     await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
-                        formData,
+                        imageFile,
                     { headers: {
                             "X-Authorization": token,
+                            "Content-Type": imageFile?.type,
                         }
                     })
                     navigate('/games/');
@@ -151,7 +144,7 @@ const UserRegister = () => {
                         if (error.response?.status === 403) {
                             setError("Email is already used");
                         } else
-                            setError("Internal Server Error");
+                            setError(error.toString());
                     }
                 } else {
                     setError("Unexpected error");
@@ -209,7 +202,6 @@ const UserRegister = () => {
                                     type="text"
                                     id="email-required"
                                     label="Email"
-                                    // defaultValue="abc@example.com"
                                     onChange={updateEmailState}
                                 />
                                     <FormControl variant="outlined">
@@ -240,20 +232,20 @@ const UserRegister = () => {
                                     <InputLabel htmlFor="outlined-adornment-cornfirmpassword" >Confirm Password</InputLabel>
                                     <OutlinedInput
                                         id="outlined-adornment-cornfirmpassword"
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={showCfPassword ? 'text' : 'password'}
                                         onChange={updateConfirmPasswordState}
                                         endAdornment={
                                             <InputAdornment position="end">
                                                 <IconButton
                                                     aria-label={
-                                                        showPassword ? 'hide the password' : 'display the password'
+                                                        showCfPassword ? 'hide the password' : 'display the password'
                                                     }
-                                                    onClick={handleClickShowPassword}
+                                                    onClick={handleClickShowCfPassword}
                                                     onMouseDown={handleMouseDownPassword}
                                                     onMouseUp={handleMouseUpPassword}
                                                     edge="end"
                                                 >
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    {showCfPassword ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
                                             </InputAdornment>
                                         }
