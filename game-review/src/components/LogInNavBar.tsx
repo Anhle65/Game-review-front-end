@@ -19,11 +19,15 @@ const LogInNavBar = () => {
     const authorization = useUserStore();
     const userId = authorization.userId;
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+    const [anchorElGame, setAnchorElGame] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const [userImage, setUserImage] = React.useState("");
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorElUser(event.currentTarget);
+    };
+    const handleOpenGameMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
 
@@ -55,6 +59,15 @@ const LogInNavBar = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
+    const handleCloseGameMenu = () => {
+        setAnchorElGame(null);
+    };
+    const handleWishlistClick = () => {
+
+    }
+    const handleOwnedClick = () => {
+
+    }
     React.useEffect(()=> {
         axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
@@ -110,12 +123,34 @@ const LogInNavBar = () => {
                             >
                                 New Game
                             </Button>
-                            <Button
-                                onClick={handleMyGameClick}
-                                sx={{my: 2, color: 'white', display: 'block'}}
-                            >
-                                My Game
-                            </Button>
+                            <Tooltip title="my-game">
+                                    <Button
+                                        // onClick={handleMyGameClick}
+                                        onClick={handleOpenGameMenu}
+                                        sx={{my: 2, color: 'white', display: 'block'}}
+                                    >
+                                        My Game
+                                    </Button>
+                            </Tooltip>
+                            <Menu
+                                // sx={{ mt: '45px' }}
+                                id="menu-game"
+                                anchorEl={anchorElGame}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseGameMenu}>
+                                    <MenuItem onClick={handleMyGameClick}>Reviews</MenuItem>
+                                    <MenuItem onClick={handleWishlistClick}>In Wishlist</MenuItem>
+                                    <MenuItem onClick={handleOwnedClick}>Owned</MenuItem>
+                            </Menu>
                         </Stack>
                     </Box>
                     <Box sx={{flexGrow: 0}}>
