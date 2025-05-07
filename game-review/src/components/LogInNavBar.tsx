@@ -27,9 +27,12 @@ const LogInNavBar = () => {
         setAnchorElUser(event.currentTarget);
     };
 
-    const handleCreateGame = () => {
+    const handleEditProfile = () => {
         setAnchorElUser(null);
         navigate('/users/'+userId+'/edit');
+    }
+    const handleCreateGame = () => {
+        navigate('/games/create');
     }
 
     const handleMyGameClick = () => {
@@ -139,7 +142,7 @@ const LogInNavBar = () => {
                         >
                             {fName} {lName}
                             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-                            <MenuItem onClick={handleCreateGame}>Edit Information</MenuItem>
+                            <MenuItem onClick={handleEditProfile}>Edit Information</MenuItem>
                             <MenuItem onClick={handleLogout}>Log out</MenuItem>
                         </Menu>
                     </Box>

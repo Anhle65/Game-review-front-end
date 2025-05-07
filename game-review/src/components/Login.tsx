@@ -87,12 +87,12 @@ const Login = () => {
     }
     return (
         <>
-            {userId && token && (
+            {(userId && token) && (
                 <>
                     <LogInNavBar />
                 </>
             )}
-            {!userId || !token  && (
+            {(!userId || !token)  && (
                 <>
                     <LogoutNavBar />
                 </>

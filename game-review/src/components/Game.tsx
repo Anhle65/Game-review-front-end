@@ -127,7 +127,7 @@ const Game = () => {
         console.log("Game id: " + id);
         axios.delete('http://localhost:4941'+rootUrl+'/games/' + id, {
             headers: {
-                "X-Authorization": localStorage.getItem('token')
+                "X-Authorization": token
             }})
             .then(() => {
                 // deleteGameFromStore(game);
