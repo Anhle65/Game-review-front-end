@@ -1,15 +1,13 @@
 import LogInNavBar from "./LogInNavBar";
 import {
-    Button,
     Card,
+    CardContent, CardMedia,
     Checkbox,
-    FormControl, FormControlLabel, FormGroup, FormHelperText, FormLabel,
+    FormControl, FormControlLabel, FormGroup, FormLabel,
     Grid,
     InputLabel,
-    Paper,
     Select,
     SelectChangeEvent,
-    Stack,
     TextField
 } from "@mui/material";
 import React from "react";
@@ -19,36 +17,65 @@ import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {useUserStore} from "../store";
+import {useNavigate} from "react-router-dom";
 
 type PlatformCheckedState = {
-    id: number;
+    platformId: number;
     name: string;
     isSelected: boolean;
 }
 const NewGame = () => {
     const [title, setTitle] = React.useState("");
-    const [description, setDescription] = React.useState("");
+    const [description, setDescription] = React.useState(" ");
     const [genre, setGenre] = React.useState('Genre');
     const [errorMessage, setErrorMessage] = React.useState("");
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [allGenres, setGenres] = React.useState<Genre[]>([]);
     const [allPlatforms, setAllPlatforms] = React.useState<PlatformCheckedState[]>([]);
+    const [price, setPrice] = React.useState('0');
     const authorization = useUserStore();
     const token = authorization.token;
+    const navigate = useNavigate();
     const errorChecked = allPlatforms.filter(p => p.isSelected).length < 1;
-
+    const [image, setImage] = React.useState('');
+    const [imageFile, setImageFile] = React.useState<File | null>(null);
     const onCreateGame = async () => {
-        try {
-            await axios.post("http://localhost:4941" + rootUrl + "/games", {
-                headers: {
-                    "X-Authorization": token
+        console.log("Chosen platforms: ", allPlatforms.filter(p => p.isSelected));
+        console.log("Chosen platforms id: ", allPlatforms.filter(p => p.isSelected).map(i => i.platformId));
+        if(!errorChecked) {
+            try {
+                const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
+                    title: title,
+                    description: description,
+                    creationDate: new Date(),
+                    genreId: parseInt(genre, 10),
+                    price: parseInt(price, 10),
+                    platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
+                }, {
+                    headers: {
+                        "X-Authorization": token
+                    }
+                })
+                const createdId = gamePost.data["gameId"]
+                console.log("created data: ", gamePost);
+                console.log("created id: ", createdId);
+                if(imageFile) {
+                    await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
+                        headers: {
+                            "X-Authorization": token,
+                            "Content-Type": imageFile?.type,
+                        }
+                    })
                 }
-            })
-        }catch(error: any) {
-            setErrorFlag(true);
-            if (axios.isAxiosError(error)) {
-                setErrorMessage(error.toString());
+                navigate('/games');
+            } catch (error: any) {
+                setErrorFlag(true);
+                if (axios.isAxiosError(error)) {
+                    setErrorMessage(error.message.toString());
+                }
             }
+        } else {
+            setErrorFlag(true);
         }
     }
 
@@ -86,11 +113,8 @@ const NewGame = () => {
                 setAllPlatforms(response.data);
             }, (error) => {
                 setErrorFlag(true);
-                setErrorMessage(error.toString());
+                setErrorMessage(error.message.toString());
             })
-    }
-    const onSubmit = async () => {
-
     }
     const handleSelectGenreChange = (event: SelectChangeEvent) => {
         setGenre(event.target.value as string);
@@ -100,9 +124,13 @@ const NewGame = () => {
         e.preventDefault();
         setTitle(e.currentTarget.value);
     }
+    const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        setPrice(e.currentTarget.value);
+    }
     const updateDescriptionState = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
-        setTitle(e.currentTarget.value);
+        setDescription(e.currentTarget.value);
     }
     const MenuProps = {
         PaperProps: {
@@ -113,7 +141,7 @@ const NewGame = () => {
     };
     const creatCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "800px",
+        minHeight: "800px",
         width: "80%",
         margin: "10px",
         padding: "0px",
@@ -124,78 +152,101 @@ const NewGame = () => {
             {console.log("genres: ",genre)}
             <LogInNavBar/>
             {errorFlag && <Alert variant="danger">{errorMessage}</Alert>}
-            <Card sx={{ ...creatCardStyles, maxHeight: 'inherit', maxWidth: 'inherit', p: 2 }} >
-                <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
+            <Card sx={{...creatCardStyles, maxHeight: 'inherit', maxWidth: 'inherit', p: 2}}>
+                <h1>
+                    Game Information
+                </h1>
+                <CardMedia
+                    component="img"
+                    sx={{objectFit: "cover"}}
+                    image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+                />
+                <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
+                    if (e.target.files) {
+                        setImage(URL.createObjectURL(e.target.files[0]));
+                        setImageFile(e.target.files[0]);
+                    }
+                }}/>
+                <Grid container rowSpacing={1} columnSpacing={{xs: 1, sm: 2, md: 3}}>
                     <Grid size={6}>
-                    <FormControl fullWidth sx={{ my: 2}} variant="outlined">
-                    <TextField
-                        required
-                        type="text"
-                        id="title-required"
-                        label="Title"
-                        onChange={updateTitleState}
-                        sx={{ my: 2}}
-                    />
-                    <TextField
-                        multiline
-                        type="text"
-                        id="description-required"
-                        rows={8}
-                        label="Description"
-                        onChange={updateDescriptionState}
-                        sx={{ my: 2}}
-                    />
-                    </FormControl>
-                        <FormControl sx={{ m: 1, width: 200, justifyContent: 'left', alignItems: 'left' }}>
-                            <InputLabel id="select-genre">Genre</InputLabel>
-                            <Select
-                                sx={{ my: 2}}
-                                labelId="select-genre"
-                                id="select-genre"
-                                value={allGenres.map(g=>g.name).includes(genre) ? genre : ''}
-                                onChange={handleSelectGenreChange}
-                                MenuProps={MenuProps}
-                            >
-                                { allGenres.map(genre => (
-                                    <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
-                                ))
-                                }
-                            </Select>
+                        <FormControl fullWidth sx={{my: 2}} variant="outlined">
+                            <TextField
+                                required
+                                type="text"
+                                id="title-required"
+                                label="Title"
+                                onChange={updateTitleState}
+                                sx={{my: 2}}
+                            />
+                            <TextField
+                                multiline
+                                type="text"
+                                id="description-required"
+                                rows={8}
+                                label="Description"
+                                onChange={updateDescriptionState}
+                                sx={{my: 2}}
+                            />
+                            <TextField
+                                type="number"
+                                id="price-required"
+                                label="Price"
+                                onChange={updatePrice}
+                                value={price}
+                                placeholder='0'
+                                sx={{my: 2}}
+                            />
                         </FormControl>
                     </Grid>
-                        <Grid size={6}>
-                            <FormControl
-                                required
-                                sx={{ m: 3 }}
-                                variant="outlined"
-                            >
-                                <FormLabel color="info">Platform compatible: </FormLabel>
-                                {errorFlag && (
-                                    <FormLabel component="legend">Choose at least one platform</FormLabel>
-                                )}
-                                {allPlatforms.length > 0 && (
-                                    <FormGroup>
-                                        {allPlatforms.map((p) => (
-                                            <FormControlLabel
-                                                key={p.id}
-                                                control={
-                                                    <Checkbox
-                                                        checked={p.isSelected ?? false}
-                                                        onChange={handlePlatformSelectChange}
-                                                        name={p.name}
-                                                    />
-                                                }
-                                                label={p.name}
-                                            />
-                                        ))}
-                                    </FormGroup>
-                                )}
+                    <Grid size={6}>
+                        <FormControl
+                            required
+                            sx={{m: 3}}
+                            variant="outlined"
+                        >
+                            <FormControl sx={{m: 1, width: 200, justifyContent: 'left', alignItems: 'left'}}>
+                                <InputLabel id="select-genre">Genre</InputLabel>
+                                <Select
+                                    sx={{my: 2}}
+                                    labelId="select-genre"
+                                    id="select-genre"
+                                    value={allGenres.map(g => g.genreId).includes(parseInt(genre, 10)) ? genre : ''}
+                                    onChange={handleSelectGenreChange}
+                                    MenuProps={MenuProps}
+                                >
+                                    {allGenres.map(genre => (
+                                        <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
+                                    ))
+                                    }
+                                </Select>
                             </FormControl>
-                        </Grid>
+                            <FormLabel color="info" sx={{m: 2}}>Platform compatible: </FormLabel>
+                            {errorFlag && (
+                                <FormLabel component="legend">Choose at least one platform</FormLabel>
+                            )}
+                            {allPlatforms.length > 0 && (
+                                <FormGroup>
+                                    {allPlatforms.map((p) => (
+                                        <FormControlLabel
+                                            key={p.platformId}
+                                            control={
+                                                <Checkbox
+                                                    checked={p.isSelected ?? false}
+                                                    onChange={handlePlatformSelectChange}
+                                                    name={p.name}
+                                                />
+                                            }
+                                            label={p.name}
+                                        />
+                                    ))}
+                                </FormGroup>
+                            )}
+                        </FormControl>
                     </Grid>
+                </Grid>
                 <button type="button" className="btn btn-success" onClick={(e) => {
                     e.preventDefault();
-                    onSubmit();
+                    onCreateGame();
                 }}>Create Game
                 </button>
             </Card>
