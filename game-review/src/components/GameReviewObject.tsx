@@ -48,7 +48,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
                             <br/>
                             Messages: {gameReview.review}
                             <br/>
-                            Rated on: {gameReview.timestamp}
+                            Rated on: {new Date(gameReview.timestamp).toLocaleDateString()}
                         </Typography>
                     </Typography>
                     <div>

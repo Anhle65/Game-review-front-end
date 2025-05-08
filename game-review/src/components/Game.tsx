@@ -261,7 +261,7 @@ const Game = () => {
                         <Typography variant="subtitle1" align="left">
                             Genre: {genreName?.name}
                             <br/>
-                            Created on: {game.creationDate}
+                            Created on: {new Date(game.creationDate).toLocaleDateString()}
                             <br/>
                             Number of wishlisters: {game.numberOfWishlists}
                             <br/>

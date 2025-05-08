@@ -22,13 +22,13 @@ import {
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
-import {NavLink} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 
 interface IGameProps {
     game: Game
 }
 const GameListObject = (props: IGameProps) => {
-
+    const navigate = useNavigate();
     const [game] = React.useState<Game> (props.game);
     const [genres, setGenres] = React.useState<Genre[]>([]);
     const [errorFlag, setErrorFlag] = React.useState(false);
@@ -149,8 +149,9 @@ const GameListObject = (props: IGameProps) => {
                 height="300"
                 width="200"
                 sx={{objectFit:"cover"}}
-                image={image}
+                image={image.length > 0 ? image: "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                 alt="Auction hero"
+                onClick={() => navigate('/games/' + game.gameId)}
             />
             <CardContent>
                 <Typography variant="h6">
@@ -166,7 +167,7 @@ const GameListObject = (props: IGameProps) => {
                         <br/>
                         Creator: {game.creatorFirstName} {game.creatorLastName}
                         <br/>
-                        Created on : {game.creationDate}
+                        Created on : {new Date(game.creationDate).toLocaleDateString()}
                     </Typography>
                     <div>
                         <Typography variant="h6" align="right">
