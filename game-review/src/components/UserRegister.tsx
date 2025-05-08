@@ -109,13 +109,16 @@ const UserRegister = () => {
                     authorization.setAuthorization(userId, token);
                     console.log("userId:", userId);
                     console.log("token:", token);
-                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
-                        imageFile,
-                    { headers: {
-                            "X-Authorization": token,
-                            "Content-Type": imageFile?.type,
-                        }
-                    })
+                    if (imageFile) {
+                        await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                            imageFile,
+                            {
+                                headers: {
+                                    "X-Authorization": token,
+                                    "Content-Type": imageFile?.type,
+                                }
+                            })
+                    }
                     navigate('/games/');
                 }
             } catch (error: any) {
