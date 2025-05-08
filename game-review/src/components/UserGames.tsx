@@ -11,21 +11,13 @@ import {useUserStore} from "../store";
 import GameList from "./GameList";
 
 const UserGames = () => {
-    const {id} = useParams();
-    const [errorFlag, setErrorFlag] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState("");
     const authorization = useUserStore();
     const userId = authorization.userId;
-    const token = authorization.token;
     const myGameParams = {
-        ownedByMe: true,
-        // wishlistedByMe: true,
-        // reviewerId: userId
+        creatorId: parseInt(userId,10)
     }
     return(
-        <>
-            <GameList params={myGameParams}/>
-        </>
+        <GameList params={myGameParams}/>
     )
 }
 export default UserGames
