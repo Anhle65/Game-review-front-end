@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ChangeEvent} from "react";
 import axios from "axios";
 import CSS from 'csstype';
 import {Alert, AlertTitle, Pagination, PaginationItem, Paper, Stack} from "@mui/material";
@@ -21,24 +21,34 @@ const GameList = ({params}: GameListProps) => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [characterSearching, setCharacterSearching] = React.useState("");
+    const [triggerSearch, setTriggerSearch] = React.useState(false);
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
-    const filterParams = new URLSearchParams();
 
-    Object.entries(params).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-            value.forEach((v) => filterParams.append(key, String(v)));
-        } else {
-            filterParams.append(key, String(value));
-        }
-    });
-
-    let url = `http://localhost:4941${rootUrl}/games`;
-    if (filterParams.toString()) {
-        url += `?${filterParams.toString()}`;
+    const triggerSearching = () => {
+        setTriggerSearch(!triggerSearch);
     }
+
     React.useEffect(() => {
+        console.log('state: ', triggerSearch);
+        console.log('string: ', characterSearching);
+        let filterParams = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (Array.isArray(value)) {
+                value.forEach((v) => filterParams.append(key, String(v)));
+            } else {
+                filterParams.append(key, String(value));
+            }
+        });
+        let url = `http://localhost:4941${rootUrl}/games`;
+        if(characterSearching.trim()) {
+            filterParams.append('q', characterSearching);
+        }
+        if (filterParams.toString()) {
+            url += `?${filterParams.toString()}`;
+        }
         console.log("Input params: ", filterParams);
         console.log("New url: ", url);
             const getGames = () => {
@@ -55,7 +65,7 @@ const GameList = ({params}: GameListProps) => {
                     })
             }
             getGames();
-        }, [setGames]
+        }, [triggerSearch]
     )
     const Search = styled('div')(({ theme }) => ({
         position: 'relative',
@@ -101,13 +111,18 @@ const GameList = ({params}: GameListProps) => {
             },
         },
     }));
-
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const searchTerm = e.target.value;
+        setCharacterSearching(searchTerm)
+        console.log('string: ', characterSearching);
+    }
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
         display: "block",
-        width: "fit-content"
+        width: "fit-content",
+        minWidth: "1000px"
     }
     return (
         <>
@@ -128,17 +143,22 @@ const GameList = ({params}: GameListProps) => {
         }}>
             <Stack direction="row" spacing={2}>
             <Paper elevation={3} style={card}>
-                {/*<h1> </h1>*/}
                 <Stack direction="row" spacing={2}>
-                    <Search>
+                    {triggerSearch}
+                    <Search >
                         <SearchIconWrapper>
-                            <SearchIcon />
+                            <SearchIcon/>
                         </SearchIconWrapper>
                         <StyledInputBase
+                            value={characterSearching}
+                            onChange={handleInputChange}
                             placeholder="Search…"
-                            inputProps={{ 'aria-label': 'search' }}
+                            // inputProps={{'aria-label': 'search'}}
+                            type="text"
+
                         />
                     </Search>
+                    <button onClick={triggerSearching}>Search</button>
                 </Stack>
                 <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
                     {errorFlag ? (
