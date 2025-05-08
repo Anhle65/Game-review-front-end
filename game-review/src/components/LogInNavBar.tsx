@@ -27,9 +27,6 @@ const LogInNavBar = () => {
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
-    const handleOpenGameMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
 
     const handleEditProfile = () => {
         setAnchorElUser(null);
@@ -37,6 +34,9 @@ const LogInNavBar = () => {
     }
     const handleCreateGame = () => {
         navigate('/games/create');
+    }
+    const handleReviewedGame = () => {
+        navigate('/users/' +userId+'/reviewed');
     }
 
     const handleMyGameClick = () => {
@@ -59,14 +59,11 @@ const LogInNavBar = () => {
     const handleCloseUserMenu = () => {
         setAnchorElUser(null);
     };
-    const handleCloseGameMenu = () => {
-        setAnchorElGame(null);
-    };
     const handleWishlistClick = () => {
-
+        navigate('/users/' +userId+'/wishlisted');
     }
     const handleOwnedClick = () => {
-
+        navigate('/users/' +userId+'/owned');
     }
     React.useEffect(()=> {
         axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
@@ -123,34 +120,10 @@ const LogInNavBar = () => {
                             >
                                 New Game
                             </Button>
-                            <Tooltip title="my-game">
-                                    <Button
-                                        // onClick={handleMyGameClick}
-                                        onClick={handleOpenGameMenu}
-                                        sx={{my: 2, color: 'white', display: 'block'}}
-                                    >
-                                        My Game
-                                    </Button>
-                            </Tooltip>
-                            <Menu
-                                // sx={{ mt: '45px' }}
-                                id="menu-game"
-                                anchorEl={anchorElGame}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseGameMenu}>
-                                    <MenuItem onClick={handleMyGameClick}>Reviews</MenuItem>
-                                    <MenuItem onClick={handleWishlistClick}>In Wishlist</MenuItem>
-                                    <MenuItem onClick={handleOwnedClick}>Owned</MenuItem>
-                            </Menu>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleReviewedGame}>Reviews</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleWishlistClick}>In Wishlist</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleOwnedClick}>Owned</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleMyGameClick}>My game</Button>
                         </Stack>
                     </Box>
                     <Box sx={{flexGrow: 0}}>
