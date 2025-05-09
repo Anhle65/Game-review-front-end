@@ -12,6 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
+import Box from "@mui/material/Box";
 
 type GameListProps = {
     params: Record<string, string | number | boolean | any[]>;
@@ -22,18 +23,11 @@ const GameList = ({params}: GameListProps) => {
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
     const [characterSearching, setCharacterSearching] = React.useState("");
-    const [triggerSearch, setTriggerSearch] = React.useState(false);
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
 
-    const triggerSearching = () => {
-        setTriggerSearch(!triggerSearch);
-    }
-
     React.useEffect(() => {
-        console.log('state: ', triggerSearch);
-        console.log('string: ', characterSearching);
         let filterParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
             if (Array.isArray(value)) {
@@ -49,7 +43,6 @@ const GameList = ({params}: GameListProps) => {
         if (filterParams.toString()) {
             url += `?${filterParams.toString()}`;
         }
-        console.log("Input params: ", filterParams);
         console.log("New url: ", url);
             const getGames = () => {
                 axios.get(url,{headers: {
@@ -65,56 +58,14 @@ const GameList = ({params}: GameListProps) => {
                     })
             }
             getGames();
-        }, [triggerSearch]
+        }, [characterSearching]
     )
-    const Search = styled('div')(({ theme }) => ({
-        position: 'relative',
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
-        },
-        marginLeft: 0,
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            marginLeft: theme.spacing(1),
-            width: 'auto',
-        },
-    }));
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);
         window.scrollTo({top:0});
     }
-    const SearchIconWrapper = styled('div')(({ theme }) => ({
-        padding: theme.spacing(0, 2),
-        height: '100%',
-        position: 'absolute',
-        pointerEvents: 'none',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    }));
-
-    const StyledInputBase = styled(InputBase)(({ theme }) => ({
-        color: 'inherit',
-        width: '100%',
-        '& .MuiInputBase-input': {
-            padding: theme.spacing(1, 1, 1, 0),
-            // vertical padding + font size from searchIcon
-            paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-            transition: theme.transitions.create('width'),
-            [theme.breakpoints.up('sm')]: {
-                width: '12ch',
-                '&:focus': {
-                    width: '20ch',
-                },
-            },
-        },
-    }));
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const searchTerm = e.target.value;
-        setCharacterSearching(searchTerm)
-        console.log('string: ', characterSearching);
+        setCharacterSearching(e.target.value)
     }
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
     const card: CSS.Properties = {
@@ -142,23 +93,10 @@ const GameList = ({params}: GameListProps) => {
             alignItems: 'center',
         }}>
             <Stack direction="row" spacing={2}>
-            <Paper elevation={3} style={card}>
+            <Paper elevation={3} style={card} sx={{justifyContent: 'left'}}>
                 <Stack direction="row" spacing={2}>
-                    {triggerSearch}
-                    <Search >
-                        <SearchIconWrapper>
-                            <SearchIcon/>
-                        </SearchIconWrapper>
-                        <StyledInputBase
-                            value={characterSearching}
-                            onChange={handleInputChange}
-                            placeholder="Search…"
-                            // inputProps={{'aria-label': 'search'}}
-                            type="text"
-
-                        />
-                    </Search>
-                    <button onClick={triggerSearching}>Search</button>
+                    <SearchIcon/>
+                    <input type='text' width="100.px" placeholder="Search..." className="form-control" id="input" value={characterSearching} onChange={handleInputChange} />
                 </Stack>
                 <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
                     {errorFlag ? (
