@@ -23,6 +23,7 @@ function App() {
             <Route path="/" element={<GameList params={{}}/>} />
             <Route path="/games" element={<GameList params={{}}/>} />
             <Route path="/games/create" element={<NewGame />} />
+            <Route path="/games/:id/edit" element={<NewGame />} />
             <Route path="/games/:id" element={<Game />} />
             <Route path="/games/user/:id" element={<GameList params={{}}/>} />
             <Route path="/users/:id/profile" element={<UserProfile />} />

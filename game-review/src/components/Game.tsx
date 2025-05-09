@@ -61,7 +61,6 @@ const Game = () => {
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const genreName = genres.find(g => g.genreId === game.genreId)
-    // const userId = localStorage.getItem('userId');
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
         .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
@@ -137,10 +136,11 @@ const Game = () => {
         setgamename(event.target.value)
     }
     const editGame = () => {
-        axios.put('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
-            .then(() => {
-                // editGameFromStore(game, gamename);
-            })
+        // axios.patch('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
+        //     .then(() => {
+        //         // editGameFromStore(game, gamename);
+        //     })
+        navigate(`/games/${id}/edit`);
     }
 
     const handleAddReview = () => {
@@ -375,10 +375,15 @@ const Game = () => {
                     <>
                         <CardActions>
                             <IconButton onClick={() => {
-                                setOpenEditDialog(true)}}>
+                                // setOpenEditDialog(true)
+                                navigate(`/games/${id}/edit`);
+                            }}>
                                 <Edit/>
                             </IconButton>
-                            <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
+                            <IconButton onClick={() => {
+                                setOpenDeleteDialog(true)
+                                // navigate(`/games/${id}/edit`);
+                            }}>
                                 <Delete/>
                             </IconButton>
                         </CardActions>
@@ -411,7 +416,7 @@ const Game = () => {
                             aria-labelledby="alert-dialog-title"
                             aria-describedby="alert-dialog-description">
                             <DialogTitle id="alert-dialog-title">
-                                {`Renaming "${game?.title}" to:`}
+                                {`Edit game "${game?.title}" information:`}
                             </DialogTitle>
                             <DialogContent>
                                 <DialogContentText id="alert-dialog-description">
