@@ -160,7 +160,7 @@ const GameListObject = (props: IGameProps) => {
                     </NavLink>
                 </Typography>
                 <Stack direction="row" spacing={2} justifyContent="center">
-                    <Typography variant="subtitle2" align="left">
+                    <Typography variant="subtitle2" align="left"  >
                         Genres: {gameGenre?.name}
                         <br/>
                         Platforms: {platformsName}
@@ -171,67 +171,12 @@ const GameListObject = (props: IGameProps) => {
                     </Typography>
                     <div>
                         <Typography variant="h6" align="right">
-                            ${game.price}
+                            ${game.price/100}
                         </Typography>
                         <Avatar alt="Creator Image" src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                     </div>
                 </Stack>
             </CardContent>
-            <CardActions>
-                <IconButton onClick={() => {setOpenEditDialog(true)}}>
-                    <Edit/>
-                </IconButton>
-                <IconButton onClick={() => {setOpenDeleteDialog(true)}}>
-                    <Delete/>
-                </IconButton>
-            </CardActions>
-            <Dialog
-                open={openDeleteDialog}
-                onClose={handleDeleteDialogClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">
-                    {"Delete game?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this game?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                    <Button variant="outlined" color="error" onClick={() => {
-                        if(game) deleteGame()
-                        handleDeleteDialogClose();
-                    }} autoFocus>
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog
-                open={openEditDialog}
-                onClose={handleEditDialogClose}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description">
-                <DialogTitle id="alert-dialog-title">
-                    {`Renaming "${game?.title}" to:`}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        <TextField id="outlined-basic" label="Title" variant="outlined"
-                                   value={gamename} onChange={updateGamenameState} />
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEditDialogClose}>Cancel</Button>
-                    <Button variant="outlined" color="error" onClick={() => {
-                        if (game) editGame()
-                        handleEditDialogClose();
-                    }} autoFocus>
-                        Save changes
-                    </Button>
-                </DialogActions>
-            </Dialog>
         </Card>
         </>
     )
