@@ -17,7 +17,7 @@ import {
     TextField,
     Stack,
     Avatar,
-    Pagination, PaginationItem, Alert, AlertTitle
+    Pagination, PaginationItem, Alert, AlertTitle, Fab
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
@@ -29,6 +29,12 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {Form} from "react-bootstrap";
 import {useUserStore} from "../store";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import NavigationIcon from "@mui/icons-material/Navigation";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import Box from "@mui/material/Box";
+import DeleteIcon from "@mui/icons-material/Delete";
 const Game = () => {
     const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
@@ -424,18 +430,30 @@ const Game = () => {
                                                value={gamename} onChange={updateGamenameState} />
                                 </DialogContentText>
                             </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleEditDialogClose}>Cancel</Button>
-                                <Button variant="outlined" color="error" onClick={() => {
-                                    if (game) editGame()
-                                    handleEditDialogClose();
-                                }} autoFocus>
-                                    Save changes
-                                </Button>
-                            </DialogActions>
                         </Dialog>
                     </>
                 )}
+                <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                    <Fab color="primary" aria-label="add">
+                        <AddIcon />
+                    </Fab>
+                    {parseInt(userId as string,10) === game.creatorId && (
+                        <>
+                            <Fab color="success" aria-label="edit" onClick={editGame}>
+                                <EditIcon />
+                            </Fab>
+                            <Fab color="error" aria-label="delete" onClick={() => {
+                                setOpenDeleteDialog(true)}}>
+                                <DeleteIcon />
+                            </Fab>
+                        </>
+                    )}
+                    {parseInt(userId as string,10) !== game.creatorId && (
+                        <Fab aria-label="like" color='error'>
+                            <FavoriteIcon />
+                        </Fab>
+                    )}
+                </Box>
             </Card>
         </div>
             </>

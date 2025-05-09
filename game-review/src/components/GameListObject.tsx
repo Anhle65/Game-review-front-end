@@ -23,7 +23,6 @@ import {
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
-
 interface IGameProps {
     game: Game
 }

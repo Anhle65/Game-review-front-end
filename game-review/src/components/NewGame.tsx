@@ -6,6 +6,7 @@ import {
     FormControl, FormControlLabel, FormGroup, FormLabel,
     Grid,
     InputLabel,
+    ListItemIcon,
     Select,
     SelectChangeEvent,
     TextField
@@ -18,7 +19,7 @@ import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {useUserStore} from "../store";
 import {useNavigate, useParams} from "react-router-dom";
-
+import AttachMoneyTwoToneIcon from '@mui/icons-material/AttachMoneyTwoTone';
 type PlatformCheckedState = {
     platformId: number;
     name: string;
@@ -100,6 +101,7 @@ const NewGame = () => {
         getPlatforms();
         if(id) {
             getGame().then( () => {
+                console.log("Game: ", game);
                     setTitle(game.title);
                     setDescription(game.description);
                     setGenre(game.genreId.toString());
@@ -237,39 +239,43 @@ const NewGame = () => {
                         </FormControl>
                         <FormControl
                             required
-                            sx={{m: 3}}
+                            sx={{m: 3, justifyContent: 'flex-end', alignItems: 'flex-end'}}
                             variant="outlined"
                         >
-                            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}} sx={{justifyContent: 'left', alignItems: 'left'}}>
+                            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}
+                                  sx={{justifyContent: 'left', alignItems: 'left'}}>
                                 <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
-                                <TextField
-                                    type="number"
-                                    id="price-required"
-                                    label="Price"
-                                    onChange={updatePrice}
-                                    value={price}
-                                    placeholder='0'
-                                    // sx={{my: 2}}
-                                />
-                                <FormControl sx={{m: 1}}>
-                                    <InputLabel id="select-genre">Genre</InputLabel>
-                                    <Select
-                                        sx={{my: 1}}
-                                        labelId="select-genre"
-                                        id="select-genre"
-                                        value={allGenres.map(g => g.genreId).includes(parseInt(genre, 10)) ? genre : ''}
-                                        onChange={handleSelectGenreChange}
-                                        MenuProps={MenuProps}
-                                    >
-                                        {allGenres.map(genre => (
-                                            <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
-                                        ))
-                                        }
-                                    </Select>
-                                </FormControl>
+                                    <FormControl sx={{m: 1, width:'100.px'}}>
+                                        <InputLabel id="select-genre">Genre</InputLabel>
+                                        <Select
+                                            sx={{my: 1, width:'100.px'}}
+                                            labelId="select-genre"
+                                            id="select-genre"
+                                            value={allGenres.map(g => g.genreId).includes(parseInt(genre, 10)) ? genre : ''}
+                                            onChange={handleSelectGenreChange}
+                                            MenuProps={MenuProps}
+                                        >
+                                            {allGenres.map(genre => (
+                                                <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
+                                            ))
+                                            }
+                                        </Select>
+                                    </FormControl>
+                                    <ListItemIcon>
+                                        <AttachMoneyTwoToneIcon fontSize="large"/>
+                                        <TextField
+                                        type="number"
+                                        id="price-required"
+                                        label="Price"
+                                        onChange={updatePrice}
+                                        value={price}
+                                        placeholder='0'
+                                        // sx={{my: 2}}
+                                    />
+                                    </ListItemIcon>
                                 </Grid>
                                 <Grid size={6} sx={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <FormLabel color="info" >Platform compatible: </FormLabel>
+                                    <FormLabel style={{color: "gray"}} color="info">Platform compatible: </FormLabel>
                                     {allPlatforms.length > 0 && (
                                         <FormGroup>
                                             {allPlatforms.map((p) => (
@@ -287,8 +293,8 @@ const NewGame = () => {
                                             ))}
                                         </FormGroup>
                                     )}
-                                    {errorFlag && (
-                                        <FormLabel color='error'>Choose at least one platform</FormLabel>
+                                    {allPlatforms.filter(p=>p.isSelected === true).length < 1 && (
+                                        <FormLabel style={{color: "red"}} color='error'>Choose at least one platform</FormLabel>
                                     )}
                                 </Grid>
                             </Grid>
@@ -308,11 +314,20 @@ const NewGame = () => {
                         />
                     </Grid>
                 </Grid>
-                <button type="button" className="btn btn-success" onClick={(e) => {
-                    e.preventDefault();
-                    onCreateGame();
-                }}>Create Game
-                </button>
+                {game.creatorId !== 0 && (
+                    <button type="button" className="btn btn-success" onClick={(e) => {
+                        e.preventDefault();
+                        onCreateGame();
+                    }}>Update Game
+                    </button>
+                )}
+                {game.creatorId === 0 && (
+                    <button type="button" className="btn btn-success" onClick={(e) => {
+                        e.preventDefault();
+                        onCreateGame();
+                    }}>Create Game
+                    </button>
+                )}
             </Card>
         </>
     )

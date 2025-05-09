@@ -1,7 +1,7 @@
 import React, {ChangeEvent} from "react";
 import axios from "axios";
 import CSS from 'csstype';
-import {Alert, AlertTitle, Pagination, PaginationItem, Paper, Stack} from "@mui/material";
+import {Alert, AlertTitle, Fab, Pagination, PaginationItem, Paper, Stack} from "@mui/material";
 import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -12,8 +12,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
-import Box from "@mui/material/Box";
-
 type GameListProps = {
     params: Record<string, string | number | boolean | any[]>;
 };
@@ -93,10 +91,11 @@ const GameList = ({params}: GameListProps) => {
             alignItems: 'center',
         }}>
             <Stack direction="row" spacing={2}>
-            <Paper elevation={3} style={card} sx={{justifyContent: 'left'}}>
+            <Paper elevation={3} style={card} sx={{justifyContent: 'flex-start',
+                alignItems: 'flex-start'}}>
                 <Stack direction="row" spacing={2}>
-                    <SearchIcon/>
-                    <input type='text' width="100.px" placeholder="Search..." className="form-control" id="input" value={characterSearching} onChange={handleInputChange} />
+                    <SearchIcon fontSize='large'/>
+                    <input type='text' style={{ width: "300px", overflowY: "auto" }} placeholder="Search..." className="form-control" id="input" value={characterSearching} onChange={handleInputChange} />
                 </Stack>
                 <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
                     {errorFlag ? (
