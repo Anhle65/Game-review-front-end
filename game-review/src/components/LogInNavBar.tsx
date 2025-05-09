@@ -1,7 +1,7 @@
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
-import {Stack} from "@mui/material";
+import {ListItemIcon, Stack} from "@mui/material";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
@@ -14,6 +14,7 @@ import {useNavigate} from "react-router-dom";
 import {rootUrl} from "../base.routes";
 import axios from "axios";
 import {useUserStore} from "../store";
+import {Edit, Logout} from "@mui/icons-material";
 
 const LogInNavBar = () => {
     const authorization = useUserStore();
@@ -133,7 +134,8 @@ const LogInNavBar = () => {
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{mt: '45px'}}
+                            sx={{mt: '45px', justifyContent: "space-around",
+                                alignItems: "center"}}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -150,8 +152,16 @@ const LogInNavBar = () => {
                         >
                             {fName} {lName}
                             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
-                            <MenuItem onClick={handleEditProfile}>Edit Information</MenuItem>
-                            <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                            <MenuItem onClick={handleEditProfile}>
+                                <ListItemIcon>
+                                    <Edit fontSize="small" />
+                                </ListItemIcon>
+                                Edit Information</MenuItem>
+                            <MenuItem onClick={handleLogout}>
+                                <ListItemIcon>
+                                <Logout fontSize="small" />
+                                </ListItemIcon>
+                                Logout</MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
