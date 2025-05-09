@@ -17,7 +17,7 @@ import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {useUserStore} from "../store";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 type PlatformCheckedState = {
     platformId: number;
@@ -25,7 +25,23 @@ type PlatformCheckedState = {
     isSelected: boolean;
 }
 const NewGame = () => {
+    const {id} = useParams();
     const [title, setTitle] = React.useState("");
+    const [game, setGame] = React.useState<Game>({
+        creationDate: "",
+        creatorFirstName: "",
+        creatorId: 0,
+        creatorLastName: "",
+        description: "",
+        gameId: 0,
+        genreId: 0,
+        numberOfOwners: 0,
+        numberOfWishlists: 0,
+        platformIds: [],
+        price: 0,
+        rating: 0,
+        title: ""
+    });
     const [description, setDescription] = React.useState(" ");
     const [genre, setGenre] = React.useState('Genre');
     const [errorMessage, setErrorMessage] = React.useState("");
@@ -42,14 +58,14 @@ const NewGame = () => {
     const onCreateGame = async () => {
         console.log("Chosen platforms: ", allPlatforms.filter(p => p.isSelected));
         console.log("Chosen platforms id: ", allPlatforms.filter(p => p.isSelected).map(i => i.platformId));
-        if(!errorChecked) {
+        // if(!errorChecked) {
             try {
                 const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
                     title: title,
                     description: description,
                     creationDate: new Date(),
                     genreId: parseInt(genre, 10),
-                    price: parseInt(price, 10),
+                    price: parseInt(price, 10)*100,
                     platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
                 }, {
                     headers: {
@@ -74,16 +90,46 @@ const NewGame = () => {
                     setErrorMessage(error.message.toString());
                 }
             }
-        } else {
-            setErrorFlag(true);
-        }
+        // } else {
+        //     setErrorFlag(true);
+        // }
     }
 
     React.useEffect(() => {
         getGenres();
         getPlatforms();
-    }, [allGenres.length])
+        if(id) {
+            getGame().then( () => {
+                    setTitle(game.title);
+                    setDescription(game.description);
+                    setGenre(game.genreId.toString());
+                    setPrice((game.price /100).toString());
+                    setAllPlatforms(prevPlatforms =>
+                        prevPlatforms.map(platform => ({
+                            ...platform,
+                            isSelected: game.platformIds.includes(platform.platformId)
+                        })))
+                }
+            );
+            getGameImage();
+        }
+    }, [])
 
+    const getGameImage = async () => {
+        await axios.get("http://localhost:4941" + rootUrl + "/games/" + id + "/image", {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setImage(imgUrl);
+            })
+    }
+    const getGame = async () => {
+        await axios.get("http://localhost:4941" + rootUrl + "/games/" + id)
+            .then(res => {
+                setGame(res.data);
+            })
+    }
     const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
         setAllPlatforms((prev) =>
@@ -156,18 +202,7 @@ const NewGame = () => {
                 <h1>
                     Game Information
                 </h1>
-                <CardMedia
-                    component="img"
-                    sx={{objectFit: "cover"}}
-                    image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
-                />
-                <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
-                    if (e.target.files) {
-                        setImage(URL.createObjectURL(e.target.files[0]));
-                        setImageFile(e.target.files[0]);
-                    }
-                }}/>
-                <Grid container rowSpacing={1} columnSpacing={{xs: 1, sm: 2, md: 3}}>
+                <Grid container rowSpacing={2} columnSpacing={{xs: 1, sm: 2, md: 3}}>
                     <Grid size={6}>
                         <FormControl fullWidth sx={{my: 2}} variant="outlined">
                             <TextField
@@ -176,6 +211,12 @@ const NewGame = () => {
                                 id="title-required"
                                 label="Title"
                                 onChange={updateTitleState}
+                                value={title}
+                                slotProps={{
+                                    inputLabel: {
+                                        shrink: true,
+                                    },
+                                }}
                                 sx={{my: 2}}
                             />
                             <TextField
@@ -184,64 +225,87 @@ const NewGame = () => {
                                 id="description-required"
                                 rows={8}
                                 label="Description"
+                                value={description}
+                                slotProps={{
+                                    inputLabel: {
+                                        shrink: true,
+                                    },
+                                }}
                                 onChange={updateDescriptionState}
                                 sx={{my: 2}}
                             />
-                            <TextField
-                                type="number"
-                                id="price-required"
-                                label="Price"
-                                onChange={updatePrice}
-                                value={price}
-                                placeholder='0'
-                                sx={{my: 2}}
-                            />
                         </FormControl>
-                    </Grid>
-                    <Grid size={6}>
                         <FormControl
                             required
                             sx={{m: 3}}
                             variant="outlined"
                         >
-                            <FormControl sx={{m: 1, width: 200, justifyContent: 'left', alignItems: 'left'}}>
-                                <InputLabel id="select-genre">Genre</InputLabel>
-                                <Select
-                                    sx={{my: 2}}
-                                    labelId="select-genre"
-                                    id="select-genre"
-                                    value={allGenres.map(g => g.genreId).includes(parseInt(genre, 10)) ? genre : ''}
-                                    onChange={handleSelectGenreChange}
-                                    MenuProps={MenuProps}
-                                >
-                                    {allGenres.map(genre => (
-                                        <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
-                                    ))
-                                    }
-                                </Select>
-                            </FormControl>
-                            <FormLabel color="info" sx={{m: 2}}>Platform compatible: </FormLabel>
-                            {errorFlag && (
-                                <FormLabel component="legend">Choose at least one platform</FormLabel>
-                            )}
-                            {allPlatforms.length > 0 && (
-                                <FormGroup>
-                                    {allPlatforms.map((p) => (
-                                        <FormControlLabel
-                                            key={p.platformId}
-                                            control={
-                                                <Checkbox
-                                                    checked={p.isSelected ?? false}
-                                                    onChange={handlePlatformSelectChange}
-                                                    name={p.name}
+                            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}} sx={{justifyContent: 'left', alignItems: 'left'}}>
+                                <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
+                                <TextField
+                                    type="number"
+                                    id="price-required"
+                                    label="Price"
+                                    onChange={updatePrice}
+                                    value={price}
+                                    placeholder='0'
+                                    // sx={{my: 2}}
+                                />
+                                <FormControl sx={{m: 1}}>
+                                    <InputLabel id="select-genre">Genre</InputLabel>
+                                    <Select
+                                        sx={{my: 1}}
+                                        labelId="select-genre"
+                                        id="select-genre"
+                                        value={allGenres.map(g => g.genreId).includes(parseInt(genre, 10)) ? genre : ''}
+                                        onChange={handleSelectGenreChange}
+                                        MenuProps={MenuProps}
+                                    >
+                                        {allGenres.map(genre => (
+                                            <MenuItem value={genre.genreId}>{genre.name}</MenuItem>
+                                        ))
+                                        }
+                                    </Select>
+                                </FormControl>
+                                </Grid>
+                                <Grid size={6} sx={{justifyContent: 'center', alignItems: 'center'}}>
+                                    <FormLabel color="info" >Platform compatible: </FormLabel>
+                                    {allPlatforms.length > 0 && (
+                                        <FormGroup>
+                                            {allPlatforms.map((p) => (
+                                                <FormControlLabel
+                                                    key={p.platformId}
+                                                    control={
+                                                        <Checkbox
+                                                            checked={p.isSelected ?? false}
+                                                            onChange={handlePlatformSelectChange}
+                                                            name={p.name}
+                                                        />
+                                                    }
+                                                    label={p.name}
                                                 />
-                                            }
-                                            label={p.name}
-                                        />
-                                    ))}
-                                </FormGroup>
-                            )}
+                                            ))}
+                                        </FormGroup>
+                                    )}
+                                    {errorFlag && (
+                                        <FormLabel color='error'>Choose at least one platform</FormLabel>
+                                    )}
+                                </Grid>
+                            </Grid>
                         </FormControl>
+                    </Grid>
+                    <Grid size={6}>
+                        <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
+                            if (e.target.files) {
+                                setImage(URL.createObjectURL(e.target.files[0]));
+                                setImageFile(e.target.files[0]);
+                            }
+                        }}/>
+                        <CardMedia
+                            component="img"
+                            sx={{objectFit: "cover"}}
+                            image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+                        />
                     </Grid>
                 </Grid>
                 <button type="button" className="btn btn-success" onClick={(e) => {
