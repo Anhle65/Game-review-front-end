@@ -17,7 +17,7 @@ import {
     TextField,
     Stack,
     Avatar,
-    Pagination, PaginationItem, Alert, AlertTitle, Fab
+    Pagination, PaginationItem, Alert, AlertTitle, Fab, Rating
 } from "@mui/material";
 import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
@@ -60,7 +60,7 @@ const Game = () => {
     const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
     const [gamename, setgamename] = React.useState("");
-    const [image, setImage] = React.useState("");
+    const [image, setImage] = React.useState("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
     const [creatorImage, setCreatorImage] = React.useState("");
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -213,11 +213,15 @@ const Game = () => {
             responseType: 'blob',
         })
             .then((response) => {
+                setErrorFlag(false);
                 const imgUrl = URL.createObjectURL(response.data);
                 setImage(imgUrl);
             }).catch((error) => {
             if (axios.isAxiosError(error)) {
-                if (error.response?.status !== 404) {
+                if (error.response?.status === 404) {
+                    setErrorFlag(false);
+                } else {
+                    setErrorFlag(true);
                     console.error("Failed to load image", error);
                 }
             }
@@ -292,7 +296,7 @@ const Game = () => {
 
                             </Typography>
                                 <Typography variant="h3">
-                                    ${game.price}
+                                    ${game.price/100}
                                 </Typography>
                             </Stack>
                         </div>
@@ -449,7 +453,7 @@ const Game = () => {
                         </>
                     )}
                     {parseInt(userId as string,10) !== game.creatorId && (
-                        <Fab aria-label="like" color='error'>
+                        <Fab aria-label="like" >
                             <FavoriteIcon />
                         </Fab>
                     )}

@@ -3,24 +3,14 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card,
-    CardActions,
     CardContent,
     CardMedia,
-    IconButton,
     Typography,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Button,
-    TextField,
     Stack,
     Avatar,
     Alert,
     AlertTitle
 } from "@mui/material";
-import {Delete, Edit} from "@mui/icons-material";
 import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 interface IGameProps {
@@ -33,38 +23,12 @@ const GameListObject = (props: IGameProps) => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
-    const [gamename, setgamename] = React.useState("");
-    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
-    const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const [image, setImage] = React.useState("");
-    // const deleteGameFromStore = useGameStore(state => state.removeGame);
-    // const editGameFromStore = useGameStore(state => state.editGame);
     const [creatorImage, setCreatorImage] = React.useState("");
     const gameGenre = genres.find(g => g.genreId === game.genreId);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
                                                 .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
     const platformsName = allPlatforms.join(', ');
-    const handleDeleteDialogClose = () => {
-        setOpenDeleteDialog(false);
-    }
-    const handleEditDialogClose = () => {
-        setOpenEditDialog(false);
-    }
-    const deleteGame = () => {
-        axios.delete('http://localhost:4941'+rootUrl+'/games/' + game.gameId)
-            .then(() => {
-                // deleteGameFromStore(game);
-            })
-    }
-    const updateGamenameState = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setgamename(event.target.value)
-    }
-    const editGame = () => {
-        axios.put('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
-            .then(() => {
-                // editGameFromStore(game, gamename);
-            })
-    }
     React.useEffect(()=> {
         axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId + '/image', {
             responseType: 'blob',
@@ -76,7 +40,10 @@ const GameListObject = (props: IGameProps) => {
                 setErrorMessage("");
             }).catch((error) => {
                 if (axios.isAxiosError(error)) {
-                    if (error.response?.status !== 404) {
+                    if (error.response?.status === 404) {
+                        setErrorFlag(false);
+                    } else {
+                        setErrorFlag(true);
                         console.error("Failed to load image", error);
                     }
                 } else {
@@ -106,11 +73,15 @@ const GameListObject = (props: IGameProps) => {
         })
             .then((response) => {
                 const imgUrl = URL.createObjectURL(response.data);
+                setErrorFlag(false);
                 setImage(imgUrl);
         }).catch((error) => {
             setImage('');
             if (axios.isAxiosError(error)) {
-                if (error.response?.status !== 404) {
+                if (error.response?.status === 404) {
+                    setErrorFlag(false);
+                } else {
+                    setErrorFlag(true);
                     console.error("Failed to load image", error);
                 }
             }
