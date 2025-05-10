@@ -34,9 +34,14 @@ const LogInNavBar = () => {
         navigate('/users/'+userId+'/edit');
     }
     const handleCreateGame = () => {
-        navigate('/games/create');
+        if (window.location.pathname.endsWith('create/') || window.location.pathname.endsWith('create')) {
+            window.location.reload();
+        } else {
+            navigate('/games/create');
+        }
     }
     const handleReviewedGame = () => {
+
         navigate('/users/' +userId+'/reviewed');
     }
 
@@ -119,7 +124,7 @@ const LogInNavBar = () => {
                                 onClick={handleCreateGame}
                                 sx={{my: 2, color: 'white', display: 'block'}}
                             >
-                                New Game
+                                Create Game
                             </Button>
                             <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleReviewedGame}>Reviews</Button>
                             <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleWishlistClick}>In Wishlist</Button>
