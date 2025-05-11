@@ -74,6 +74,7 @@ const Game = () => {
     const [inputComment, setInputComment] = React.useState(' ');
     const [inputRating, setInputRating] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [addWishlistState, setAddWishlistState] = React.useState(false);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
@@ -141,6 +142,20 @@ const Game = () => {
     const updateGamenameState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setgamename(event.target.value)
     }
+
+    React.useEffect(()=> {
+        const addToWishList = () => {
+            axios.post('http://localhost:4941/'+rootUrl+'/games/'+id+'/wishlist', {},
+            {headers: {
+                'X-Authorization': token
+                }})
+                .then((res) => {
+                    const message = res.status;
+                })
+        }
+        addToWishList();
+
+    })
     const editGame = () => {
         // axios.patch('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
         //     .then(() => {
