@@ -242,7 +242,6 @@ const NewGame = () => {
     }
     return (
         <>
-            {console.log("genres: ",genre)}
             <LogInNavBar/>
             {errorFlag && <Alert variant="danger">{errorMessage}</Alert>}
             <Card sx={{...creatCardStyles, maxHeight: 'inherit', maxWidth: 'inherit', p: 2}}>
@@ -315,6 +314,12 @@ const NewGame = () => {
                                         onChange={updatePrice}
                                         value={price}
                                         placeholder='Eg: 0 is $0, 999 is $9.99'
+                                        slotProps={{
+                                            inputLabel: {
+                                                shrink: true,
+                                            },
+                                        }}
+                                        sx={{my: 2}}
                                         // sx={{my: 2}}
                                     />
                                     </ListItemIcon>

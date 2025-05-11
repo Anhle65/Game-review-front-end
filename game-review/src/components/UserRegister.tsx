@@ -38,7 +38,6 @@ const UserRegister = () => {
     const token = authorization.token;
     const userId = authorization.userId;
     const navigate = useNavigate();
-    const formData = new FormData();
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
         setError('');
