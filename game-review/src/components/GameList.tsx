@@ -1,7 +1,20 @@
 import React, {ChangeEvent} from "react";
 import axios from "axios";
 import CSS from 'csstype';
-import {Alert, AlertTitle, Autocomplete, Fab, Pagination, PaginationItem, Paper, Stack, TextField} from "@mui/material";
+import {
+    Alert,
+    AlertTitle,
+    Autocomplete,
+    Box, Checkbox,
+    Fab, FormControlLabel, FormGroup, FormLabel,
+    Grid,
+    Pagination,
+    PaginationItem,
+    Paper,
+    Stack,
+    styled,
+    TextField
+} from "@mui/material";
 import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -29,6 +42,76 @@ const GameList = ({params}: GameListProps) => {
     const [value, setValue] = React.useState('Oldest games');
     const [inputValue, setInputValue] = React.useState('');
     const [labelSorting, setLabelSorting] = React.useState('CREATED_ASC');
+    const [allPlatforms, setAllPlatforms] = React.useState<PlatformCheckedState[]>([]);
+    const [allGenres, setGenres] = React.useState<GenreSelectionState[]>([]);
+    const [chosenPlatform, setChosenPlatforms] = React.useState<PlatformCheckedState[]>([]);
+    const [chosenGenres, setChosenGenres] = React.useState<GenreSelectionState[]>([]);
+    // React.useEffect(()=> {
+    //     const getPlatforms = () => {
+    //         axios.get('https://localhost:4941' + rootUrl + '/games/platforms')
+    //             .then((response) => {
+    //                 const platformsWithSelection = response.data.map((platform: any) => ({
+    //                     ...platform,
+    //                     isSelected: false
+    //                 }));
+    //                 setAllPlatforms(platformsWithSelection)
+    //             })
+    //     }
+    //     getPlatforms();
+    // }
+    const getGenres = async () => {
+        await axios.get('http://localhost:4941'+ rootUrl + '/games/genres')
+            .then((response) => {
+                setErrorFlag(false);
+                setErrorMessage("");
+                const genresState = response.data.map((g:any) => ({
+                        ...g,
+                        isSelected: false
+                }))
+                setGenres(genresState);
+            }, (error) => {
+                setErrorFlag(true);
+                setErrorMessage(error.toString());
+            })
+    }
+    const handleGenresSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = event.target;
+        setGenres((prev) =>
+            prev.map((g) =>
+                g.name === name ? { ...g, isSelected: checked } : g
+            )
+        );
+        setChosenGenres(allGenres.filter(g=>g.isSelected));
+    };
+    const getPlatforms = async () => {
+        await axios.get('http://localhost:4941'+ rootUrl + '/games/platforms')
+            .then((response) => {
+                setErrorFlag(false);
+                setErrorMessage("");
+                const platformsWithSelection = response.data.map((platform: any) => ({
+                    ...platform,
+                    isSelected: false
+                }));
+                setAllPlatforms(platformsWithSelection);
+            }, (error) => {
+                setErrorFlag(true);
+                setErrorMessage(error.message.toString());
+            })
+    }
+    const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, checked } = event.target;
+        setAllPlatforms((prev) =>
+            prev.map((p) =>
+                p.name === name ? { ...p, isSelected: checked } : p
+            )
+        );
+        setChosenPlatforms(allPlatforms.filter(p=>p.isSelected))
+    };
+    React.useEffect(() => {
+        getPlatforms();
+        getGenres();
+    }, [])
+
     React.useEffect(() => {
         let filterParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
@@ -42,26 +125,34 @@ const GameList = ({params}: GameListProps) => {
         if(characterSearching.trim()) {
             filterParams.append('q', characterSearching);
         }
+        chosenGenres.forEach((genre) => {
+            filterParams.append('genreIds', genre.genreId.toString())
+        })
+        chosenPlatform.forEach((platform) => {
+            filterParams.append('platformIds', platform.platformId.toString())
+        })
         filterParams.append('sortBy', labelSorting);
         if (filterParams.toString()) {
             url += `?${filterParams.toString()}`;
         }
         console.log("New url: ", url);
-            const getGames = () => {
-                axios.get(url,{headers: {
-                    "X-Authorization": token
-                    }})
-                    .then((response) => {
-                        setErrorFlag(false);
-                        setGames(response.data['games']);
-                        setErrorMessage("");
-                    }, (error) => {
-                        setErrorFlag(true);
-                        setErrorMessage(error.toString() + " defaulting to old users changes app may not work as expected")
-                    })
-            }
-            getGames();
-        }, [characterSearching, labelSorting]
+        const getGames = () => {
+            axios.get(url,{headers: {
+                "X-Authorization": token
+                }})
+                .then((response) => {
+                    setErrorFlag(false);
+                    setGames(response.data['games']);
+                    setErrorMessage("");
+                }, (error) => {
+                    setErrorFlag(true);
+                    setErrorMessage(error.toString() + " defaulting to old users changes app may not work as expected")
+                })
+        }
+        getGames();
+        // console.log("Chosen genres :", allGenres);
+        // console.log("Chosen platforms: ", chosenPlatform);
+        }, [characterSearching, labelSorting, chosenPlatform, chosenGenres]
     )
     const handleSorting = (e:ChangeEvent<HTMLInputElement>, newValue: string| null) => {
         const label = optionSortBy.find(o => o.value === newValue)?.label;
@@ -105,58 +196,110 @@ const GameList = ({params}: GameListProps) => {
             justifyContent: 'center',
             alignItems: 'center',
         }}>
-            <Stack direction="row" spacing={2}>
-            <Paper elevation={3} style={card} sx={{justifyContent: 'flex-start',
-                alignItems: 'flex-start'}}>
-                <Stack direction="row" spacing={2} sx={{justifyContent: 'space-between'}} padding='15px 20px 0 15px'>
-                    <div>
-                        <Stack direction='row'>
-                            <SearchIcon fontSize='large'/>
-                            <input type='text' style={{width: "300px", overflowY: "auto"}} placeholder="Search..."
-                                   className="form-control" id="input" value={characterSearching} onChange={handleInputSearchingChange}/>
-                        </Stack>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start',
+                marginTop: 4
+            }}>
+                <Stack direction="row" spacing={2}>
+                <Paper elevation={3} style={card} sx={{justifyContent: 'center',
+                    alignItems: 'center'}}>
+                    <Stack direction="row" spacing={2} sx={{justifyContent: 'space-between'}} padding='15px 20px 0 15px'>
+                        <div>
+                            <Stack direction='row'>
+                                <SearchIcon fontSize='large'/>
+                                <input type='text' style={{width: "300px", overflowY: "auto"}} placeholder="Search..."
+                                       className="form-control" id="input" value={characterSearching} onChange={handleInputSearchingChange}/>
+                            </Stack>
+                        </div>
+                        <Autocomplete
+                            value={value}
+                            onChange={(event: any, newValue: string| null) => handleSorting(event, newValue)}
+                            inputValue={inputValue}
+                            onInputChange={(event, newInputValue) => {
+                                setInputValue(newInputValue);
+                            }}
+                            id="sort-by-selection"
+                            options={optionSortBy.map(o => o.value)}
+                            sx={{width: 200}}
+                            renderInput={(params) => <TextField {...params} label="Sort by"/>}
+                        />
+                    </Stack>
+                    <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
+                        {errorFlag ? (
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                {errorMessage}
+                            </Alert>
+                        ) : null}
+                        {game_rows()}
                     </div>
-                    <Autocomplete
-                        value={value}
-                        onChange={(event: any, newValue: string| null) => handleSorting(event, newValue)}
-                        inputValue={inputValue}
-                        onInputChange={(event, newInputValue) => {
-                            setInputValue(newInputValue);
-                        }}
-                        id="sort-by-selection"
-                        options={optionSortBy.map(o => o.value)}
-                        sx={{width: 200}}
-                        renderInput={(params) => <TextField {...params} label="Sort by"/>}
-                    />
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <Pagination
+                            count={Math.ceil(games.length / 9)}
+                            showFirstButton showLastButton
+                            onChange={(event, value) => handlePaginationClick(value)}
+                            renderItem={(item) => (
+                                <PaginationItem
+                                    slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
+                                    {...item}
+                                />
+                            )}
+                        />
+                    </div>
+                </Paper>
                 </Stack>
-                <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
-                    {errorFlag ? (
-                        <Alert severity="error">
-                            <AlertTitle>Error</AlertTitle>
-                            {errorMessage}
-                        </Alert>
-                    ) : null}
-                    {game_rows()}
-                </div>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}>
-                    <Pagination
-                        count={Math.ceil(games.length / 9)}
-                        showFirstButton showLastButton
-                        onChange={(event, value) => handlePaginationClick(value)}
-                        renderItem={(item) => (
-                            <PaginationItem
-                                slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
-                                {...item}
-                            />
+                <Paper sx={{ justifyContent: 'center',
+                    alignItems: 'center'}}>
+                    Advanced Filter:
+                    <br/>
+                    <FormLabel style={{color: "black", fontSize:'large'}} color="info">Platform compatible: </FormLabel>
+                    <Box padding='0 0 0 35px'>
+                    {allPlatforms.length > 0 && (
+                        <FormGroup>
+                            {allPlatforms.map((p) => (
+                                <FormControlLabel
+                                    key={p.platformId}
+                                    control={
+                                        <Checkbox
+                                            checked={p.isSelected ?? false}
+                                            onChange={handlePlatformSelectChange}
+                                            name={p.name}
+                                        />
+                                    }
+                                    label={p.name}
+                                />
+                            ))}
+                        </FormGroup>
+                    )}
+                    </Box>
+                    <FormLabel style={{color: "black", fontSize:'large', display: 'flex', padding:'0 0 0 15px'}} color="info">Genres: </FormLabel>
+                    <Box padding='0 0 0 35px'>
+                        {allGenres.length > 0 && (
+                            <FormGroup>
+                                {allGenres.map((g) => (
+                                    <FormControlLabel
+                                        key={g.genreId}
+                                        control={
+                                            <Checkbox
+                                                checked={g.isSelected ?? false}
+                                                onChange={handleGenresSelectChange}
+                                                name={g.name}
+                                            />
+                                        }
+                                        label={g.name}
+                                    />
+                                ))}
+                            </FormGroup>
                         )}
-                    />
-                </div>
-            </Paper>
-            </Stack>
+                    </Box>
+                </Paper>
+            </Box>
         </div>
         </>
 )
