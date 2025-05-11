@@ -31,7 +31,11 @@ const LogInNavBar = () => {
 
     const handleEditProfile = () => {
         setAnchorElUser(null);
-        navigate('/users/'+userId+'/edit');
+        if (window.location.pathname.endsWith('edit/') || window.location.pathname.endsWith('edit')) {
+            window.location.reload();
+        } else {
+            navigate('/users/'+userId+'/edit');
+        }
     }
     const handleCreateGame = () => {
         if (window.location.pathname.endsWith('create/') || window.location.pathname.endsWith('create')) {

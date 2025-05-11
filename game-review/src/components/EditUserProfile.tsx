@@ -1,59 +1,353 @@
 import React, {useState} from "react";
 import {useUserStore} from "../store";
-import {Card, CardContent} from "@mui/material";
+import {
+    Button,
+    Card,
+    CardContent, CardMedia, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+    FormControl,
+    Grid,
+    InputAdornment,
+    InputLabel, ListItemIcon,
+    OutlinedInput,
+    TextField
+} from "@mui/material";
 import {CardTitle} from "react-bootstrap";
 import LogInNavBar from "./LogInNavBar";
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
 import {rootUrl} from "../base.routes";
 import {useNavigate} from "react-router-dom";
-
+import CloseIcon from '@mui/icons-material/Close';
+import CSS from "csstype";
+import IconButton from "@mui/material/IconButton";
+import {Edit, Visibility, VisibilityOff} from "@mui/icons-material";
+import EditIcon from '@mui/icons-material/Edit';
+import EditOffIcon from '@mui/icons-material/EditOff';
 const EditUserProfile = () => {
     const [email, setEmail] = useState("");
+    const [originEmail, setOriginEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
+    const [editFNameState, setEditFNameState] = useState(false);
+    const [editLNameState, setEditLNameState] = useState(false);
+    const [editEmailState, setEditEmailState] = useState(false);
+    const [editPasswordState, setEditPasswordState] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [image, setImage] = React.useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showCfPassword, setShowCfPassword] = useState(false);
     const [imageFile, setImageFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
     const token = authorization.token;
     const userId = authorization.userId;
     const navigate = useNavigate();
-    const formData = new FormData();
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+
     const onSubmit = async () => {
-        console.log("Image file object: ",imageFile);
-        console.log("Image file type: ", imageFile?.type);
-        console.log(formData);
-        await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
-            imageFile,
-            { headers: {
-                    "X-Authorization": token,
-                    "Content-Type": imageFile?.type,
+        const data:Record<string, string> = {'firstName': firstName,
+            'lastName': lastName}
+        if(email !== originEmail)
+            data["email"] = email;
+        if(editPasswordState) {
+            if(password !== confirmPassword) {
+                setErrorFlag(true);
+                setErrorMsg("Password has to match with confirm password");
+            } else {
+                if(!password) {
+                    setErrorFlag(true);
+                    setErrorMsg("Password can't be null");
+                } else {
+                    setErrorFlag(false);
+                    data["password"] = password;
                 }
-            })
-        navigate('/users/' + userId + '/profile');
+            }
+        }
+        if(!errorFlag) {
+            try {
+                if (!image) {
+                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                        imageFile,
+                        {
+                            headers: {
+                                "X-Authorization": token,
+                                "Content-Type": imageFile?.type,
+                            }
+                        })
+                }
+                await axios.patch("http://localhost:4941" + rootUrl + '/users/' + userId,
+                    data,
+                    {
+                        headers: {
+                            "X-Authorization": token,
+                        }
+                    })
+                navigate('/users/' + userId + '/profile');
+            } catch (error) {
+                setErrorFlag(true);
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 400) {
+                        if (firstName.length < 1) {
+                            setErrorMsg("Fist name can not be null");
+                        } else {
+                            if (lastName.length < 1) {
+                                setErrorMsg("Last name can not be null");
+                            } else {
+                                if (password.length < 6 || password.length > 64) {
+                                    setErrorMsg("Password length must be from 6 to 64 characters");
+                                } else {
+                                    setErrorMsg("Invalid email");
+                                }
+                            }
+                        }
+                    } else {
+                        if (error.response?.status === 403) {
+                            setErrorMsg("Email is already used");
+                        } else
+                            setErrorMsg(error.toString());
+                    }
+                } else {
+                    setErrorMsg("Unexpected error");
+                }
+            }
+        }
+    }
+    const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(event.target.value)
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+
+    const updateFnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFirstName(event.target.value.trim())
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+    const updateLnameState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLastName(event.target.value.trim())
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+    const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleClickShowCfPassword = () => setShowCfPassword((show) => !show);
+    const updatePasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setPassword(event.target.value)
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+    const handleDeleteDialogClose = () => {
+        setOpenDeleteDialog(false);
+    }
+    const updateConfirmPasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPassword(event.target.value)
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+    React.useEffect(() => {
+        axios.get('http://localhost:4941'+rootUrl+'/users/'+userId, {
+            headers: {
+                "X-Authorization": token
+            }
+        })
+            .then((response) => {
+            setFirstName(response.data.firstName);
+            setLastName(response.data.lastName);
+            setEmail(response.data.email);
+            setOriginEmail(response.data.email);
+        })
+    }, [])
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const imgUrl = URL.createObjectURL(response.data);
+                setErrorFlag(false);
+                setImage(imgUrl);
+            }).catch((error) => {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    setErrorFlag(true);
+                    console.error("Failed to load image", error);
+                }
+            }
+        });
+    }, []);
+    const editCardStyles: CSS.Properties = {
+        display: "inline-block",
+        minHeight: "800px",
+        width: "70%",
+        margin: "10px",
+        padding: "0px",
     }
     return (
         <>
             <LogInNavBar/>
-            <Card>
+            <Card sx={editCardStyles}>
                 <CardTitle>Edit profile</CardTitle>
                 <CardContent>
-                    <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
-                        if (e.target.files) {
-                            setImage(URL.createObjectURL(e.target.files[0]));
-                            setImageFile(e.target.files[0]);
-                        }
-                    }}/>
-                    <Avatar alt="User Image" sx={{ width: 100, height: 100 }} src={image.length !== 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                    <Grid container rowSpacing={2} columnSpacing={{xs: 1, sm: 2, md: 3}}>
+                        <Grid size={6}>
+                            <FormControl fullWidth sx={{my: 2}} variant="outlined">
+                                <TextField
+                                    required
+                                    type="text"
+                                    id="first-name-required"
+                                    label="First Name"
+                                    onChange={updateFnameState}
+                                    value={firstName}
+                                    slotProps={{
+                                        inputLabel: {
+                                            shrink: true,
+                                        },
+                                    }}
+                                    fullWidth
+                                    sx={{my: 2}}
+                                />
+                                <TextField
+                                    type="text"
+                                    required
+                                    id="last-name-required"
+                                    label="Last Name"
+                                    value={lastName}
+                                    onChange={updateLnameState}
+                                    sx={{my: 2}}
+                                    fullWidth
+                                    slotProps={{
+                                        inputLabel: {
+                                            shrink: true,
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    type="text"
+                                    required
+                                    id="email-required"
+                                    rows={8}
+                                    label="Email"
+                                    value={email}
+                                    onChange={updateEmailState}
+                                    sx={{my: 2}}
+                                    slotProps={{
+                                        inputLabel: {
+                                            shrink: true,
+                                        },
+                                    }}
+                                />
+                            </FormControl>
+                            <FormControl variant="outlined">
+                                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                                <ListItemIcon>
+                                <OutlinedInput
+                                    fullWidth
+                                    required
+                                    disabled={!editPasswordState}
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    onChange={updatePasswordState}
+                                    value={password}
+                                    sx={{display:'flex'}}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            {editPasswordState && (
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={(e) => e.preventDefault()}
+                                                onMouseUp={(e) => e.preventDefault()}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                            </IconButton>)}
+                                        </InputAdornment>
+                                    }
+                                    label="Password"
+                                />
+                                    {editPasswordState && (<EditIcon fontSize="large" onClick={()=>setEditPasswordState(false)}/>)}
+                                    {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>setEditPasswordState(true)}/>)}
+                                </ListItemIcon>
+                            </FormControl>
+                            <br/>
+                            {editPasswordState && (
+                            <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
+                                <InputLabel style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-cornfirmpassword"
+                                    type={showCfPassword ? 'text' : 'password'}
+                                    onChange={updateConfirmPasswordState}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showCfPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleClickShowCfPassword}
+                                                onMouseDown={(e) => e.preventDefault()}
+                                                onMouseUp={(e) => e.preventDefault()}
+                                                edge="end"
+                                            >
+                                                {showCfPassword ? <VisibilityOff/> : <Visibility/>}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Confirm Password"
+                                />
+                            </FormControl>
+                            )}
+                        </Grid>
+                        <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
+                            <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
+                                if (e.target.files) {
+                                    setImage(URL.createObjectURL(e.target.files[0]));
+                                    setImageFile(e.target.files[0]);
+                                }
+                            }}/>
+                            <CloseIcon fontSize='large' onClick={() => {
+                                setOpenDeleteDialog(true)
+                            }}/>
+                            <br/>
+                            <CardMedia
+                                component="img"
+                                sx={{objectFit: "cover"}}
+                                image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+                            />
+                        </Grid>
+                    </Grid>
                     <button type="button" className="btn btn-success" onClick={(e) => {
-                        e.preventDefault(); // Prevent form from refreshing the page
+                        e.preventDefault();
                         onSubmit();
                     }}>Update account
                     </button>
                 </CardContent>
+                <Dialog
+                    open={openDeleteDialog}
+                    onClose={handleDeleteDialogClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">
+                        {"Remove image?"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to remove image?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                        <Button variant="outlined" color="error" onClick={() => {
+                            setImage('');
+                            setImageFile(null);
+                            setOpenDeleteDialog(false);
+                        }} autoFocus>
+                            Remove
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Card>
         </>
     )
