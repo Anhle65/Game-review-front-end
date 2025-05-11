@@ -20,11 +20,6 @@ import {Alert} from "react-bootstrap";
 import {useUserStore} from "../store";
 import {useNavigate, useParams} from "react-router-dom";
 import AttachMoneyTwoToneIcon from '@mui/icons-material/AttachMoneyTwoTone';
-type PlatformCheckedState = {
-    platformId: number;
-    name: string;
-    isSelected: boolean;
-}
 const NewGame = () => {
     const {id} = useParams();
     const [title, setTitle] = React.useState("");
@@ -168,8 +163,6 @@ const NewGame = () => {
     }
     const getGame = async () => {
         const gameResponse = await axios.get("http://localhost:4941" + rootUrl + "/games/" + id);
-        const gameData = gameResponse.data;
-        // setGame(gameData);
         return gameResponse.data;
     }
     const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
