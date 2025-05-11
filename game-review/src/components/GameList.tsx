@@ -1,13 +1,11 @@
 import React, {ChangeEvent} from "react";
 import axios from "axios";
 import CSS from 'csstype';
-import {Alert, AlertTitle, Fab, Pagination, PaginationItem, Paper, Stack} from "@mui/material";
+import {Alert, AlertTitle, Autocomplete, Fab, Pagination, PaginationItem, Paper, Stack, TextField} from "@mui/material";
 import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import {alpha, styled} from "@mui/material/styles";
-import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
@@ -24,7 +22,13 @@ const GameList = ({params}: GameListProps) => {
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
-
+    const optionSortBy = [{label:'CREATED_ASC', value: 'Oldest games'}, {label:'CREATED_DESC', value: 'Newest games'},
+        {label:'ALPHABETICAL_ASC', value: 'A->Z'}, {label:'ALPHABETICAL_DESC', value: 'Z->A'},
+        {label:'PRICE_ASC', value: 'Lowest price'}, {label:'PRICE_DESC', value: 'Highest price'},
+        {label:'RATING_ASC', value: 'Best rating'}, {label:'RATING_DESC', value: 'Low rating'}];
+    const [value, setValue] = React.useState('Oldest games');
+    const [inputValue, setInputValue] = React.useState('');
+    const [labelSorting, setLabelSorting] = React.useState('CREATED_ASC');
     React.useEffect(() => {
         let filterParams = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {
@@ -38,6 +42,7 @@ const GameList = ({params}: GameListProps) => {
         if(characterSearching.trim()) {
             filterParams.append('q', characterSearching);
         }
+        filterParams.append('sortBy', labelSorting);
         if (filterParams.toString()) {
             url += `?${filterParams.toString()}`;
         }
@@ -56,13 +61,23 @@ const GameList = ({params}: GameListProps) => {
                     })
             }
             getGames();
-        }, [characterSearching]
+        }, [characterSearching, labelSorting]
     )
+    const handleSorting = (e:ChangeEvent<HTMLInputElement>, newValue: string| null) => {
+        const label = optionSortBy.find(o => o.value === newValue)?.label;
+        if(label && newValue) {
+            setLabelSorting(label);
+            setValue(newValue);
+        } else {
+            setValue('Oldest games')
+            setLabelSorting('CREATED_ASC');
+        }
+    }
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);
         window.scrollTo({top:0});
     }
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleInputSearchingChange = (e: ChangeEvent<HTMLInputElement>) => {
         setCharacterSearching(e.target.value)
     }
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
@@ -93,9 +108,26 @@ const GameList = ({params}: GameListProps) => {
             <Stack direction="row" spacing={2}>
             <Paper elevation={3} style={card} sx={{justifyContent: 'flex-start',
                 alignItems: 'flex-start'}}>
-                <Stack direction="row" spacing={2}>
-                    <SearchIcon fontSize='large'/>
-                    <input type='text' style={{ width: "300px", overflowY: "auto" }} placeholder="Search..." className="form-control" id="input" value={characterSearching} onChange={handleInputChange} />
+                <Stack direction="row" spacing={2} sx={{justifyContent: 'space-between'}} padding='15px 20px 0 15px'>
+                    <div>
+                        <Stack direction='row'>
+                            <SearchIcon fontSize='large'/>
+                            <input type='text' style={{width: "300px", overflowY: "auto"}} placeholder="Search..."
+                                   className="form-control" id="input" value={characterSearching} onChange={handleInputSearchingChange}/>
+                        </Stack>
+                    </div>
+                    <Autocomplete
+                        value={value}
+                        onChange={(event: any, newValue: string| null) => handleSorting(event, newValue)}
+                        inputValue={inputValue}
+                        onInputChange={(event, newInputValue) => {
+                            setInputValue(newInputValue);
+                        }}
+                        id="sort-by-selection"
+                        options={optionSortBy.map(o => o.value)}
+                        sx={{width: 200}}
+                        renderInput={(params) => <TextField {...params} label="Sort by"/>}
+                    />
                 </Stack>
                 <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
                     {errorFlag ? (
