@@ -23,6 +23,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
+import { Title } from "@mui/icons-material";
 type GameListProps = {
     params: Record<string, string | number | boolean | any[]>;
 };
@@ -46,19 +47,16 @@ const GameList = ({params}: GameListProps) => {
     const [allGenres, setGenres] = React.useState<GenreSelectionState[]>([]);
     const [chosenPlatform, setChosenPlatforms] = React.useState<PlatformCheckedState[]>([]);
     const [chosenGenres, setChosenGenres] = React.useState<GenreSelectionState[]>([]);
-    // React.useEffect(()=> {
-    //     const getPlatforms = () => {
-    //         axios.get('https://localhost:4941' + rootUrl + '/games/platforms')
-    //             .then((response) => {
-    //                 const platformsWithSelection = response.data.map((platform: any) => ({
-    //                     ...platform,
-    //                     isSelected: false
-    //                 }));
-    //                 setAllPlatforms(platformsWithSelection)
-    //             })
-    //     }
-    //     getPlatforms();
-    // }
+    const [price, setPrice] = React.useState('');
+    let filterParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+            value.forEach((v) => filterParams.append(key, String(v)));
+        } else {
+            filterParams.append(key, String(value));
+        }
+    });
+    let url = `http://localhost:4941${rootUrl}/games`;
     const getGenres = async () => {
         await axios.get('http://localhost:4941'+ rootUrl + '/games/genres')
             .then((response) => {
@@ -76,12 +74,13 @@ const GameList = ({params}: GameListProps) => {
     }
     const handleGenresSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
-        setGenres((prev) =>
-            prev.map((g) =>
-                g.name === name ? { ...g, isSelected: checked } : g
+        setGenres((prev) => {
+            const updated = prev.map((g) =>
+                g.name === name ? {...g, isSelected: checked} : g
             )
-        );
-        setChosenGenres(allGenres.filter(g=>g.isSelected));
+            setChosenGenres(updated.filter(g=>g.isSelected));
+            return updated;
+        });
     };
     const getPlatforms = async () => {
         await axios.get('http://localhost:4941'+ rootUrl + '/games/platforms')
@@ -100,12 +99,13 @@ const GameList = ({params}: GameListProps) => {
     }
     const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, checked } = event.target;
-        setAllPlatforms((prev) =>
-            prev.map((p) =>
+        setAllPlatforms((prev) => {
+            const updated = prev.map((p) =>
                 p.name === name ? { ...p, isSelected: checked } : p
-            )
-        );
-        setChosenPlatforms(allPlatforms.filter(p=>p.isSelected))
+            );
+            setChosenPlatforms(updated.filter(p => p.isSelected));
+            return updated;
+        });
     };
     React.useEffect(() => {
         getPlatforms();
@@ -113,17 +113,11 @@ const GameList = ({params}: GameListProps) => {
     }, [])
 
     React.useEffect(() => {
-        let filterParams = new URLSearchParams();
-        Object.entries(params).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-                value.forEach((v) => filterParams.append(key, String(v)));
-            } else {
-                filterParams.append(key, String(value));
-            }
-        });
-        let url = `http://localhost:4941${rootUrl}/games`;
         if(characterSearching.trim()) {
             filterParams.append('q', characterSearching);
+        }
+        if(price) {
+            filterParams.append('price', price);
         }
         chosenGenres.forEach((genre) => {
             filterParams.append('genreIds', genre.genreId.toString())
@@ -150,9 +144,9 @@ const GameList = ({params}: GameListProps) => {
                 })
         }
         getGames();
-        // console.log("Chosen genres :", allGenres);
-        // console.log("Chosen platforms: ", chosenPlatform);
-        }, [characterSearching, labelSorting, chosenPlatform, chosenGenres]
+        console.log("Chosen genres :", allGenres);
+        console.log("Chosen platforms: ", chosenPlatform);
+        }, [characterSearching, labelSorting, chosenPlatform, chosenGenres, price]
     )
     const handleSorting = (e:ChangeEvent<HTMLInputElement>, newValue: string| null) => {
         const label = optionSortBy.find(o => o.value === newValue)?.label;
@@ -162,6 +156,17 @@ const GameList = ({params}: GameListProps) => {
         } else {
             setValue('Oldest games')
             setLabelSorting('CREATED_ASC');
+        }
+    }
+    const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        if(e.currentTarget.value.startsWith('-')) {
+            setErrorFlag(true);
+            setErrorMessage('Price must be at least $0');
+        } else {
+            setPrice(e.currentTarget.value);
+            setErrorFlag(false);
+            setErrorMessage('');
         }
     }
     const handlePaginationClick = (value: number) => {
@@ -191,6 +196,12 @@ const GameList = ({params}: GameListProps) => {
                     <LogoutNavBar />
                 </>
             )}
+            {errorFlag ? (
+                <Alert severity="error">
+                    <AlertTitle>Error</AlertTitle>
+                    {errorMessage}
+                </Alert>
+            ) : null}
         <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -227,12 +238,6 @@ const GameList = ({params}: GameListProps) => {
                         />
                     </Stack>
                     <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
-                        {errorFlag ? (
-                            <Alert severity="error">
-                                <AlertTitle>Error</AlertTitle>
-                                {errorMessage}
-                            </Alert>
-                        ) : null}
                         {game_rows()}
                     </div>
                     <div style={{
@@ -254,11 +259,16 @@ const GameList = ({params}: GameListProps) => {
                     </div>
                 </Paper>
                 </Stack>
-                <Paper sx={{ justifyContent: 'center',
-                    alignItems: 'center'}}>
-                    Advanced Filter:
+                <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'flex-start'}}>
+                    <FormLabel style={{color: "black", fontSize:'large'}} color="info">Advanced Filter:</FormLabel>
                     <br/>
+                    <FormLabel style={{color: "black", fontSize:'large'}} color="info">Price is less than:</FormLabel>
+                    <br/>
+                    <input type='number' style={{width: '200px'}} onChange={updatePrice} value={price} placeholder='Eg: 0 is $0, 999 is $9.99'/>
+                    <br/>
+                    <Box padding='20px 0 0 0'>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Platform compatible: </FormLabel>
+                    </Box>
                     <Box padding='0 0 0 35px'>
                     {allPlatforms.length > 0 && (
                         <FormGroup>
