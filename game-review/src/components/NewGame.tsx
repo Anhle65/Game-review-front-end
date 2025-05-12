@@ -9,6 +9,7 @@ import {
     ListItemIcon,
     Select,
     SelectChangeEvent,
+    Box,
     TextField
 } from "@mui/material";
 import React from "react";
@@ -30,89 +31,111 @@ const NewGame = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [allGenres, setGenres] = React.useState<Genre[]>([]);
     const [allPlatforms, setAllPlatforms] = React.useState<PlatformCheckedState[]>([]);
-    const [price, setPrice] = React.useState('0');
+    const [price, setPrice] = React.useState('');
     const authorization = useUserStore();
     const token = authorization.token;
     const navigate = useNavigate();
     const platformChecked = allPlatforms.filter(p => p.isSelected).length < 1;
     const [image, setImage] = React.useState('https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png');
     const [imageFile, setImageFile] = React.useState<File | null>(null);
+    const [titleExist, setTitleExist] = React.useState<string[]>([]);
+    const [originTitle, setOriginTitle] = React.useState('');
     const onCreateGame = async () => {
         console.log("Chosen platforms: ", allPlatforms.filter(p => p.isSelected));
         console.log("Chosen platforms id: ", allPlatforms.filter(p => p.isSelected).map(i => i.platformId));
-        if(!errorFlag)
-            try {
-                const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
-                    title: title,
-                    description: description,
-                    creationDate: new Date(),
-                    genreId: parseInt(genre, 10),
-                    price: parseInt(price, 10),
-                    platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
-                }, {
+        if(titleExist.includes(title.trim())) {
+            setErrorFlag(true);
+            setErrorMessage("Title already exists! Please choose another name!");
+        } else {
+            setErrorFlag(false);
+            setErrorMessage('');
+        }
+        try {
+            const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
+                title: title,
+                description: description,
+                creationDate: new Date(),
+                genreId: parseInt(genre, 10),
+                price: parseInt(price, 10),
+                platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
+            }, {
+                headers: {
+                    "X-Authorization": token
+                }
+            })
+            const createdId = gamePost.data["gameId"]
+            console.log("created data: ", gamePost);
+            console.log("created id: ", createdId);
+            if(imageFile) {
+                await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
                     headers: {
-                        "X-Authorization": token
+                        "X-Authorization": token,
+                        "Content-Type": imageFile?.type,
                     }
                 })
-                const createdId = gamePost.data["gameId"]
-                console.log("created data: ", gamePost);
-                console.log("created id: ", createdId);
-                if(imageFile) {
-                    await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
-                        headers: {
-                            "X-Authorization": token,
-                            "Content-Type": imageFile?.type,
-                        }
-                    })
-                }
-                navigate('/games');
-            } catch (error: any) {
-                setErrorFlag(true);
-                if (axios.isAxiosError(error)) {
-                    setErrorMessage(error.message.toString());
-                }
             }
-    }
-    const onUpdateGame = async () => {
-        if(!errorFlag) {
-            try {
-                await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
-                    gameId: id,
-                    title: title,
-                    description: description,
-                    genreId: parseInt(genre, 10),
-                    price: parseInt(price, 10),
-                    platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
-                }, {
-                    headers: {
-                        "X-Authorization": token
-                    }
-                })
-                if (imageFile) {
-                    await axios.put("http://localhost:4941" + rootUrl + "/games/" + id + "/image", imageFile, {
-                        headers: {
-                            "X-Authorization": token,
-                            "Content-Type": imageFile?.type,
-                        }
-                    })
-                }
-                navigate('/games/' + id);
-            } catch (error) {
-                setErrorFlag(true);
-                if (axios.isAxiosError(error)) {
-                    setErrorMessage(error.message.toString());
-                }
-                setErrorMessage("Unexpected error");
+            navigate('/games');
+        } catch (error: any) {
+            setErrorFlag(true);
+            if (axios.isAxiosError(error)) {
+                setErrorMessage(error.message.toString());
             }
         }
+    }
+    const onUpdateGame = async () => {
+        if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
+            setErrorFlag(true);
+            setErrorMessage("Title already exists! Please choose another name!");
+        } else {
+            setErrorFlag(false);
+            setErrorMessage('');
+        }
+        try {
+            await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
+                gameId: id,
+                title: title,
+                description: description,
+                genreId: parseInt(genre, 10),
+                price: parseInt(price, 10),
+                platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
+            }, {
+                headers: {
+                    "X-Authorization": token
+                }
+            })
+            if (imageFile) {
+                await axios.put("http://localhost:4941" + rootUrl + "/games/" + id + "/image", imageFile, {
+                    headers: {
+                        "X-Authorization": token,
+                        "Content-Type": imageFile?.type,
+                    }
+                })
+            }
+            navigate('/games/' + id);
+        } catch (error) {
+            setErrorFlag(true);
+            if (axios.isAxiosError(error)) {
+                setErrorMessage(error.message.toString());
+            }
+            setErrorMessage("Unexpected error");
+        }
+    }
+    const getAllTitles = async () => {
+        await axios.get("http://localhost:4941" + rootUrl + "/games/")
+            .then((response) => {
+                const allTitles = response.data['games'].map((g:any)=> g.title);
+                setTitleExist(allTitles);
+            })
     }
     React.useEffect(() => {
         getGenres();
         getPlatforms();
+        getAllTitles();
         if(id) {
             getGame().then( (res) => {
                 console.log("Game: ", res);
                     setTitle(res.title);
+                    setOriginTitle(res.title);
                     setDescription(res.description);
                     setCreatorId(res.creatorId);
                     setGenre(res.genreId.toString());
@@ -129,7 +152,7 @@ const NewGame = () => {
             setTitle("");
             setDescription(" ");
             setGenre('');
-            setPrice('0');
+            setPrice('');
             setAllPlatforms(prevPlatforms =>
                 prevPlatforms.map(platform => ({
                     ...platform,
@@ -213,13 +236,14 @@ const NewGame = () => {
     }
     const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
-        if (e.currentTarget.value.startsWith('-')) {
+        if (isNaN(parseInt(e.currentTarget.value, 10))) {
             setErrorFlag(true);
+            setPrice('0');
             setErrorMessage("Price must be at least $0");
         } else {
             setErrorFlag(false);
+            setPrice(e.currentTarget.value);
         }
-        setPrice(e.currentTarget.value);
     }
     const updateDescriptionState = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -238,7 +262,6 @@ const NewGame = () => {
         width: "90%",
         margin: "10px",
         padding: "0px",
-        // backgroundColor: "lightcyan",
     }
     return (
         <>
@@ -283,13 +306,14 @@ const NewGame = () => {
                         </FormControl>
                         <FormControl
                             required
-                            sx={{m: 3, justifyContent: 'flex-end', alignItems: 'flex-end'}}
+                            fullWidth
+                            sx={{m: 3}}
                             variant="outlined"
                         >
-                            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}
-                                  sx={{justifyContent: 'left', alignItems: 'left'}}>
-                                <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
-                                    <FormControl sx={{m: 1, width:'100.px'}}>
+                            <Box sx={{flexGrow: 1, justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+                            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
+                                <Grid size={4}>
+                                    <FormControl fullWidth sx={{m: 1}}>
                                         <InputLabel id="select-genre">Genre</InputLabel>
                                         <Select
                                             sx={{my: 1, width:'100.px'}}
@@ -305,27 +329,31 @@ const NewGame = () => {
                                             }
                                         </Select>
                                     </FormControl>
-                                    <ListItemIcon>
-                                        <AttachMoneyTwoToneIcon fontSize="large"/>
-                                        <TextField
-                                        type="number"
-                                        id="price-required"
-                                        label="Price"
-                                        onChange={updatePrice}
-                                        value={price}
-                                        placeholder='Eg: 0 is $0, 999 is $9.99'
-                                        slotProps={{
-                                            inputLabel: {
-                                                shrink: true,
-                                            },
-                                        }}
-                                        sx={{my: 2}}
-                                        // sx={{my: 2}}
+                                    <ListItemIcon sx={{width:'100%'}}>
+                                        <AttachMoneyTwoToneIcon sx={{my: 3}} fontSize="large"/>
+                                        <TextField fullWidth
+                                            type="number"
+                                            id="price-required"
+                                            label="Price"
+                                            onChange={updatePrice}
+                                            value={price}
+                                            placeholder='Eg: 0 is $0, 999 is $9.99'
+                                            slotProps={{
+                                                inputLabel: {
+                                                    shrink: true,
+                                                },
+                                            }}
+                                                   inputProps={{
+                                                       min: 0
+                                                   }}
+                                            sx={{my: 2}}
                                     />
                                     </ListItemIcon>
                                 </Grid>
-                                <Grid size={6} sx={{justifyContent: 'center', alignItems: 'center'}}>
+                                <Grid size={8} sx={{justifyContent: 'center', alignItems: 'center'}}>
                                     <FormLabel style={{color: "gray"}} color="info">Platform compatible: </FormLabel>
+                                    <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+
                                     {allPlatforms.length > 0 && (
                                         <FormGroup>
                                             {allPlatforms.map((p) => (
@@ -343,11 +371,13 @@ const NewGame = () => {
                                             ))}
                                         </FormGroup>
                                     )}
+                                    </Box>
                                     {platformChecked && (
                                         <FormLabel style={{color: "red"}} color='error'>Choose at least one platform</FormLabel>
                                     )}
                                 </Grid>
                             </Grid>
+                            </Box>
                         </FormControl>
                     </Grid>
                     <Grid size={6}>

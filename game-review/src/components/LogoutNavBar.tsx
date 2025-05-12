@@ -10,10 +10,18 @@ import {useNavigate} from "react-router-dom";
 const LogoutNavBar = () => {
     const navigate = useNavigate();
     const handleSignUp = () => {
-        navigate('/users/register');
+        if (window.location.pathname.endsWith('register/') || window.location.pathname.endsWith('register')) {
+            window.location.reload();
+        } else {
+            navigate('/users/register');
+        }
     }
     const handleLogIn = () => {
-        navigate('/users/login');
+        if (window.location.pathname.endsWith('login/') || window.location.pathname.endsWith('login')) {
+            window.location.reload();
+        } else {
+            navigate('/users/login');
+        }
     }
     const handleDashboardClick = () => {
         if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {

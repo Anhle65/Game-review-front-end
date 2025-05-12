@@ -7,7 +7,7 @@ import {
     Autocomplete,
     Box, Checkbox,
     Fab, FormControlLabel, FormGroup, FormLabel,
-    Grid,
+    Grid, ListItemIcon,
     Pagination,
     PaginationItem,
     Paper,
@@ -24,6 +24,7 @@ import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
 import { Title } from "@mui/icons-material";
+import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
 type GameListProps = {
     params: Record<string, string | number | boolean | any[]>;
 };
@@ -160,13 +161,13 @@ const GameList = ({params}: GameListProps) => {
     }
     const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
-        if(e.currentTarget.value.startsWith('-')) {
+        if (isNaN(parseInt(e.currentTarget.value, 10))) {
             setErrorFlag(true);
-            setErrorMessage('Price must be at least $0');
+            setPrice('');
+            setErrorMessage("Price must be at least $0");
         } else {
-            setPrice(e.currentTarget.value);
             setErrorFlag(false);
-            setErrorMessage('');
+            setPrice(e.currentTarget.value);
         }
     }
     const handlePaginationClick = (value: number) => {
@@ -262,9 +263,27 @@ const GameList = ({params}: GameListProps) => {
                 <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'flex-start'}}>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Advanced Filter:</FormLabel>
                     <br/>
-                    <FormLabel style={{color: "black", fontSize:'large'}} color="info">Price is less than:</FormLabel>
-                    <br/>
-                    <input type='number' style={{width: '200px'}} onChange={updatePrice} value={price} placeholder='Eg: 0 is $0, 999 is $9.99'/>
+                    <ListItemIcon>
+                        <AttachMoneyTwoToneIcon sx={{my: 3}} fontSize="large"/>
+                        <TextField
+                            type="number"
+                            id="price-required"
+                            label="Max Price"
+                            onChange={updatePrice}
+                            value={price}
+                            placeholder='Eg: 0 is $0, 999 is $9.99'
+                            slotProps={{
+                                inputLabel: {
+                                    shrink: true,
+                                },
+                            }}
+                            inputProps={{
+                                min:0
+                            }}
+                            sx={{my: 2}}
+                            // sx={{my: 2}}
+                        />
+                    </ListItemIcon>
                     <br/>
                     <Box padding='20px 0 0 0'>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Platform compatible: </FormLabel>
