@@ -23,12 +23,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
-import { Title } from "@mui/icons-material";
 import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
-type GameListProps = {
+type GameParams = {
     params: Record<string, string | number | boolean | any[]>;
 };
-const GameList = ({params}: GameListProps) => {
+const GameList = ({params}: GameParams) => {
     const [games, setGames] = React.useState<Game[]>([]);
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
