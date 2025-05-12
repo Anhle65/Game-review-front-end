@@ -74,7 +74,8 @@ const Game = () => {
     const [inputComment, setInputComment] = React.useState(' ');
     const [inputRating, setInputRating] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [addWishlistState, setAddWishlistState] = React.useState(false);
+    const [addWishlistState, setAddWishlistState] = React.useState(true);
+    const [userWishlist, setUserWishlist] = React.useState<number[]>([]);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
@@ -143,24 +144,16 @@ const Game = () => {
         setgamename(event.target.value)
     }
 
-    React.useEffect(()=> {
-        const addToWishList = () => {
-            axios.post('http://localhost:4941/'+rootUrl+'/games/'+id+'/wishlist', {},
-            {headers: {
-                'X-Authorization': token
-                }})
-                .then((res) => {
-                    const message = res.status;
-                })
-        }
-        addToWishList();
-
-    })
+    const addToWishList = async () => {
+        await axios.post('http://localhost:4941/'+rootUrl+'/games/'+id+'/wishlist', {},
+        {headers: {
+            'X-Authorization': token
+            }})
+            .then((res) => {
+                const message = res.status;
+            })
+    }
     const editGame = () => {
-        // axios.patch('http://localhost:4941'+rootUrl+'/games/' + game.gameId, {"gamename": gamename})
-        //     .then(() => {
-        //         // editGameFromStore(game, gamename);
-        //     })
         navigate(`/games/${id}/edit`);
     }
 
@@ -171,16 +164,58 @@ const Game = () => {
             navigate("/users/login/");
         }
     }
-    React.useEffect(() => {
-            const getGame = () => {
-                axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
-                    .then((response) => {
-                        setGame(response.data);
-                    })
+    const getWishlistGame = async () => {
+        await axios.get("http://localhost:4941"+rootUrl+'/games?wishlistedByMe=true', {
+            headers: {
+                "X-Authorization": token
             }
-            getGame();
-        }, [id]
-    )
+        })
+            .then((response) => {
+                console.log("Wishlist game", response.data);
+                const gameId = response.data['games'].map((g:any) =>g.gameId);
+                console.log("Wishlist game id ", gameId);
+                if(gameId.includes(parseInt(id as string,10))){
+                    setAddWishlistState(false);
+                }
+                setUserWishlist(gameId);
+                return gameId;
+            })
+    }
+
+    const addToWishlist = async () => {
+        await axios.post("http://localhost:4941"+rootUrl+'/games/'+id+'/wishlist', {
+            'gameId': id,
+            'authId': userId
+        }, {
+            headers: {
+                'X-Authorization': token
+            }
+        })
+    }
+    const removeFromWishlist = async () => {
+        await axios.delete("http://localhost:4941"+rootUrl+'/games/'+id+'/wishlist', {
+            headers: {
+                'X-Authorization': token
+            }
+        })
+    }
+    const onClickWishlistButton = () => {
+        if(addWishlistState){
+            addToWishlist();
+        }else{
+            removeFromWishlist();
+        }
+    }
+    React.useEffect(() => {
+        getWishlistGame();
+        const getGame = () => {
+            axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
+                .then((response) => {
+                    setGame(response.data);
+                })
+            }
+        getGame();
+    }, [id])
     React.useEffect(()=> {
         const getReviews = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id + '/reviews')
@@ -468,7 +503,9 @@ const Game = () => {
                         </>
                     )}
                     {parseInt(userId as string,10) !== game.creatorId && (
-                        <Fab aria-label="like" >
+                        <Fab aria-label="like" color={addWishlistState ? 'default': 'error'} onClick={() => {
+                            setAddWishlistState(!addWishlistState)
+                            onClickWishlistButton()}}>
                             <FavoriteIcon />
                         </Fab>
                     )}
