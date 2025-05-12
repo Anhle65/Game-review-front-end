@@ -38,10 +38,11 @@ const GameListObject = (props: IGameProps) => {
                 setCreatorImage(imgUrl);
                 setErrorFlag(false);
                 setErrorMessage("");
-            }).catch((error) => {
+            },(error) => {
                 if (axios.isAxiosError(error)) {
                     if (error.response?.status === 404) {
                         setErrorFlag(false);
+                        setErrorMessage('');
                     } else {
                         setErrorFlag(true);
                         console.error("Failed to load image", error);
@@ -75,11 +76,12 @@ const GameListObject = (props: IGameProps) => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setErrorFlag(false);
                 setImage(imgUrl);
-        }).catch((error) => {
+        }, (error) => {
             setImage('');
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 404) {
                     setErrorFlag(false);
+                    setErrorMessage("");
                 } else {
                     setErrorFlag(true);
                     console.error("Failed to load image", error);

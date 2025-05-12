@@ -162,11 +162,8 @@ const GameList = ({params}: GameListProps) => {
     const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (isNaN(parseInt(e.currentTarget.value, 10))) {
-            setErrorFlag(true);
             setPrice('');
-            setErrorMessage("Price must be at least $0");
         } else {
-            setErrorFlag(false);
             setPrice(e.currentTarget.value);
         }
     }

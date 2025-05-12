@@ -36,15 +36,15 @@ const UserProfile = () => {
             .then((response) => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setUserImage(imgUrl);
-            }).catch((error) => {
+            },(error) => {
                 console.log(userImage)
-            if (axios.isAxiosError(error)) {
-                if (error.response?.status !== 404) {
-                    console.error("Failed to load image", error);
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status !== 404) {
+                        console.error("Failed to load image", error);
+                    }
                 }
             }
-        });
-
+        );
     }, [userId]);
     const cardInformationStyles: CSS.Properties = {
         display: "inline-block",
