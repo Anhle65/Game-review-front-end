@@ -17,10 +17,10 @@ import {
     TextField,
     Stack,
     Avatar,
+    Tooltip,
     Pagination, PaginationItem, Alert, AlertTitle, Fab, Rating
 } from "@mui/material";
-import {Delete, Edit} from "@mui/icons-material";
-import {rootUrl} from "../base.routes";
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';import {rootUrl} from "../base.routes";
 import { useNavigate, useParams} from "react-router-dom";
 import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
@@ -65,6 +65,7 @@ const Game = () => {
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
+    const [openAddWishlistDialog, setOpenAddWishlistDialog] = React.useState(false);
     const [openEditDialog, setOpenEditDialog] = React.useState(false);
     const genreName = genres.find(g => g.genreId === game.genreId)
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
@@ -76,11 +77,19 @@ const Game = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const [addWishlistState, setAddWishlistState] = React.useState(true);
     const [userWishlist, setUserWishlist] = React.useState<number[]>([]);
+    const [openWlMessage, setOpenWlMessage] = React.useState(false);
+    const [openCreateMessage, setOpenCreateMessage] = React.useState(false);
+    const [openEditMessage, setOpenEditMessage] = React.useState(false);
+    const [alreadyOwned, setAlreadyOwned] = React.useState(false);
+    const [openOwnMessage, setOpenOwnMessage] = React.useState(false);
     const handleDeleteDialogClose = () => {
         setOpenDeleteDialog(false);
     }
     const handleAddReviewDialogClose = () => {
         setOpenAddReviewDialog(false);
+    }
+    const handleAddWishlistDialogClose = () => {
+        setOpenAddWishlistDialog(false);
     }
     const handleInputComment = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputComment(event.target.value);
@@ -137,32 +146,19 @@ const Game = () => {
                 "X-Authorization": token
             }})
             .then(() => {
-                // deleteGameFromStore(game);
+                navigate('/users/'+userId+'/myGames')
             })
-    }
-    const updateGamenameState = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setgamename(event.target.value)
     }
 
-    const addToWishList = async () => {
-        await axios.post('http://localhost:4941/'+rootUrl+'/games/'+id+'/wishlist', {},
-        {headers: {
-            'X-Authorization': token
-            }})
-            .then((res) => {
-                const message = res.status;
-            })
-    }
     const editGame = () => {
         navigate(`/games/${id}/edit`);
     }
-
-    const handleAddReview = () => {
-        if (userId) {
-            navigate("/games/" + id + "/review/");
-        } else {
-            navigate("/users/login/");
-        }
+    const createGame = () => {
+        window.scrollTo({top:0});
+        navigate(`/games/create`);
+    }
+    const handleLogin = () => {
+        navigate("/users/login/");
     }
     const getWishlistGame = async () => {
         await axios.get("http://localhost:4941"+rootUrl+'/games?wishlistedByMe=true', {
@@ -181,7 +177,9 @@ const Game = () => {
                 return gameId;
             })
     }
-
+    const onClickOwnedButton = () => {
+        setAlreadyOwned(!alreadyOwned);
+    }
     const addToWishlist = async () => {
         await axios.post("http://localhost:4941"+rootUrl+'/games/'+id+'/wishlist', {
             'gameId': id,
@@ -200,14 +198,20 @@ const Game = () => {
         })
     }
     const onClickWishlistButton = () => {
-        if(addWishlistState){
-            addToWishlist();
-        }else{
-            removeFromWishlist();
+        if(userId) {
+            setAddWishlistState(!addWishlistState);
+            if (addWishlistState) {
+                addToWishlist();
+            } else {
+                removeFromWishlist();
+            }
+        }else {
+            setOpenAddWishlistDialog(true);
         }
     }
     React.useEffect(() => {
-        getWishlistGame();
+        if(userId)
+            getWishlistGame();
         const getGame = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
                 .then((response) => {
@@ -351,9 +355,59 @@ const Game = () => {
                             </Stack>
                         </div>
                     </Stack>
+                    <Stack direction='row'sx={{justifyContent: "space-between", alignItems: "center"}}>
                     <Typography variant="h6" align="left">
                         Reviews({gameReviews.length}):
                     </Typography>
+                        <div>
+                            <Box sx={{ '& > :not(style)': { m: 1 } }}>
+                        <Tooltip open={openCreateMessage} onClose={()=>setOpenCreateMessage(false)} onOpen={()=>setOpenCreateMessage(true)}
+                                 title="Create new game">
+                            <Fab color="primary" aria-label="add" onClick={createGame}>
+                                <AddIcon />
+                            </Fab>
+                        </Tooltip>
+                        {parseInt(userId as string,10) !== game.creatorId && (
+                            <>
+                                <Tooltip open={openOwnMessage} onClose={() => setOpenOwnMessage(false)}
+                                       onOpen={() => setOpenOwnMessage(true)}
+                                       title={alreadyOwned ? "Add game as owned" : "Remove game from own"}>
+                                    <Fab aria-label="like" color={alreadyOwned ? 'error' : 'default'} onClick={() => {
+                                        onClickOwnedButton();
+                                    }}>
+                                        <BookmarkBorderOutlinedIcon/>
+                                    </Fab>
+                                </Tooltip>
+                                <Tooltip open={openWlMessage} onClose={() => setOpenWlMessage(false)}
+                                               onOpen={() => setOpenWlMessage(true)}
+                                               title={addWishlistState ? "Add game into wishlist" : "Remove game from wishlist"}>
+                                    <Fab aria-label="like" disabled={alreadyOwned} color={addWishlistState ? 'default' : 'error'} onClick={() => {
+                                        onClickWishlistButton();
+                                    }}>
+                                        <FavoriteIcon/>
+                                </Fab>
+                            </Tooltip></>
+                        )}
+                        {parseInt(userId as string,10) === game.creatorId && (
+                            <>
+                                <Tooltip open={openEditMessage} onClose={()=>setOpenEditMessage(false)} onOpen={()=>setOpenEditMessage(true)}
+                                         title="Edit game">
+                                    <Fab color="success" aria-label="edit" onClick={editGame}>
+                                        <EditIcon />
+                                    </Fab>
+                                </Tooltip>
+                                <Tooltip open={openWlMessage} onClose={()=>setOpenWlMessage(false)} onOpen={()=>setOpenWlMessage(true)}
+                                         title="Delete game">
+                                    <Fab color="error" aria-label="delete" onClick={() => {
+                                        setOpenDeleteDialog(true)}}>
+                                        <DeleteIcon />
+                                    </Fab>
+                                </Tooltip>
+                            </>
+                        )}
+                            </Box>
+                        </div>
+                    </Stack>
                     <br/>
                     <div style={{display: "inline-block", justifyContent: 'left', alignItems: 'left'}}>
                         {gameReview_rows()}
@@ -373,7 +427,7 @@ const Game = () => {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleAddReviewDialogClose}>Cancel</Button>
-                            <Button variant="outlined" color="success" onClick={handleAddReview} autoFocus>
+                            <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
                                 Login
                             </Button>
                         </DialogActions>
@@ -399,8 +453,7 @@ const Game = () => {
                     )}
                     {errorFlag ? (
                         <Alert severity="error">
-                            <AlertTitle>Error</AlertTitle>
-                            {errorMessage}
+                            <AlertTitle>{errorMessage}</AlertTitle>
                         </Alert>
                     ) : null}
                     <Form>
@@ -418,98 +471,60 @@ const Game = () => {
                                         {i}
                                     </option>
                                 )}
-                                {/*{console.log("Rating: "+inputRating)}*/}
                             </Form.Select>
                         </Form.Group>
-                        <Button type="submit" onClick={(e) => {
+                        <Button type="submit" autoFocus color='info' onClick={(e) => {
                             e.preventDefault()
                             if (!userId)
                                 setOpenAddReviewDialog(true)
                             else
                                 onSubmitForm()
                         }}>Post review</Button>
-                        {/*</fieldset>*/}
                     </Form>
                 </CardContent>
-                {parseInt(userId as string,10) === game.creatorId && (
-                    <>
-                        <CardActions>
-                            <IconButton onClick={() => {
-                                // setOpenEditDialog(true)
-                                navigate(`/games/${id}/edit`);
-                            }}>
-                                <Edit/>
-                            </IconButton>
-                            <IconButton onClick={() => {
-                                setOpenDeleteDialog(true)
-                                // navigate(`/games/${id}/edit`);
-                            }}>
-                                <Delete/>
-                            </IconButton>
-                        </CardActions>
-                        <Dialog
-                            open={openDeleteDialog}
-                            onClose={handleDeleteDialogClose}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description">
-                            <DialogTitle id="alert-dialog-title">
-                                {"Delete game?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    Are you sure you want to delete this game?
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-                                <Button variant="outlined" color="error" onClick={() => {
-                                    if(game) deleteGame()
-                                    handleDeleteDialogClose();
-                                }} autoFocus>
-                                    Delete
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
-                        <Dialog
-                            open={openEditDialog}
-                            onClose={handleEditDialogClose}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description">
-                            <DialogTitle id="alert-dialog-title">
-                                {`Edit game "${game?.title}" information:`}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description">
-                                    <TextField id="outlined-basic" label="Title" variant="outlined"
-                                               value={gamename} onChange={updateGamenameState} />
-                                </DialogContentText>
-                            </DialogContent>
-                        </Dialog>
-                    </>
-                )}
-                <Box sx={{ '& > :not(style)': { m: 1 } }}>
-                    <Fab color="primary" aria-label="add">
-                        <AddIcon />
-                    </Fab>
-                    {parseInt(userId as string,10) === game.creatorId && (
-                        <>
-                            <Fab color="success" aria-label="edit" onClick={editGame}>
-                                <EditIcon />
-                            </Fab>
-                            <Fab color="error" aria-label="delete" onClick={() => {
-                                setOpenDeleteDialog(true)}}>
-                                <DeleteIcon />
-                            </Fab>
-                        </>
-                    )}
-                    {parseInt(userId as string,10) !== game.creatorId && (
-                        <Fab aria-label="like" color={addWishlistState ? 'default': 'error'} onClick={() => {
-                            setAddWishlistState(!addWishlistState)
-                            onClickWishlistButton()}}>
-                            <FavoriteIcon />
-                        </Fab>
-                    )}
-                </Box>
+                    <Dialog
+                        open={openDeleteDialog}
+                        onClose={handleDeleteDialogClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title">
+                            {"Delete game?"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Are you sure you want to delete this game?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+                            <Button variant="outlined" color="error" onClick={() => {
+                                if(game) deleteGame()
+                                handleDeleteDialogClose();
+                            }} autoFocus>
+                                Delete
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                    <Dialog
+                        open={openAddWishlistDialog}
+                        onClose={handleAddWishlistDialogClose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description">
+                        <DialogTitle id="alert-dialog-title" color="warning">
+                            Wishlist game
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                You need to log in to wishlist game.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleAddWishlistDialogClose}>Cancel</Button>
+                            <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
+                                Login
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
             </Card>
         </div>
             </>
