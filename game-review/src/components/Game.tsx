@@ -3,10 +3,8 @@ import axios from "axios";
 import CSS from 'csstype';
 import {
     Card,
-    CardActions,
     CardContent,
     CardMedia,
-    IconButton,
     Typography,
     Dialog,
     DialogActions,
@@ -14,11 +12,10 @@ import {
     DialogContentText,
     DialogTitle,
     Button,
-    TextField,
     Stack,
     Avatar,
     Tooltip,
-    Pagination, PaginationItem, Alert, AlertTitle, Fab, Rating
+    Pagination, PaginationItem, Alert, AlertTitle, Fab
 } from "@mui/material";
 import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';import {rootUrl} from "../base.routes";
 import { useNavigate, useParams} from "react-router-dom";
@@ -31,7 +28,6 @@ import {Form} from "react-bootstrap";
 import {useUserStore} from "../store";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import NavigationIcon from "@mui/icons-material/Navigation";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Box from "@mui/material/Box";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -59,14 +55,13 @@ const Game = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
-    const [gamename, setgamename] = React.useState("");
     const [image, setImage] = React.useState("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
     const [creatorImage, setCreatorImage] = React.useState("");
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openAddWishlistDialog, setOpenAddWishlistDialog] = React.useState(false);
-    const [openEditDialog, setOpenEditDialog] = React.useState(false);
+    const [openAddOwnDialog, setOpenAddOwnDialog] = React.useState(false);
     const genreName = genres.find(g => g.genreId === game.genreId)
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
@@ -75,8 +70,7 @@ const Game = () => {
     const [inputComment, setInputComment] = React.useState(' ');
     const [inputRating, setInputRating] = React.useState(0);
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [addWishlistState, setAddWishlistState] = React.useState(true);
-    const [userWishlist, setUserWishlist] = React.useState<number[]>([]);
+    const [isAddWishlist, setIsAddWishlist] = React.useState(true);
     const [openWlMessage, setOpenWlMessage] = React.useState(false);
     const [openCreateMessage, setOpenCreateMessage] = React.useState(false);
     const [openEditMessage, setOpenEditMessage] = React.useState(false);
@@ -99,11 +93,6 @@ const Game = () => {
         setCurrentPage(value);
     }
     const onSubmitForm = async () => {
-        console.log("Rating number: "+inputRating);
-        console.log("Comment: "+inputComment);
-        if(!userId) {
-
-        }
         try {
             if (inputRating === 0 || isNaN(inputRating)) {
                 setErrorFlag(true);
@@ -136,11 +125,7 @@ const Game = () => {
             }
         }
     }
-    const handleEditDialogClose = () => {
-        setOpenEditDialog(false);
-    }
     const deleteGame = () => {
-        console.log("Game id: " + id);
         axios.delete('http://localhost:4941'+rootUrl+'/games/' + id, {
             headers: {
                 "X-Authorization": token
@@ -171,15 +156,42 @@ const Game = () => {
                 const gameId = response.data['games'].map((g:any) =>g.gameId);
                 console.log("Wishlist game id ", gameId);
                 if(gameId.includes(parseInt(id as string,10))){
-                    setAddWishlistState(false);
+                    setIsAddWishlist(false);
                 }
-                setUserWishlist(gameId);
+                return gameId;
+            })
+    }
+    const getOwnedGame = async () => {
+        await axios.get("http://localhost:4941"+rootUrl+'/games?ownedByMe=true', {
+            headers: {
+                "X-Authorization": token
+            }
+        })
+            .then((response) => {
+                console.log("Owned game", response.data);
+                const gameId = response.data['games'].map((g:any) =>g.gameId);
+                console.log("Owned game id ", gameId);
+                if(gameId.includes(parseInt(id as string,10))){
+                    setAlreadyOwned(true);
+                }
                 return gameId;
             })
     }
     const onClickOwnedButton = () => {
-        setAlreadyOwned(!alreadyOwned);
-    }
+        if (!userId) {
+            setOpenAddOwnDialog(true);
+            return;
+        }
+
+        if (alreadyOwned) {
+            removeFromOwn();
+            setAlreadyOwned(false);
+        } else {
+            addToOwn();
+            setAlreadyOwned(true);
+            setIsAddWishlist(true);
+        }
+    };
     const addToWishlist = async () => {
         await axios.post("http://localhost:4941"+rootUrl+'/games/'+id+'/wishlist', {
             'gameId': id,
@@ -188,6 +200,32 @@ const Game = () => {
             headers: {
                 'X-Authorization': token
             }
+        }).then((res)=>{
+            setIsAddWishlist(false)
+            return res.data.gameId;
+        })
+    }
+    const addToOwn = async () => {
+        await axios.post("http://localhost:4941"+rootUrl+'/games/' + id + '/owned', {
+            'gameId': id,
+            'authId': userId
+        }, {
+            headers: {
+                'X-Authorization': token
+            }
+        }).then((res)=>{
+            setAlreadyOwned(true);
+            return res.data.gameId;
+        })
+    }
+    const removeFromOwn = async () => {
+        await axios.delete("http://localhost:4941"+rootUrl+'/games/' + id + '/owned', {
+            headers: {
+                'X-Authorization': token
+            }
+        }).then((res)=>{
+            setAlreadyOwned(false);
+            return res.data.gameId;
         })
     }
     const removeFromWishlist = async () => {
@@ -195,23 +233,28 @@ const Game = () => {
             headers: {
                 'X-Authorization': token
             }
+        }).then((res)=>{
+            setIsAddWishlist(true);
+            return res.data.gameId;
         })
     }
-    const onClickWishlistButton = () => {
+    const onClickWishlistButton = async () => {
         if(userId) {
-            setAddWishlistState(!addWishlistState);
-            if (addWishlistState) {
-                addToWishlist();
+            // setAddWishlistState(!isAddWishlist);
+            if (isAddWishlist) {
+                await addToWishlist();
             } else {
-                removeFromWishlist();
+                await removeFromWishlist();
             }
         }else {
             setOpenAddWishlistDialog(true);
         }
     }
     React.useEffect(() => {
-        if(userId)
+        if(userId) {
+            getOwnedGame();
             getWishlistGame();
+        }
         const getGame = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
                 .then((response) => {
@@ -219,7 +262,7 @@ const Game = () => {
                 })
             }
         getGame();
-    }, [id])
+    }, [])
     React.useEffect(()=> {
         const getReviews = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id + '/reviews')
@@ -236,9 +279,16 @@ const Game = () => {
             })
                 .then((response) => {
                     const imgUrl = URL.createObjectURL(response.data);
+                    setErrorFlag(false);
+                    setErrorMessage('');
                     setCreatorImage(imgUrl);
                 }).catch((error) => {
-                console.error("Failed to load image", error);
+                    if(axios.isAxiosError(error)) {
+                        if (error.response?.status !== 404) {
+                            setErrorFlag(true);
+                            setErrorMessage('Unexpected error');
+                        }
+                    }
             });
         }
     }, [game.creatorId]);
@@ -355,7 +405,7 @@ const Game = () => {
                             </Stack>
                         </div>
                     </Stack>
-                    <Stack direction='row'sx={{justifyContent: "space-between", alignItems: "center"}}>
+                    <Stack direction='row' sx={{ justifyContent: "space-between", alignItems: "center"}}>
                     <Typography variant="h6" align="left">
                         Reviews({gameReviews.length}):
                     </Typography>
@@ -371,7 +421,7 @@ const Game = () => {
                             <>
                                 <Tooltip open={openOwnMessage} onClose={() => setOpenOwnMessage(false)}
                                        onOpen={() => setOpenOwnMessage(true)}
-                                       title={alreadyOwned ? "Add game as owned" : "Remove game from own"}>
+                                       title={alreadyOwned ? "Remove game from owned" : "Add game to owned"}>
                                     <Fab aria-label="like" color={alreadyOwned ? 'error' : 'default'} onClick={() => {
                                         onClickOwnedButton();
                                     }}>
@@ -380,8 +430,8 @@ const Game = () => {
                                 </Tooltip>
                                 <Tooltip open={openWlMessage} onClose={() => setOpenWlMessage(false)}
                                                onOpen={() => setOpenWlMessage(true)}
-                                               title={addWishlistState ? "Add game into wishlist" : "Remove game from wishlist"}>
-                                    <Fab aria-label="like" disabled={alreadyOwned} color={addWishlistState ? 'default' : 'error'} onClick={() => {
+                                               title={(isAddWishlist && !alreadyOwned) ? "Add game into wishlist" : "Remove game from wishlist"}>
+                                    <Fab aria-label="like" disabled={alreadyOwned} color={(isAddWishlist && !alreadyOwned)? 'default' : 'error'} onClick={() => {
                                         onClickWishlistButton();
                                     }}>
                                         <FavoriteIcon/>
@@ -525,6 +575,26 @@ const Game = () => {
                             </Button>
                         </DialogActions>
                     </Dialog>
+                <Dialog
+                    open={openAddOwnDialog}
+                    onClose={()=>setOpenAddOwnDialog(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title" color="warning">
+                        Own game
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            You need to log in to own game.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={()=>setOpenAddOwnDialog(false)}>Cancel</Button>
+                        <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
+                            Login
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Card>
         </div>
             </>
