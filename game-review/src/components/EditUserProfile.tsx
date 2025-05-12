@@ -9,9 +9,10 @@ import {
     InputAdornment,
     InputLabel, ListItemIcon,
     OutlinedInput,
+    Box,
     TextField
 } from "@mui/material";
-import {CardTitle} from "react-bootstrap";
+import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "./LogInNavBar";
 import Avatar from "@mui/material/Avatar";
 import axios from "axios";
@@ -28,9 +29,6 @@ const EditUserProfile = () => {
     const [originEmail, setOriginEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorFlag, setErrorFlag] = useState(false);
-    const [editFNameState, setEditFNameState] = useState(false);
-    const [editLNameState, setEditLNameState] = useState(false);
-    const [editEmailState, setEditEmailState] = useState(false);
     const [editPasswordState, setEditPasswordState] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -188,6 +186,7 @@ const EditUserProfile = () => {
             <Card sx={editCardStyles}>
                 <CardTitle>Edit profile</CardTitle>
                 <CardContent>
+                    {errorFlag && <Alert variant="danger">{errorMsg}</Alert>}
                     <Grid container rowSpacing={2} columnSpacing={{xs: 1, sm: 2, md: 3}}>
                         <Grid size={6}>
                             <FormControl fullWidth sx={{my: 2}} variant="outlined">
@@ -238,6 +237,9 @@ const EditUserProfile = () => {
                                     }}
                                 />
                             </FormControl>
+                            <Box sx={{flexGrow: 1, justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+                                <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
+                                    <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                             <FormControl variant="outlined">
                                 <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                                 <ListItemIcon>
@@ -272,33 +274,39 @@ const EditUserProfile = () => {
                                     {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>setEditPasswordState(true)}/>)}
                                 </ListItemIcon>
                             </FormControl>
-                            <br/>
-                            {editPasswordState && (
-                            <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
-                                <InputLabel style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
-                                <OutlinedInput
-                                    id="outlined-adornment-cornfirmpassword"
-                                    type={showCfPassword ? 'text' : 'password'}
-                                    onChange={updateConfirmPasswordState}
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label={
-                                                    showCfPassword ? 'hide the password' : 'display the password'
-                                                }
-                                                onClick={handleClickShowCfPassword}
-                                                onMouseDown={(e) => e.preventDefault()}
-                                                onMouseUp={(e) => e.preventDefault()}
-                                                edge="end"
-                                            >
-                                                {showCfPassword ? <VisibilityOff/> : <Visibility/>}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                    label="Confirm Password"
-                                />
-                            </FormControl>
-                            )}
+                                    </Grid>
+                                    <br/>
+                                    {editPasswordState && (
+                                        <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                    <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
+                                        <InputLabel style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
+                                        <OutlinedInput
+                                            id="outlined-adornment-cornfirmpassword"
+                                            fullWidth
+                                            type={showCfPassword ? 'text' : 'password'}
+                                            onChange={updateConfirmPasswordState}
+                                            endAdornment={
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label={
+                                                            showCfPassword ? 'hide the password' : 'display the password'
+                                                        }
+                                                        onClick={handleClickShowCfPassword}
+                                                        onMouseDown={(e) => e.preventDefault()}
+                                                        onMouseUp={(e) => e.preventDefault()}
+                                                        edge="end"
+                                                    >
+                                                        {showCfPassword ? <VisibilityOff/> : <Visibility/>}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            }
+                                            label="Confirm Password"
+                                        />
+                                    </FormControl>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </Box>
                         </Grid>
                         <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
                             <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
