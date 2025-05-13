@@ -56,6 +56,7 @@ const Game = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
+    const [numberOwner, setNumberOwner] = React.useState(0);
     const [image, setImage] = React.useState("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
     const [creatorImage, setCreatorImage] = React.useState("");
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
@@ -129,13 +130,21 @@ const Game = () => {
         }
     }
     const deleteGame = () => {
-        axios.delete('http://localhost:4941'+rootUrl+'/games/' + id, {
-            headers: {
-                "X-Authorization": token
-            }})
-            .then(() => {
-                navigate('/users/'+userId+'/myGames')
+        if(gameReviews.length < 1 && numberOwner === 0) {
+            axios.delete('http://localhost:4941' + rootUrl + '/games/' + id, {
+                headers: {
+                    "X-Authorization": token
+                }
             })
+                .then(() => {
+                    navigate('/users/' + userId + '/myGames')
+                    setErrorFlag(false);
+                    setErrorMessage("");
+                })
+        } else {
+            setErrorFlag(true);
+            setErrorMessage("Cannot delete game that has been reviewed or owned by other users")
+        }
     }
 
     const editGame = () => {
@@ -175,7 +184,9 @@ const Game = () => {
             .then((response) => {
                 console.log("Owned game", response.data);
                 const gameId = response.data['games'].map((g:any) =>g.gameId);
+                setNumberOwner(response.data['games'].length);
                 console.log("Owned game id ", gameId);
+                console.log("Owners ", response.data['games'].length);
                 if(gameId.includes(parseInt(id as string,10))){
                     setAlreadyOwned(true);
                 } else {
@@ -189,7 +200,6 @@ const Game = () => {
             setOpenAddOwnDialog(true);
             return;
         }
-
         if (alreadyOwned) {
             removeFromOwn();
             setAlreadyOwned(false);
@@ -258,7 +268,6 @@ const Game = () => {
         }
     }
     React.useEffect(() => {
-        // window.location.reload();
         if(userId) {
             getOwnedGame();
             getWishlistGame();
@@ -286,24 +295,30 @@ const Game = () => {
         getReviews();
     },[id])
     const getCreatorImage = async (creatorId: number) => {
-            const response = await axios.get('http://localhost:4941' + rootUrl + '/users/' + creatorId + '/image', {
-                responseType: 'blob',
-            })
-                .then((response) => {
-                    const imgUrl = URL.createObjectURL(response.data);
+        try {
+            const response = await axios.get(
+                `http://localhost:4941${rootUrl}/users/${creatorId}/image`,
+                { responseType: 'blob' }
+            );
+            const imgUrl = URL.createObjectURL(response.data);
+            setCreatorImage(imgUrl);
+            setErrorFlag(false);
+            setErrorMessage('');
+        } catch (error) {
+            setCreatorImage('');
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status !== 404) {
+                    setErrorMessage('Unexpected error while fetching image');
+                    setErrorFlag(true);
+                } else {
                     setErrorFlag(false);
                     setErrorMessage('');
-                    setCreatorImage(imgUrl);
-                }).catch((error) => {
-                    setCreatorImage('');
-                    if (axios.isAxiosError(error)) {
-                        if (error.response?.status !== 404) {
-                            setErrorFlag(true);
-                            setErrorMessage('Unexpected error');
-                        }
-                    }
-            });
-            return response;
+                }
+            } else {
+                setErrorFlag(true);
+                setErrorMessage('Unknown error occurred');
+            }
+        }
     }
     React.useEffect(() => {
         const getGenres = () => {
@@ -353,6 +368,7 @@ const Game = () => {
         display: "block",
         minWidth: "900px",
     }
+
     return(
         <>
         {userId && (
@@ -537,7 +553,7 @@ const Game = () => {
                             <Form.Select id="select" onChange={(e)=> setInputRating(parseInt(e.target.value, 10))}>
                                 <option value = "Choose...">Choose...</option>
                                 {rating.map(i =>
-                                    <option value={i}>
+                                    <option value={i} key={i}>
                                         {i}
                                     </option>
                                 )}
@@ -617,7 +633,7 @@ const Game = () => {
                 </Dialog>
             </Card>
         </div>
-            {creatorId && genreId ? (
+            {(creatorId !== 0 && genreId !== 0) ? (
                 <SimilarGame creatorId={creatorId} genreId={genreId} />
             ) : (
                 <div>Loading game info...</div>
