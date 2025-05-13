@@ -41,6 +41,8 @@ const UserRegister = () => {
     const userId = authorization.userId;
     const navigate = useNavigate();
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
         setError('');
@@ -160,6 +162,21 @@ const UserRegister = () => {
             setError('You need to logout first to register');
         }
     };
+    const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            if(e.target.files[0]) {
+                setImage(URL.createObjectURL(e.target.files[0]));
+                setImageFile(e.target.files[0]);
+            }
+        }
+    }
+    const handleRemoveImage = () => {
+        setImage("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
+        setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    }
     const signUpCardStyles: CSS.Properties = {
         display: "inline-block",
         height: "800px",
@@ -261,11 +278,8 @@ const UserRegister = () => {
                                 <label style={{alignItems:'flex-start', display: 'flex'}} >Upload image here: </label>
                                 <Stack direction='row' spacing={2}>
                                 <br/>
-                                    <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
-                                        if (e.target.files) {
-                                            setImage(URL.createObjectURL(e.target.files[0]));
-                                            setImageFile(e.target.files[0]);
-                                        }
+                                    <input type="file" ref={fileInputRef} accept="image/png, image/jpeg, image/jpg, image/gif" onChange={(e) => {
+                                        handleUploadImage(e);
                                     }}/>
                                     <Tooltip title={'Remove image'}>
                                         <CloseIcon fontSize='large' onClick={() => {
@@ -306,8 +320,7 @@ const UserRegister = () => {
                     <DialogActions>
                         <Button onClick={()=>setOpenDeleteDialog(false)}>Cancel</Button>
                         <Button variant="outlined" color="error" onClick={() => {
-                            setImage('');
-                            setImageFile(null);
+                            handleRemoveImage();
                             setOpenDeleteDialog(false);
                         }} autoFocus>
                             Remove

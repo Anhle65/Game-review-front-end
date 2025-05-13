@@ -42,6 +42,7 @@ const [imageFile, setImageFile] = React.useState<File | null>(null);
 const [titleExist, setTitleExist] = React.useState<string[]>([]);
 const [originTitle, setOriginTitle] = React.useState('');
 const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+const fileInputRef = React.useRef<HTMLInputElement>(null);
 
 const onCreateGame = async () => {
         console.log("Chosen platforms: ", allPlatforms.filter(p => p.isSelected));
@@ -275,6 +276,21 @@ const updateDescriptionState = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(e.currentTarget.value);
     setErrorFlag(false);
 }
+const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+        if(e.target.files[0]) {
+            setImage(URL.createObjectURL(e.target.files[0]));
+            setImageFile(e.target.files[0]);
+        }
+    }
+}
+const handleRemoveImage = () => {
+    setImage("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
+    setImageFile(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+}
 const MenuProps = {
     PaperProps: {
         style: {
@@ -400,11 +416,8 @@ return (
                 <Grid size={6}>
                     <Stack direction='row' spacing={2}>
                         <br/>
-                        <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
-                            if (e.target.files) {
-                                setImage(URL.createObjectURL(e.target.files[0]));
-                                setImageFile(e.target.files[0]);
-                            }
+                        <input type="file" ref={fileInputRef} accept="image/png, image/jpg, image/jpeg, image/gif" onChange={(e) => {
+                            handleUploadImage(e);
                         }}/>
                         <Tooltip title={'Remove image'}>
                             <CloseIcon fontSize='large' onClick={() => {
@@ -453,6 +466,7 @@ return (
                     setImage('');
                     setImageFile(null);
                     setOpenDeleteDialog(false);
+                    handleRemoveImage();
                 }} autoFocus>
                     Remove
                 </Button>
