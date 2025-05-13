@@ -264,10 +264,12 @@ const Game = () => {
                     setGame(response.data);
                     setGenreId(response.data.genreId);
                     setCreatorId(response.data.creatorId);
+                    console.log('Into game id: ', id);
+                    console.log('Into game creator id: ', response.data.creatorId);
                 })
             }
         getGame();
-    }, [])
+    }, [id])
     React.useEffect(()=> {
         const getReviews = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id + '/reviews')
@@ -296,7 +298,7 @@ const Game = () => {
                     }
             });
         }
-    }, [game.creatorId]);
+    }, [creatorId]);
     React.useEffect(() => {
         const getGenres = () => {
             axios.get('http://localhost:4941'+rootUrl+'/games/genres')
@@ -335,14 +337,14 @@ const Game = () => {
                 }
             }
         });
-    }, []);
+    }, [id]);
     const gameReview_rows = () => gameReviews.slice((currentPage - 1) * 3, currentPage * 3).map((rv: Review) => <GameReviewObject key={`${game.gameId}-${rv.reviewerId}`} gameReview={rv} />);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
-        maxWidth: "60%",
+        // maxWidth: "60%",
         display: "block",
-        width: "fit-content"
+        minWidth: "900px",
     }
     return(
         <>
@@ -464,8 +466,14 @@ const Game = () => {
                         </div>
                     </Stack>
                     <br/>
-                    <div style={{display: "inline-block", justifyContent: 'left', alignItems: 'left'}}>
+                    <div style={{display: "flex", justifyContent: 'left', alignItems: 'left'}}>
+                        <Box sx={{
+                            display: 'inline-block',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                        }}>
                         {gameReview_rows()}
+                        </Box>
                     </div>
                     <Dialog
                         open={openAddReviewDialog}
@@ -602,7 +610,7 @@ const Game = () => {
                 </Dialog>
             </Card>
         </div>
-            {(creatorId || genreId) && (
+            {(creatorId && genreId) && (
                 <SimilarGame creatorId={creatorId} genreId={genreId} />
             )}
             </>

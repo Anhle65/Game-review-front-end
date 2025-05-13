@@ -12,7 +12,7 @@ import {
     PaginationItem,
     Paper,
     Stack,
-    TextField
+    TextField, Typography
 } from "@mui/material";
 import { rootUrl } from "../base.routes";
 import GameListObject from "./GameListObject";
@@ -23,6 +23,7 @@ import LogInNavBar from "./LogInNavBar";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
 import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
+import {NavLink} from "react-router-dom";
 type GameParams = {
     params: Record<string, string | number | boolean | any[]>;
 };
@@ -48,6 +49,7 @@ const GameList = ({params}: GameParams) => {
     const [chosenGenres, setChosenGenres] = React.useState<GenreSelectionState[]>([]);
     const [price, setPrice] = React.useState('');
     let filterParams = new URLSearchParams();
+    let numberElements = 0;
     Object.entries(params).forEach(([key, value]) => {
         if (Array.isArray(value)) {
             value.forEach((v) => filterParams.append(key, String(v)));
@@ -178,7 +180,8 @@ const GameList = ({params}: GameParams) => {
         margin: "20px",
         display: "block",
         width: "fit-content",
-        minWidth: "1000px"
+        minWidth: "1000px",
+        minHeight: '1000px'
     }
     return (
         <>
@@ -233,26 +236,41 @@ const GameList = ({params}: GameParams) => {
                             renderInput={(params) => <TextField {...params} label="Sort by"/>}
                         />
                     </Stack>
-                    <div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>
-                        {game_rows()}
+                    <div style={{display: "flex", maxWidth: "965px", minWidth: "320px"}}>
+                        <Box sx={{
+                            display: 'inline-block',
+                            justifyContent: 'flex-start',
+                            alignItems: 'flex-start',
+                        }}>
+                            {game_rows()}
+                        </Box>
                     </div>
-                    <div style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}>
-                        <Pagination
-                            count={Math.ceil(games.length / 9)}
-                            showFirstButton showLastButton
-                            onChange={(event, value) => handlePaginationClick(value)}
-                            renderItem={(item) => (
-                                <PaginationItem
-                                    slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
-                                    {...item}
-                                />
-                            )}
-                        />
-                    </div>
+                    {game_rows().length > 0 ? (
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <Pagination
+                                count={Math.ceil(games.length / 9)}
+                                showFirstButton showLastButton
+                                onChange={(event, value) => handlePaginationClick(value)}
+                                renderItem={(item) => (
+                                    <PaginationItem
+                                        slots={{previous: ArrowBackIcon, next: ArrowForwardIcon}}
+                                        {...item}
+                                    />
+                                )}
+                            />
+                        </div>
+                    ):(
+                        (
+                        <><Typography variant='h4'>No Game</Typography>
+                            <Typography variant='h6'>
+                            <NavLink to={'/games/'} end>Back to dashboard</NavLink>
+                        </Typography></>
+                    )
+                    )}
                 </Paper>
                 </Stack>
                 <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'flex-start'}}>

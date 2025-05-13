@@ -37,8 +37,8 @@ const SimilarGame = (props: SimilarGameProps) => {
             }
         }
         fetchGames();
-    },[])
-    const game_rows = () => games.slice((currentPage - 1) * 3, currentPage * 3).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
+    }, [props.creatorId, props.genreId])
+    const game_rows = () => games.slice((currentPage - 1) * 3, currentPage * 3).map((game: Game) => <GameListObject key={game.gameId + game.title + 'similar'} game={game}/>);
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
