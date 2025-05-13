@@ -149,7 +149,7 @@ const Game = () => {
         navigate("/users/login/");
     }
     const getWishlistGame = async () => {
-        await axios.get("http://localhost:4941"+rootUrl+'/games?wishlistedByMe=true', {
+        const response = await axios.get("http://localhost:4941"+rootUrl+'/games?wishlistedByMe=true', {
             headers: {
                 "X-Authorization": token
             }
@@ -160,12 +160,14 @@ const Game = () => {
                 console.log("Wishlist game id ", gameId);
                 if(gameId.includes(parseInt(id as string,10))){
                     setIsAddWishlist(false);
+                } else {
+                    setIsAddWishlist(true);
                 }
-                return gameId;
             })
+        return response;
     }
     const getOwnedGame = async () => {
-        await axios.get("http://localhost:4941"+rootUrl+'/games?ownedByMe=true', {
+        const response = await axios.get("http://localhost:4941"+rootUrl+'/games?ownedByMe=true', {
             headers: {
                 "X-Authorization": token
             }
@@ -176,9 +178,11 @@ const Game = () => {
                 console.log("Owned game id ", gameId);
                 if(gameId.includes(parseInt(id as string,10))){
                     setAlreadyOwned(true);
+                } else {
+                    setAlreadyOwned(false);
                 }
-                return gameId;
             })
+        return response;
     }
     const onClickOwnedButton = () => {
         if (!userId) {
@@ -254,6 +258,8 @@ const Game = () => {
         }
     }
     React.useEffect(() => {
+        // window.location.reload();
+        window.scrollTo(0,0);
         if(userId) {
             getOwnedGame();
             getWishlistGame();
@@ -266,6 +272,7 @@ const Game = () => {
                     setCreatorId(response.data.creatorId);
                     console.log('Into game id: ', id);
                     console.log('Into game creator id: ', response.data.creatorId);
+                    getCreatorImage(response.data.creatorId);
                 })
             }
         getGame();
@@ -279,9 +286,8 @@ const Game = () => {
         }
         getReviews();
     },[id])
-    React.useEffect(()=> {
-        if(game.creatorId !== 0) {
-            axios.get('http://localhost:4941' + rootUrl + '/users/' + game.creatorId + '/image', {
+    const getCreatorImage = async (creatorId: number) => {
+            const response = await axios.get('http://localhost:4941' + rootUrl + '/users/' + creatorId + '/image', {
                 responseType: 'blob',
             })
                 .then((response) => {
@@ -290,15 +296,16 @@ const Game = () => {
                     setErrorMessage('');
                     setCreatorImage(imgUrl);
                 }).catch((error) => {
-                    if(axios.isAxiosError(error)) {
+                    setCreatorImage('');
+                    if (axios.isAxiosError(error)) {
                         if (error.response?.status !== 404) {
                             setErrorFlag(true);
                             setErrorMessage('Unexpected error');
                         }
                     }
             });
-        }
-    }, [creatorId]);
+            return response;
+    }
     React.useEffect(() => {
         const getGenres = () => {
             axios.get('http://localhost:4941'+rootUrl+'/games/genres')
@@ -329,6 +336,7 @@ const Game = () => {
                 setImage(imgUrl);
             }).catch((error) => {
             if (axios.isAxiosError(error)) {
+                setImage('https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png');
                 if (error.response?.status === 404) {
                     setErrorFlag(false);
                 } else {
@@ -610,8 +618,10 @@ const Game = () => {
                 </Dialog>
             </Card>
         </div>
-            {(creatorId && genreId) && (
+            {creatorId && genreId ? (
                 <SimilarGame creatorId={creatorId} genreId={genreId} />
+            ) : (
+                <div>Loading game info...</div>
             )}
             </>
     )
