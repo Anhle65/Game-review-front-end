@@ -7,12 +7,11 @@ import {
     Autocomplete,
     Box, Checkbox,
     Fab, FormControlLabel, FormGroup, FormLabel,
-    Grid, ListItemIcon,
+    ListItemIcon,
     Pagination,
     PaginationItem,
     Paper,
     Stack,
-    styled,
     TextField
 } from "@mui/material";
 import { rootUrl } from "../base.routes";

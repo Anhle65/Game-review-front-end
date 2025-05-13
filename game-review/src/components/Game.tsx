@@ -31,6 +31,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Box from "@mui/material/Box";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SimilarGame from "./SimilarGame";
 const Game = () => {
     const {id} = useParams();
     const [game, setGame] = React.useState<Game> ({
@@ -62,6 +63,8 @@ const Game = () => {
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openAddWishlistDialog, setOpenAddWishlistDialog] = React.useState(false);
     const [openAddOwnDialog, setOpenAddOwnDialog] = React.useState(false);
+    const [genreId, setGenreId] = React.useState(0);
+    const [creatorId, setCreatorId] = React.useState(0);
     const genreName = genres.find(g => g.genreId === game.genreId)
     const [platforms, setPlatforms] = React.useState<Platform[]>([]);
     const allPlatforms = game.platformIds.map(id => platforms.find(p => p.platformId === id)?.name)
@@ -259,6 +262,8 @@ const Game = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id)
                 .then((response) => {
                     setGame(response.data);
+                    setGenreId(response.data.genreId);
+                    setCreatorId(response.data.creatorId);
                 })
             }
         getGame();
@@ -597,6 +602,9 @@ const Game = () => {
                 </Dialog>
             </Card>
         </div>
+            {(creatorId || genreId) && (
+                <SimilarGame creatorId={creatorId} genreId={genreId} />
+            )}
             </>
     )
 }
