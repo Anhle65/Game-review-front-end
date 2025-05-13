@@ -5,14 +5,15 @@ import {rootUrl} from "../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {
+    Box, Button,
     Card,
-    CardContent,
+    CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
     FormControl,
     InputAdornment,
     InputLabel,
     OutlinedInput,
     Stack,
-    TextField,
+    TextField, Tooltip,
     Typography
 } from "@mui/material";
 import LogoutNavBar from "./LogoutNavBar";
@@ -21,6 +22,7 @@ import LogInNavBar from "./LogInNavBar";
 import Avatar from "@mui/material/Avatar";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
+import CloseIcon from "@mui/icons-material/Close";
 
 const UserRegister = () => {
     const [email, setEmail] = useState('');
@@ -38,6 +40,7 @@ const UserRegister = () => {
     const token = authorization.token;
     const userId = authorization.userId;
     const navigate = useNavigate();
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
         setError('');
@@ -106,8 +109,8 @@ const UserRegister = () => {
                     });
                     const {userId, token} = response.data;
                     authorization.setAuthorization(userId, token);
-                    console.log("userId:", userId);
-                    console.log("token:", token);
+                    // console.log("userId:", userId);
+                    // console.log("token:", token);
                     if (imageFile) {
                         await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
                             imageFile,
@@ -138,7 +141,7 @@ const UserRegister = () => {
                                 if (password.length < 6 || password.length > 64) {
                                     setError("Password length must be from 6 to 64 characters");
                                 } else {
-                                    setError("Invalid email");
+                                    setError("Invalid email or email is currently null");
                                 }
                             }
                         }
@@ -163,7 +166,7 @@ const UserRegister = () => {
         width: "500px",
         margin: "10px",
         padding: "0px",
-        backgroundColor: "lightcyan",
+        // backgroundColor: "lightcyan",
     }
     return (
         <>{(userId && token) && (
@@ -180,19 +183,19 @@ const UserRegister = () => {
                 <h2 className="signup-title">Register</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Card sx={signUpCardStyles}>
+                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <CardContent>
                         <form>
-                            <Stack direction="column" spacing={2} sx={{
-                                justifyContent: "space-around",
-                                alignItems: "center",
-                            }}>
+                            <Stack direction="column" spacing={2}>
                                 <TextField
+                                    fullWidth
                                     required
                                     id="first-name-required"
                                     label="First name"
                                     onChange={updateFnameState}
                                 />
                                 <TextField
+                                    fullWidth
                                     required
                                     id="last-name-required"
                                     // defaultValue="Smith"
@@ -200,6 +203,7 @@ const UserRegister = () => {
                                     label="Last name"
                                 />
                                 <TextField
+                                    fullWidth
                                     required
                                     type="text"
                                     id="email-required"
@@ -254,13 +258,21 @@ const UserRegister = () => {
                                         label="Confirm Password"
                                     />
                                 </FormControl>
-                                <label>Upload image: </label>
-                                <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
-                                    if (e.target.files) {
-                                        setImage(URL.createObjectURL(e.target.files[0]));
-                                        setImageFile(e.target.files[0]);
-                                    }
+                                <label style={{alignItems:'flex-start', display: 'flex'}} >Upload image here: </label>
+                                <Stack direction='row' spacing={2}>
+                                <br/>
+                                    <input type="file" accept="image/png, image/jpeg, image/gif" onChange={(e) => {
+                                        if (e.target.files) {
+                                            setImage(URL.createObjectURL(e.target.files[0]));
+                                            setImageFile(e.target.files[0]);
+                                        }
                                     }}/>
+                                    <Tooltip title={'Remove image'}>
+                                        <CloseIcon fontSize='large' onClick={() => {
+                                            setOpenDeleteDialog(true)
+                                        }}/>
+                                    </Tooltip>
+                                </Stack>
                                 <Avatar alt="User Image" sx={{ width: 100, height: 100 }} src={image.length !== 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                                 <button type="button" className="btn btn-success" onClick={(e) => {
                                     e.preventDefault(); // Prevent form from refreshing the page
@@ -276,7 +288,32 @@ const UserRegister = () => {
                             </Stack>
                         </form>
                     </CardContent>
+                    </Box>
                 </Card>
+                <Dialog
+                    open={openDeleteDialog}
+                    onClose={()=>setOpenDeleteDialog(false)}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title">
+                        {"Remove image?"}
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to remove image?
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={()=>setOpenDeleteDialog(false)}>Cancel</Button>
+                        <Button variant="outlined" color="error" onClick={() => {
+                            setImage('');
+                            setImageFile(null);
+                            setOpenDeleteDialog(false);
+                        }} autoFocus>
+                            Remove
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </div>
         </>
     );
