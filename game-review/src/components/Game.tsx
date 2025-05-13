@@ -259,7 +259,6 @@ const Game = () => {
     }
     React.useEffect(() => {
         // window.location.reload();
-        window.scrollTo(0,0);
         if(userId) {
             getOwnedGame();
             getWishlistGame();
@@ -350,7 +349,7 @@ const Game = () => {
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
-        // maxWidth: "60%",
+        maxWidth: "60%",
         display: "block",
         minWidth: "900px",
     }

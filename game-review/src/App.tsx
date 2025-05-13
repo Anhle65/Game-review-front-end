@@ -14,6 +14,7 @@ import UserGames from "./components/UserGames";
 import UserGameReview from "./components/UserGameReview";
 import UserGameWishlist from "./components/UserGameWishlist";
 import UserGameOwned from "./components/UserGameOwned";
+import GameWithKey from "./components/GameWithKey";
 function App() {
   return (
     <div className="App">
@@ -24,7 +25,7 @@ function App() {
             <Route path="/games" element={<GameList params={{}}/>} />
             <Route path="/games/create" element={<NewGame />} />
             <Route path="/games/:id/edit" element={<NewGame />} />
-            <Route path="/games/:id" element={<Game />} />
+            <Route path="/games/:id" element={<GameWithKey />} />
             <Route path="/games/user/:id" element={<GameList params={{}}/>} />
             <Route path="/users/:id/profile" element={<UserProfile />} />
             <Route path="/users/:id/edit" element={<EditUserProfile />} />
