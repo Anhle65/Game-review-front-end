@@ -10,7 +10,7 @@ import {
     InputLabel, ListItemIcon,
     OutlinedInput,
     Box,
-    TextField
+    TextField, Tooltip
 } from "@mui/material";
 import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "./LogInNavBar";
@@ -315,9 +315,11 @@ const EditUserProfile = () => {
                                     setImageFile(e.target.files[0]);
                                 }
                             }}/>
-                            <CloseIcon fontSize='large' onClick={() => {
-                                setOpenDeleteDialog(true)
-                            }}/>
+                            <Tooltip title={'Remove image'}>
+                                <CloseIcon fontSize='large' onClick={() => {
+                                    setOpenDeleteDialog(true)
+                                }}/>
+                            </Tooltip>
                             <br/>
                             <CardMedia
                                 component="img"
