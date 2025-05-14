@@ -1,13 +1,11 @@
 import React from "react";
-import {rootUrl} from "../base.routes";
 import axios from "axios";
-import {Autocomplete, Pagination, PaginationItem, Paper, Stack, Box, Typography} from "@mui/material";
+import { Pagination, PaginationItem, Paper, Stack, Box, Typography} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import GameListObject from "./GameListObject";
 import CSS from "csstype";
 import {useParams} from "react-router-dom";
-import {CardTitle} from "react-bootstrap";
 type SimilarGameProps = {
     creatorId: number;
     genreId: number;
@@ -19,26 +17,39 @@ const SimilarGame = (props: SimilarGameProps) => {
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
     React.useEffect(()=> {
-        const fetchGames = async () => {
-            const [gameByCreatorId, gameByGenreId] = await Promise.all([
-                axios.get(`http://localhost:4941/api/v1/games?creatorId=${props.creatorId}`),
-                axios.get(`http://localhost:4941/api/v1/games?genreIds=${props.genreId}`),
-            ]);
-            const allGames = gameByCreatorId.data['games'].concat(gameByGenreId.data['games']);
-            const uniqueGames = Array.from(new Set(allGames.map((g:any) => g.gameId)))
-                .map(id => {
-                    return allGames.find((g:any) => g.gameId === id)
-                })
-            if(id) {
-                const similargames = uniqueGames.filter((g: any) => g.gameId !== parseInt(id));
-                setGames(similargames);
-            } else {
-                setGames(uniqueGames);
+        fetchGames().then((response) => {
+            console.log('update games',games);
+                // game_rows();
             }
+        );
+
+    }, [props])
+
+    const fetchGames = async () => {
+        const [gameByCreatorId, gameByGenreId] = await Promise.all([
+            axios.get(`http://localhost:4941/api/v1/games?creatorId=${props.creatorId}`),
+            axios.get(`http://localhost:4941/api/v1/games?genreIds=${props.genreId}`),
+        ]);
+        const combinedGames = [...gameByCreatorId.data.games, ...gameByGenreId.data.games];
+        const uniqueGames = Array.from(
+            new Map(combinedGames.map((g) => [g.gameId, g])).values()
+        );
+        setCurrentPage(1);
+        if(id) {
+            const similargames = uniqueGames.filter((g: any) => g.gameId !== parseInt(id));
+            setGames(similargames);
+            return similargames;
+        } else {
+            setGames(uniqueGames);
+            return uniqueGames;
         }
-        fetchGames();
-    }, [props.creatorId, props.genreId])
-    const game_rows = () => games.slice((currentPage - 1) * 3, currentPage * 3).map((game: Game) => <GameListObject key={game.gameId + game.title + 'similar'} game={game}/>);
+    }
+
+    const game_rows = () => {
+        return(games.slice((currentPage - 1) * 3, currentPage * 3).map((game: Game) => <GameListObject
+            key={game.gameId + game.title + 'similar'} game={game}/>))
+    };
+
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
