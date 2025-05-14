@@ -1,6 +1,6 @@
 import React from "react";
 import CSS from "csstype";
-import {Avatar, Card, CardContent, CardMedia, Stack, Typography} from "@mui/material";
+import {Avatar, Card, CardContent, CardMedia, Stack, TextField, Typography} from "@mui/material";
 import {rootUrl} from "../base.routes";
 import axios from "axios";
 
@@ -13,8 +13,8 @@ const GameReviewObject = (props: IGameReviewProps) => {
     const gameReviewCardStyles: CSS.Properties = {
         display: "inline-block",
         overflowY: "auto",
-        height: "200px",
-        width: "250px",
+        height: "250px",
+        width: "270px",
         margin: "10px",
         padding: "0px"
     }
@@ -40,21 +40,30 @@ const GameReviewObject = (props: IGameReviewProps) => {
         <Card sx={gameReviewCardStyles}>
             <CardContent>
                 <Stack direction="row" spacing={2} justifyContent="center">
-                    <Typography variant="h6" component="div" align="left">
+                    <Typography sx={{display:'flex', justifyContent:'flext-start'}} variant="h6" component="div" align="left">
                         {gameReview.reviewerFirstName} {gameReview.reviewerLastName}
-                        <br/>
-                        <Typography variant="subtitle2" align="left">
-                            Rating: {gameReview.rating}/10
-                            <br/>
-                            Messages: {gameReview.review}
-                            <br/>
-                            Rated on: {new Date(gameReview.timestamp).toLocaleDateString()}
-                        </Typography>
                     </Typography>
-                    <div>
-                        <Avatar alt="Creator Image" src={`http://localhost:4941${rootUrl}/users/${gameReview.reviewerId}/image`} />
-                    </div>
+                        <div>
+                            <Avatar alt="Creator Image" src={`http://localhost:4941${rootUrl}/users/${gameReview.reviewerId}/image`} />
+                        </div>
                 </Stack>
+                <TextField
+                    fullWidth
+                    multiline={true}
+                    variant='standard'
+                    type="text"
+                    label="Comment:"
+                    value={gameReview.review}
+                    inputProps={{
+                        readOnly: true
+                    }}
+                    sx={{my: 2, overflowY: 'auto', display:'flex'}}
+                />
+                    <Typography variant="subtitle2" align="left">
+                        Rating: {gameReview.rating}/10
+                        <br/>
+                        Rated on: {new Date(gameReview.timestamp).toLocaleDateString()}
+                    </Typography>
             </CardContent>
         </Card>
     )

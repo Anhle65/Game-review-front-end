@@ -45,21 +45,25 @@ const EditUserProfile = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const onSubmit = async () => {
+        console.log('password: ', password);
+        console.log('cfpassword: ', confirmPassword);
         const data:Record<string, string> = {'firstName': firstName,
             'lastName': lastName}
         if(email !== originEmail)
             data["email"] = email;
         if(editPasswordState) {
-            if(password !== confirmPassword) {
+            if(!password) {
                 setErrorFlag(true);
-                setErrorMsg("Password has to match with confirm password");
+                setErrorMsg("Password can't be null");
             } else {
-                if(!password) {
+                if(password !== confirmPassword) {
                     setErrorFlag(true);
-                    setErrorMsg("Password can't be null");
-                } else {
+                    setErrorMsg("Password has to match with confirm password");
+                }
+                else {
                     setErrorFlag(false);
                     data["password"] = password;
+                    data["currentPassword"] = password;
                 }
             }
         }
@@ -102,7 +106,7 @@ const EditUserProfile = () => {
                         }
                     } else {
                         if (error.response?.status === 403) {
-                            setErrorMsg("Email is already used");
+                            setErrorMsg("New password can not be the same as old password or email already exists");
                         } else
                             setErrorMsg(error.toString());
                     }
@@ -256,7 +260,7 @@ const EditUserProfile = () => {
                                 <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
                                     <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                             <FormControl variant="outlined">
-                                <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+                                <InputLabel required={editPasswordState} htmlFor="outlined-adornment-password">Password</InputLabel>
                                 <ListItemIcon>
                                 <OutlinedInput
                                     fullWidth
@@ -294,7 +298,7 @@ const EditUserProfile = () => {
                                     {editPasswordState && (
                                         <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                                     <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
-                                        <InputLabel style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
+                                        <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
                                         <OutlinedInput
                                             id="outlined-adornment-cornfirmpassword"
                                             fullWidth

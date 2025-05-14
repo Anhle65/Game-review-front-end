@@ -286,6 +286,7 @@ const Game = () => {
         getGame();
     }, [id])
     React.useEffect(()=> {
+        window.scrollTo({top:0})
         const getReviews = () => {
             axios.get('http://localhost:4941' +rootUrl+'/games/' + id + '/reviews')
                 .then((response) => {
