@@ -10,7 +10,7 @@ import {
     InputLabel, ListItemIcon,
     OutlinedInput,
     Box,
-    TextField, Tooltip
+    TextField, Tooltip, Stack
 } from "@mui/material";
 import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "./LogInNavBar";
@@ -35,7 +35,9 @@ const EditUserProfile = () => {
     const [lastName, setLastName] = useState("");
     const [image, setImage] = React.useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showCfPassword, setShowCfPassword] = useState(false);
     const [imageFile, setImageFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
@@ -43,6 +45,7 @@ const EditUserProfile = () => {
     const userId = authorization.userId;
     const navigate = useNavigate();
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+    const [openEditMessage, setOpenEditMessage] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const onSubmit = async () => {
         console.log('password: ', password);
@@ -52,6 +55,7 @@ const EditUserProfile = () => {
         if(email !== originEmail)
             data["email"] = email;
         if(editPasswordState) {
+            console.log('password inner check: ', password);
             if(!password) {
                 setErrorFlag(true);
                 setErrorMsg("Password can't be null");
@@ -63,7 +67,7 @@ const EditUserProfile = () => {
                 else {
                     setErrorFlag(false);
                     data["password"] = password;
-                    data["currentPassword"] = password;
+                    data["currentPassword"] = currentPassword;
                 }
             }
         }
@@ -106,9 +110,14 @@ const EditUserProfile = () => {
                         }
                     } else {
                         if (error.response?.status === 403) {
-                            setErrorMsg("New password can not be the same as old password or email already exists");
-                        } else
-                            setErrorMsg(error.toString());
+                            setErrorMsg("New password can not be the same as old password");
+                        } else {
+                            if(error.response?.status === 401) {
+                                setErrorMsg("Incorrect currentPassword");
+                            } else {
+                                setErrorMsg("Unexpected error");
+                            }
+                        }
                     }
                 } else {
                     setErrorMsg("Unexpected error");
@@ -133,9 +142,15 @@ const EditUserProfile = () => {
         setErrorFlag(false);
     }
     const handleClickShowPassword = () => setShowPassword((show) => !show);
+    const handleClickShowCurrentPassword = () => setShowCurrentPassword((show) => !show);
     const handleClickShowCfPassword = () => setShowCfPassword((show) => !show);
     const updatePasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(event.target.value)
+        setErrorMsg('');
+        setErrorFlag(false);
+    }
+    const updateCurrentPasswordState = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setCurrentPassword(event.target.value)
         setErrorMsg('');
         setErrorFlag(false);
     }
@@ -260,68 +275,99 @@ const EditUserProfile = () => {
                                 <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
                                     <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                             <FormControl variant="outlined">
-                                <InputLabel required={editPasswordState} htmlFor="outlined-adornment-password">Password</InputLabel>
+                                <InputLabel required={editPasswordState} htmlFor="outlined-adornment-password">Current Password</InputLabel>
                                 <ListItemIcon>
                                 <OutlinedInput
                                     fullWidth
                                     required
                                     disabled={!editPasswordState}
                                     id="outlined-adornment-password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    onChange={updatePasswordState}
-                                    value={password}
+                                    type={showCurrentPassword ? 'text' : 'password'}
+                                    onChange={updateCurrentPasswordState}
+                                    value={currentPassword}
                                     sx={{display:'flex'}}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             {editPasswordState && (
                                             <IconButton
                                                 aria-label={
-                                                    showPassword ? 'hide the password' : 'display the password'
+                                                    showCurrentPassword ? 'hide the password' : 'display the password'
                                                 }
-                                                onClick={handleClickShowPassword}
+                                                onClick={handleClickShowCurrentPassword}
                                                 onMouseDown={(e) => e.preventDefault()}
                                                 onMouseUp={(e) => e.preventDefault()}
                                                 edge="end"
                                             >
-                                                {showPassword ? <VisibilityOff/> : <Visibility/>}
+                                                {showCurrentPassword ? <VisibilityOff/> : <Visibility/>}
                                             </IconButton>)}
                                         </InputAdornment>
                                     }
-                                    label="Password"
+                                    label="Current password"
                                 />
-                                    {editPasswordState && (<EditIcon fontSize="large" onClick={()=>setEditPasswordState(false)}/>)}
-                                    {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>setEditPasswordState(true)}/>)}
+                                    <Tooltip open={openEditMessage} onClose={()=>setOpenEditMessage(false)} onOpen={()=>setOpenEditMessage(true)}
+                                        title={editPasswordState? 'Click to keep old password':'Click to update password'}>
+                                        <span>
+                                        {editPasswordState && (<EditIcon fontSize="large" onClick={()=>setEditPasswordState(false)}/>)}
+                                        {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>setEditPasswordState(true)}/>)}
+                                        </span>
+                                    </Tooltip>
                                 </ListItemIcon>
                             </FormControl>
                                     </Grid>
                                     <br/>
                                     {editPasswordState && (
-                                        <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                        <Grid size={12} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                                     <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
-                                        <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
+                                        <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">New Password</InputLabel>
                                         <OutlinedInput
                                             id="outlined-adornment-cornfirmpassword"
                                             fullWidth
-                                            type={showCfPassword ? 'text' : 'password'}
-                                            onChange={updateConfirmPasswordState}
+                                            type={showPassword ? 'text' : 'password'}
+                                            onChange={updatePasswordState}
                                             endAdornment={
                                                 <InputAdornment position="end">
                                                     <IconButton
                                                         aria-label={
-                                                            showCfPassword ? 'hide the password' : 'display the password'
+                                                            showPassword ? 'hide the password' : 'display the password'
                                                         }
-                                                        onClick={handleClickShowCfPassword}
+                                                        onClick={handleClickShowPassword}
                                                         onMouseDown={(e) => e.preventDefault()}
                                                         onMouseUp={(e) => e.preventDefault()}
                                                         edge="end"
                                                     >
-                                                        {showCfPassword ? <VisibilityOff/> : <Visibility/>}
+                                                        {showPassword ? <VisibilityOff/> : <Visibility/>}
                                                     </IconButton>
                                                 </InputAdornment>
                                             }
-                                            label="Confirm Password"
+                                            label="New Password"
                                         />
                                     </FormControl>
+                                            <br/>
+                                            <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
+                                                <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">Confirm Password</InputLabel>
+                                                <OutlinedInput
+                                                    id="outlined-adornment-cornfirmpassword"
+                                                    fullWidth
+                                                    type={showCfPassword ? 'text' : 'password'}
+                                                    onChange={updateConfirmPasswordState}
+                                                    endAdornment={
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                aria-label={
+                                                                    showCfPassword ? 'hide the password' : 'display the password'
+                                                                }
+                                                                onClick={handleClickShowCfPassword}
+                                                                onMouseDown={(e) => e.preventDefault()}
+                                                                onMouseUp={(e) => e.preventDefault()}
+                                                                edge="end"
+                                                            >
+                                                                {showCfPassword ? <VisibilityOff/> : <Visibility/>}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    }
+                                                    label="Confirm Password"
+                                                />
+                                            </FormControl>
                                         </Grid>
                                     )}
                                 </Grid>
