@@ -105,41 +105,65 @@ const onCreateGame = async () => {
         }
 }
 const onUpdateGame = async () => {
-    if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
-        setErrorFlag(true);
-        setErrorMessage("Title already exists! Please choose another name!");
+    // if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
+    //     setErrorFlag(true);
+    //     setErrorMessage("Title already exists! Please choose another name!");
+    // } else {
+    //     setErrorFlag(false);
+    //     setErrorMessage('');
+    // }
+    if(title.trim()) {
+        if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
+            setErrorFlag(true);
+            setErrorMessage("Title already exists! Please choose another name!");
+        } else {
+            if (!genre) {
+                setErrorFlag(true);
+                setErrorMessage("Game must have genre");
+            } else {
+                if (allPlatforms.filter(p => p.isSelected).length < 1) {
+                    setErrorFlag(true);
+                    setErrorMessage("Game must have at least 1 platform");
+                } else {
+                    if (!price) {
+                        setErrorFlag(true);
+                        setErrorMessage("Game price must be at least $0");
+                    }
+                }
+            }
+        }
     } else {
         setErrorFlag(false);
         setErrorMessage('');
-    }
-    try {
-        await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
-            gameId: id,
-            title: title,
-            description: description,
-            genreId: parseInt(genre, 10),
-            price: parseInt(price, 10),
-            platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
-        }, {
-            headers: {
-                "X-Authorization": token
-            }
-        })
-        if (imageFile) {
-            await axios.put("http://localhost:4941" + rootUrl + "/games/" + id + "/image", imageFile, {
+        try {
+            await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
+                gameId: id,
+                title: title,
+                description: description,
+                genreId: parseInt(genre, 10),
+                price: parseInt(price, 10),
+                platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
+            }, {
                 headers: {
-                    "X-Authorization": token,
-                    "Content-Type": imageFile?.type,
+                    "X-Authorization": token
                 }
             })
+            if (imageFile) {
+                await axios.put("http://localhost:4941" + rootUrl + "/games/" + id + "/image", imageFile, {
+                    headers: {
+                        "X-Authorization": token,
+                        "Content-Type": imageFile?.type,
+                    }
+                })
+            }
+            navigate('/games/' + id);
+        } catch (error) {
+            setErrorFlag(true);
+            if (axios.isAxiosError(error)) {
+                setErrorMessage(error.message.toString());
+            }
+            setErrorMessage("Unexpected error");
         }
-        navigate('/games/' + id);
-    } catch (error) {
-        setErrorFlag(true);
-        if (axios.isAxiosError(error)) {
-            setErrorMessage(error.message.toString());
-        }
-        setErrorMessage("Unexpected error");
     }
 }
 const getAllTitles = async () => {
@@ -161,7 +185,7 @@ React.useEffect(() => {
                 setDescription(res.description);
                 setCreatorId(res.creatorId);
                 setGenre(res.genreId.toString());
-                setPrice((res.price /100).toString());
+                setPrice((res.price).toString());
                 setAllPlatforms(prevPlatforms =>
                     prevPlatforms.map(platform => ({
                         ...platform,
