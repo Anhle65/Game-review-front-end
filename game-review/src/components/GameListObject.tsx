@@ -34,8 +34,10 @@ const GameListObject = (props: IGameProps) => {
             responseType: 'blob',
         })
             .then((response) => {
-                const imgUrl = URL.createObjectURL(response.data);
-                setCreatorImage(imgUrl);
+                if (response.data){
+                    const imgUrl = URL.createObjectURL(response.data);
+                    setCreatorImage(imgUrl);
+                }
                 setErrorFlag(false);
                 setErrorMessage("");
             },(error) => {
@@ -73,9 +75,12 @@ const GameListObject = (props: IGameProps) => {
             responseType: 'blob',
         })
             .then((response) => {
-                const imgUrl = URL.createObjectURL(response.data);
+                if(response.data) {
+                    const imgUrl = URL.createObjectURL(response.data);
+                    setImage(imgUrl);
+                }
                 setErrorFlag(false);
-                setImage(imgUrl);
+                setErrorMessage("");
         }, (error) => {
             setImage('');
             if (axios.isAxiosError(error)) {

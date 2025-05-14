@@ -114,6 +114,7 @@ const GameList = ({params}: GameParams) => {
     }, [])
 
     React.useEffect(() => {
+        setCurrentPage(1);
         if(characterSearching.trim()) {
             filterParams.append('q', characterSearching);
         }
@@ -252,6 +253,7 @@ const GameList = ({params}: GameParams) => {
                             alignItems: 'center',
                         }}>
                             <Pagination
+                                page={currentPage}
                                 count={Math.ceil(games.length / 9)}
                                 showFirstButton showLastButton
                                 onChange={(event, value) => handlePaginationClick(value)}
@@ -267,7 +269,6 @@ const GameList = ({params}: GameParams) => {
                         (
                         <><Typography variant='h4'>No Game</Typography>
                             <Typography variant='h6'>
-                            <NavLink to={'/games/'} end>Back to dashboard</NavLink>
                         </Typography></>
                     )
                     )}

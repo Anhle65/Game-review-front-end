@@ -9,7 +9,7 @@ interface IGameReviewProps {
 }
 const GameReviewObject = (props: IGameReviewProps) => {
     const [gameReview] = React.useState<Review> (props.gameReview);
-    const [reviewerImage, setReviewerImage] = React.useState("");
+    // const [reviewerImage, setReviewerImage] = React.useState("");
     const gameReviewCardStyles: CSS.Properties = {
         display: "inline-block",
         overflowY: "auto",
@@ -18,24 +18,24 @@ const GameReviewObject = (props: IGameReviewProps) => {
         margin: "10px",
         padding: "0px"
     }
-    React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
-            responseType: 'blob',
-        })
-            .then((response) => {
-                const imgUrl = URL.createObjectURL(response.data);
-                setReviewerImage(imgUrl);
-            }).catch((error) => {
-
-                if (axios.isAxiosError(error)) {
-                    if (error.response?.status !== 404) {
-                        console.error("Failed to load image", error);
-                    }
-                } else {
-                    setReviewerImage('');
-                }
-            })
-    }, [])
+    // React.useEffect(()=> {
+    //     axios.get('http://localhost:4941'+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
+    //         responseType: 'blob',
+    //     })
+    //         .then((response) => {
+    //             if(response.data) {
+    //                 const imgUrl = URL.createObjectURL(response.data);
+    //                 console.log("Should not create URL");
+    //                 setReviewerImage(imgUrl);
+    //             }
+    //         }).catch((error) => {
+    //             setReviewerImage('');
+    //             if (axios.isAxiosError(error)) {
+    //                 if (error.response?.status !== 404) {
+    //                     console.error("Failed to load image", error);
+    //                 }
+    //         }})
+    // }, [])
     return(
         <Card sx={gameReviewCardStyles}>
             <CardContent>
@@ -52,7 +52,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
                         </Typography>
                     </Typography>
                     <div>
-                        <Avatar alt="Creator Image" src={reviewerImage.length !== 0 ? reviewerImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                        <Avatar alt="Creator Image" src={`http://localhost:4941${rootUrl}/users/${gameReview.reviewerId}/image`} />
                     </div>
                 </Stack>
             </CardContent>
