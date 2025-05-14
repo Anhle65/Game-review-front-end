@@ -71,7 +71,7 @@ const onCreateGame = async () => {
                     }
                 })
             }
-            navigate('/games');
+            navigate(`/users/${creatorId}/myGames`);
         } catch (error: any) {
             setErrorFlag(true);
             if (axios.isAxiosError(error)) {
