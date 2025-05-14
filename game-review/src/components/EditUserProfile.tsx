@@ -56,13 +56,15 @@ const EditUserProfile = () => {
             data["email"] = email;
         if(editPasswordState) {
             console.log('password inner check: ', password);
-            if(!password) {
+            if(!password && !currentPassword) {
                 setErrorFlag(true);
-                setErrorMsg("Password can't be null");
+                setErrorMsg("Password and current password can't be null");
+                return;
             } else {
                 if(password !== confirmPassword) {
                     setErrorFlag(true);
                     setErrorMsg("Password has to match with confirm password");
+                    return;
                 }
                 else {
                     setErrorFlag(false);
