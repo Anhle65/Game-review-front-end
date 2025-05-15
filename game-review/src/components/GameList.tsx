@@ -39,7 +39,7 @@ const GameList = ({params}: GameParams) => {
     const optionSortBy = [{label:'CREATED_ASC', value: 'Oldest games'}, {label:'CREATED_DESC', value: 'Newest games'},
         {label:'ALPHABETICAL_ASC', value: 'A->Z'}, {label:'ALPHABETICAL_DESC', value: 'Z->A'},
         {label:'PRICE_ASC', value: 'Lowest price'}, {label:'PRICE_DESC', value: 'Highest price'},
-        {label:'RATING_ASC', value: 'Best rating'}, {label:'RATING_DESC', value: 'Low rating'}];
+        {label:'RATING_ASC', value: 'Low rating'}, {label:'RATING_DESC', value: 'Best rating'}];
     const [value, setValue] = React.useState('Oldest games');
     const [inputValue, setInputValue] = React.useState('');
     const [labelSorting, setLabelSorting] = React.useState('CREATED_ASC');
