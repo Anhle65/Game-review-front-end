@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "./LogInNavBar";
-import Avatar from "@mui/material/Avatar";
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import axios from "axios";
 import {rootUrl} from "../base.routes";
 import {useNavigate} from "react-router-dom";
@@ -34,12 +34,15 @@ const EditUserProfile = () => {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [image, setImage] = React.useState('');
+    const [originImage, setOriginImage] = React.useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showCfPassword, setShowCfPassword] = useState(false);
+    const [isRevertImage, setIsRevertImage] = useState(false);
     const [imageFile, setImageFile] = React.useState<File | null>(null);
+    const [imageOriginFile, setImageOriginFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
     const token = authorization.token;
     const userId = authorization.userId;
@@ -58,12 +61,12 @@ const EditUserProfile = () => {
             console.log('password inner check: ', password);
             if(!password && !currentPassword) {
                 setErrorFlag(true);
-                setErrorMsg("Password and current password can't be null");
+                setErrorMsg("New password and current password can't be null");
                 return;
             } else {
                 if(password !== confirmPassword) {
                     setErrorFlag(true);
-                    setErrorMsg("Password has to match with confirm password");
+                    setErrorMsg("New password must match with confirm password");
                     return;
                 }
                 else {
@@ -75,7 +78,8 @@ const EditUserProfile = () => {
         }
         if(!errorFlag) {
             try {
-                if (!image) {
+                if (imageFile) {
+                    console.log('image: ', image);
                     await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
                         imageFile,
                         {
@@ -84,6 +88,14 @@ const EditUserProfile = () => {
                                 "Content-Type": imageFile?.type,
                             }
                         })
+                } else {
+                    if(!image) {
+                        await axios.delete("http://localhost:4941" + rootUrl + '/users/' + userId + '/image', {
+                            headers: {
+                                "X-Authorization": token,
+                            }
+                        })
+                    }
                 }
                 await axios.patch("http://localhost:4941" + rootUrl + '/users/' + userId,
                     data,
@@ -112,12 +124,17 @@ const EditUserProfile = () => {
                         }
                     } else {
                         if (error.response?.status === 403) {
-                            setErrorMsg("New password can not be the same as old password");
+                            const statusText = error.response.statusText;
+                            if (statusText.includes("Email already in use")) {
+                                setErrorMsg("This email is already used.");
+                            } else {
+                                setErrorMsg("New password can not be the same as old password");
+                            }
                         } else {
                             if(error.response?.status === 401) {
                                 setErrorMsg("Incorrect currentPassword");
                             } else {
-                                setErrorMsg("Unexpected error");
+                                setErrorMsg("Internal error");
                             }
                         }
                     }
@@ -125,6 +142,8 @@ const EditUserProfile = () => {
                     setErrorMsg("Unexpected error");
                 }
             }
+        } else {
+            setErrorMsg("Unable to update profile");
         }
     }
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,6 +204,7 @@ const EditUserProfile = () => {
                 const imgUrl = URL.createObjectURL(response.data);
                 setErrorFlag(false);
                 setImage(imgUrl);
+                setOriginImage(imgUrl);
             }).catch((error) => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status !== 404) {
@@ -202,8 +222,12 @@ const EditUserProfile = () => {
             }
         }
     }
+    const handleRevertOriginImage = () => {
+        setImage(originImage);
+        setImageFile(null);
+    }
     const handleRemoveImage = () => {
-        setImage("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
+        setImage("");
         setImageFile(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
@@ -277,13 +301,13 @@ const EditUserProfile = () => {
                                 <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
                                     <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                             <FormControl variant="outlined">
-                                <InputLabel required={editPasswordState} htmlFor="outlined-adornment-password">Current Password</InputLabel>
+                                <InputLabel required={editPasswordState} htmlFor="outlined-adornment-current-password">Current Password</InputLabel>
                                 <ListItemIcon>
                                 <OutlinedInput
                                     fullWidth
                                     required
                                     disabled={!editPasswordState}
-                                    id="outlined-adornment-password"
+                                    id="outlined-adornment-current-password"
                                     type={showCurrentPassword ? 'text' : 'password'}
                                     onChange={updateCurrentPasswordState}
                                     value={currentPassword}
@@ -310,7 +334,11 @@ const EditUserProfile = () => {
                                         title={editPasswordState? 'Click to keep old password':'Click to update password'}>
                                         <span>
                                         {editPasswordState && (<EditIcon fontSize="large" onClick={()=>setEditPasswordState(false)}/>)}
-                                        {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>setEditPasswordState(true)}/>)}
+                                        {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>{setEditPasswordState(true)
+                                            setCurrentPassword('');
+                                            setConfirmPassword('');
+                                            setPassword('');
+                                        }}/>)}
                                         </span>
                                     </Tooltip>
                                 </ListItemIcon>
@@ -320,9 +348,9 @@ const EditUserProfile = () => {
                                     {editPasswordState && (
                                         <Grid size={12} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                                     <FormControl variant="outlined" style={{padding: '20px 0 0 0'}}>
-                                        <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-cornfirmpassword">New Password</InputLabel>
+                                        <InputLabel required={editPasswordState} style={{padding: '20px 0 0 0'}} htmlFor="outlined-adornment-newpassword">New Password</InputLabel>
                                         <OutlinedInput
-                                            id="outlined-adornment-cornfirmpassword"
+                                            id="outlined-adornment-newpassword"
                                             fullWidth
                                             type={showPassword ? 'text' : 'password'}
                                             onChange={updatePasswordState}
@@ -381,7 +409,14 @@ const EditUserProfile = () => {
                             }}/>
                             <Tooltip title={'Remove image'}>
                                 <CloseIcon fontSize='large' onClick={() => {
+                                    setIsRevertImage(false);
                                     setOpenDeleteDialog(true)
+                                }}/>
+                            </Tooltip>
+                            <Tooltip title={'Revert origin image'}>
+                                <SettingsBackupRestoreIcon fontSize='large' onClick={() => {
+                                    setIsRevertImage(true);
+                                    setOpenDeleteDialog(true);
                                 }}/>
                             </Tooltip>
                             <br/>
@@ -404,20 +439,22 @@ const EditUserProfile = () => {
                     aria-labelledby="alert-dialog-title"
                     aria-describedby="alert-dialog-description">
                     <DialogTitle id="alert-dialog-title">
-                        {"Remove image?"}
+                        {isRevertImage? "Revert back to original image?":"Remove image?"}
                     </DialogTitle>
                     <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                            Are you sure you want to remove image?
+                            {isRevertImage? 'Are you sure you want to revert back to original image':'Are you sure you want to remove image?'}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleDeleteDialogClose}>Cancel</Button>
                         <Button variant="outlined" color="error" onClick={() => {
-                            handleRemoveImage();
+                            if(!isRevertImage) handleRemoveImage();
+                            else {handleRevertOriginImage();
+                            console.log("revert image should be true", isRevertImage);}
                             setOpenDeleteDialog(false);
                         }} autoFocus>
-                            Remove
+                            {isRevertImage? 'Revert':'Remove'}
                         </Button>
                     </DialogActions>
                 </Dialog>

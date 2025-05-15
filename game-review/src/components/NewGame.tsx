@@ -12,6 +12,7 @@ import {
     Box,
     TextField, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Dialog, Tooltip, Stack
 } from "@mui/material";
+import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import React from "react";
 import axios from "axios";
 import MenuItem from "@mui/material/MenuItem";
@@ -21,7 +22,6 @@ import {Alert} from "react-bootstrap";
 import {useUserStore} from "../store";
 import {useNavigate, useParams} from "react-router-dom";
 import AttachMoneyTwoToneIcon from '@mui/icons-material/AttachMoneyTwoTone';
-import CloseIcon from "@mui/icons-material/Close";
 const NewGame = () => {
 const {id} = useParams();
 const [title, setTitle] = React.useState("");
@@ -36,9 +36,9 @@ const [price, setPrice] = React.useState('');
 const authorization = useUserStore();
 const token = authorization.token;
 const navigate = useNavigate();
-const platformChecked = allPlatforms.filter(p => p.isSelected).length < 1;
 const [image, setImage] = React.useState('https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png');
 const [imageFile, setImageFile] = React.useState<File | null>(null);
+const [originImage, setOriginImage] = React.useState('');
 const [titleExist, setTitleExist] = React.useState<string[]>([]);
 const [originTitle, setOriginTitle] = React.useState('');
 const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -105,36 +105,26 @@ const onCreateGame = async () => {
         }
 }
 const onUpdateGame = async () => {
-    // if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
-    //     setErrorFlag(true);
-    //     setErrorMessage("Title already exists! Please choose another name!");
-    // } else {
-    //     setErrorFlag(false);
-    //     setErrorMessage('');
-    // }
-    if(title.trim()) {
         if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
             setErrorFlag(true);
             setErrorMessage("Title already exists! Please choose another name!");
-        } else {
-            if (!genre) {
-                setErrorFlag(true);
-                setErrorMessage("Game must have genre");
-            } else {
-                if (allPlatforms.filter(p => p.isSelected).length < 1) {
-                    setErrorFlag(true);
-                    setErrorMessage("Game must have at least 1 platform");
-                } else {
-                    if (!price) {
-                        setErrorFlag(true);
-                        setErrorMessage("Game price must be at least $0");
-                    }
-                }
-            }
+            return
         }
-    } else {
-        setErrorFlag(false);
-        setErrorMessage('');
+        if (!genre) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have genre");
+            return
+        }
+        if (allPlatforms.filter(p => p.isSelected).length < 1) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have at least 1 platform");
+            return
+        }
+        if (!price) {
+            setErrorFlag(true);
+            setErrorMessage("Game price must be at least $0");
+            return;
+        }
         try {
             await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
                 gameId: id,
@@ -164,7 +154,6 @@ const onUpdateGame = async () => {
             }
             setErrorMessage("Unexpected error");
         }
-    }
 }
 const getAllTitles = async () => {
     await axios.get("http://localhost:4941" + rootUrl + "/games/")
@@ -216,6 +205,7 @@ const getGameImage = async () => {
         .then((response) => {
             const imgUrl = URL.createObjectURL(response.data);
             setImage(imgUrl);
+            setOriginImage(imgUrl);
         }, (error) => {
             if (axios.isAxiosError(error)) {
                 if (error.response?.status === 404) {
@@ -309,7 +299,7 @@ const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     }
 }
 const handleRemoveImage = () => {
-    setImage("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
+    setImage(originImage);
     setImageFile(null);
     if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -443,8 +433,8 @@ return (
                         <input type="file" ref={fileInputRef} accept="image/png, image/jpg, image/jpeg, image/gif" onChange={(e) => {
                             handleUploadImage(e);
                         }}/>
-                        <Tooltip title={'Remove image'}>
-                            <CloseIcon fontSize='large' onClick={() => {
+                        <Tooltip title={'Revert original image'}>
+                            <SettingsBackupRestoreIcon fontSize='large' onClick={() => {
                                 setOpenDeleteDialog(true)
                             }}/>
                         </Tooltip>
@@ -477,22 +467,20 @@ return (
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description">
             <DialogTitle id="alert-dialog-title">
-                {"Remove image?"}
+                {"Revert image?"}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                    Are you sure you want to remove image?
+                    Are you sure you want to revert image?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={()=>setOpenDeleteDialog(false)}>Cancel</Button>
                 <Button variant="outlined" color="error" onClick={() => {
-                    setImage('');
-                    setImageFile(null);
                     setOpenDeleteDialog(false);
                     handleRemoveImage();
                 }} autoFocus>
-                    Remove
+                    Revert
                 </Button>
             </DialogActions>
         </Dialog>
