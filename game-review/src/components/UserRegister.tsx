@@ -126,6 +126,7 @@ const UserRegister = () => {
                     navigate('/games/');
                 }
             } catch (error: any) {
+                window.scrollTo({top:0});
                 console.log(error);
                 console.log('fname:' + fname);
                 console.log('lname:' + lname);
@@ -140,10 +141,14 @@ const UserRegister = () => {
                             if (lname.length < 1) {
                                 setError("Last name can not be null");
                             } else {
+                                if(!email){
+                                    setError("Email can not be null");
+                                    return;
+                                }
                                 if (password.length < 6 || password.length > 64) {
                                     setError("Password length must be from 6 to 64 characters");
                                 } else {
-                                    setError("Invalid email or email is currently null");
+                                    setError("Invalid email");
                                 }
                             }
                         }
@@ -170,6 +175,7 @@ const UserRegister = () => {
                 if(fileSizeMB >= 5) {
                     setErrorFlag(true);
                     setError('Image size can not exceed 5MB');
+                    window.scrollTo({top:0});
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }
@@ -195,7 +201,6 @@ const UserRegister = () => {
         width: "500px",
         margin: "10px",
         padding: "0px",
-        // backgroundColor: "lightcyan",
     }
     return (
         <>{(userId && token) && (

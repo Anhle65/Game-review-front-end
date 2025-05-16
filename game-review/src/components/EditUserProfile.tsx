@@ -61,11 +61,13 @@ const EditUserProfile = () => {
         if(editPasswordState) {
             console.log('password inner check: ', password);
             if(!password && !currentPassword) {
+                window.scrollTo({top:0});
                 setErrorFlag(true);
                 setErrorMsg("New password and current password can't be null");
                 return;
             } else {
                 if(password !== confirmPassword) {
+                    window.scrollTo({top:0});
                     setErrorFlag(true);
                     setErrorMsg("New password must match with confirm password");
                     return;
@@ -109,6 +111,7 @@ const EditUserProfile = () => {
             } catch (error) {
                 setErrorFlag(true);
                 if (axios.isAxiosError(error)) {
+                    window.scrollTo({top:0});
                     if (error.response?.status === 400) {
                         if (firstName.length < 1) {
                             setErrorMsg("Fist name can not be null");
@@ -230,6 +233,7 @@ const EditUserProfile = () => {
                 if(fileSizeMB >= 5) {
                     setErrorFlag(true);
                     setErrorMsg('Image size can not exceed 5MB');
+                    window.scrollTo({top:0});
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }

@@ -73,6 +73,7 @@ const onCreateGame = async () => {
             }
             navigate(`/users/${creatorId}/myGames`);
         } catch (error: any) {
+            window.scrollTo({top:0});
             setErrorFlag(true);
             if (axios.isAxiosError(error)) {
                 if(title.trim()) {
@@ -298,6 +299,7 @@ const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
             if(fileSizeMB >= 5) {
                 setErrorFlag(true);
                 setErrorMessage('Image size can not exceed 5MB');
+                window.scrollTo({top:0});
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
