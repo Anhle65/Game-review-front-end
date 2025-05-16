@@ -15,16 +15,19 @@ import {rootUrl} from "../base.routes";
 import axios from "axios";
 import {useUserStore} from "../store";
 import {Edit, Logout} from "@mui/icons-material";
+import {isCryptoKey} from "node:util/types";
 
 const LogInNavBar = () => {
     const authorization = useUserStore();
     const userId = authorization.userId;
+    const token = authorization.token;
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const [anchorElGame, setAnchorElGame] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const [userImage, setUserImage] = React.useState("");
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
+    const [pageName, setPageName] = React.useState('');
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElUser(event.currentTarget);
     };
@@ -45,7 +48,6 @@ const LogInNavBar = () => {
         }
     }
     const handleReviewedGame = () => {
-
         navigate('/users/' +userId+'/reviewed');
     }
 
@@ -53,7 +55,6 @@ const LogInNavBar = () => {
         navigate('/users/'+userId+'/myGames');
     }
     const handleLogout = async () =>{
-        const token = localStorage.getItem("token");
         console.log('authToken: ' + token);
         await axios.post('http://localhost:4941'+rootUrl+'/users/logout', {},
             {
@@ -87,6 +88,21 @@ const LogInNavBar = () => {
         });
     }, []);
     React.useEffect(()=> {
+        if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
+            setPageName('Dash board');
+        }
+        if (window.location.pathname.endsWith('wishlisted/') || window.location.pathname.endsWith('wishlisted')) {
+            setPageName('My wishlists');
+        }
+        if (window.location.pathname.endsWith('owned/') || window.location.pathname.endsWith('owned')) {
+            setPageName('Owned games');
+        }
+        if (window.location.pathname.endsWith('myGames/') || window.location.pathname.endsWith('myGames')) {
+            setPageName('My games');
+        }
+        if (window.location.pathname.endsWith('reviewed/') || window.location.pathname.endsWith('reviewed')) {
+            setPageName('My reviews');
+        }
         axios.get('http://localhost:4941' + rootUrl + '/users/' + userId)
             .then((response) => {
                 setfName(response.data.firstName);
@@ -110,7 +126,7 @@ const LogInNavBar = () => {
         }
     }
     return(
-        <AppBar position="static">
+        <><AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>
@@ -130,21 +146,28 @@ const LogInNavBar = () => {
                             >
                                 Create Game
                             </Button>
-                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleReviewedGame}>Reviews</Button>
-                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleWishlistClick}>In Wishlist</Button>
-                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleOwnedClick}>Owned</Button>
-                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleMyGameClick}>My game</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}}
+                                    onClick={handleReviewedGame}>Reviews</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleWishlistClick}>In
+                                Wishlist</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}}
+                                    onClick={handleOwnedClick}>Owned</Button>
+                            <Button sx={{my: 2, color: 'white', display: 'block'}} onClick={handleMyGameClick}>My
+                                game</Button>
                         </Stack>
                     </Box>
                     <Box sx={{flexGrow: 0}}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-                                <Avatar alt="User Image" src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                                <Avatar alt="User Image"
+                                        src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}/>
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{mt: '45px', justifyContent: "space-around",
-                                alignItems: "center"}}
+                            sx={{
+                                mt: '45px', justifyContent: "space-around",
+                                alignItems: "center"
+                            }}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
@@ -163,19 +186,19 @@ const LogInNavBar = () => {
                             <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
                             <MenuItem onClick={handleEditProfile}>
                                 <ListItemIcon>
-                                    <Edit fontSize="small" />
+                                    <Edit fontSize="small"/>
                                 </ListItemIcon>
                                 Edit Information</MenuItem>
                             <MenuItem onClick={handleLogout}>
                                 <ListItemIcon>
-                                <Logout fontSize="small" />
+                                    <Logout fontSize="small"/>
                                 </ListItemIcon>
                                 Logout</MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
             </Container>
-        </AppBar>
+        </AppBar><h2 style={{padding: '15px 0 0 0'}}>{pageName}</h2></>
     )
 }
 export default LogInNavBar;

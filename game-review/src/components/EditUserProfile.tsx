@@ -42,7 +42,6 @@ const EditUserProfile = () => {
     const [showCfPassword, setShowCfPassword] = useState(false);
     const [isRevertImage, setIsRevertImage] = useState(false);
     const [imageFile, setImageFile] = React.useState<File | null>(null);
-    const [imageOriginFile, setImageOriginFile] = React.useState<File | null>(null);
     const authorization = useUserStore();
     const token = authorization.token;
     const userId = authorization.userId;
@@ -51,6 +50,8 @@ const EditUserProfile = () => {
     const [openEditMessage, setOpenEditMessage] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const onSubmit = async () => {
+        console.log('email: ', email);
+        console.log('current password: ', currentPassword);
         console.log('password: ', password);
         console.log('cfpassword: ', confirmPassword);
         const data:Record<string, string> = {'firstName': firstName,
@@ -115,8 +116,8 @@ const EditUserProfile = () => {
                             if (lastName.length < 1) {
                                 setErrorMsg("Last name can not be null");
                             } else {
-                                if (password.length < 6 || password.length > 64) {
-                                    setErrorMsg("Password length must be from 6 to 64 characters");
+                                if (password.length < 6 || password.length > 64 || currentPassword.length < 6 || currentPassword.length > 64) {
+                                    setErrorMsg("All password length must be from 6 to 64 characters");
                                 } else {
                                     setErrorMsg("Invalid email");
                                 }
@@ -132,7 +133,7 @@ const EditUserProfile = () => {
                             }
                         } else {
                             if(error.response?.status === 401) {
-                                setErrorMsg("Incorrect currentPassword");
+                                setErrorMsg("Incorrect current password");
                             } else {
                                 setErrorMsg("Internal error");
                             }
@@ -192,7 +193,14 @@ const EditUserProfile = () => {
             .then((response) => {
             setFirstName(response.data.firstName);
             setLastName(response.data.lastName);
-            setEmail(response.data.email);
+            if(response.data.email)
+                setEmail(response.data.email);
+            else {
+                setErrorMsg("You are unauthorized. Can not see other user's email");
+                setErrorFlag(true);
+                return
+            }
+            console.log("Email from back end: ", response.data.email);
             setOriginEmail(response.data.email);
         })
     }, [])
@@ -217,6 +225,18 @@ const EditUserProfile = () => {
     const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             if(e.target.files[0]) {
+                const file = e.target.files[0];
+                const fileSizeMB = file.size / (1024 * 1024);
+                if(fileSizeMB >= 5) {
+                    setErrorFlag(true);
+                    setErrorMsg('Image size can not exceed 5MB');
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                    return;
+                }
+                setErrorFlag(false);
+                setErrorMsg('');
                 setImage(URL.createObjectURL(e.target.files[0]));
                 setImageFile(e.target.files[0]);
             }
@@ -225,6 +245,9 @@ const EditUserProfile = () => {
     const handleRevertOriginImage = () => {
         setImage(originImage);
         setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     }
     const handleRemoveImage = () => {
         setImage("");

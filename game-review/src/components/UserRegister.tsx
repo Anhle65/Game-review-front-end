@@ -165,6 +165,18 @@ const UserRegister = () => {
     const handleUploadImage = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             if(e.target.files[0]) {
+                const file = e.target.files[0];
+                const fileSizeMB = file.size / (1024 * 1024);
+                if(fileSizeMB >= 5) {
+                    setErrorFlag(true);
+                    setError('Image size can not exceed 5MB');
+                    if (fileInputRef.current) {
+                        fileInputRef.current.value = '';
+                    }
+                    return;
+                }
+                setErrorFlag(false);
+                setError('');
                 setImage(URL.createObjectURL(e.target.files[0]));
                 setImageFile(e.target.files[0]);
             }

@@ -206,12 +206,13 @@ const GameList = ({params}: GameParams) => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            flexGrow: 1
         }}>
             <Box sx={{
                 display: 'flex',
-                justifyContent: 'center',
+                // justifyContent: 'center',
                 alignItems: 'flex-start',
-                marginTop: 4
+                marginTop: 2
             }}>
                 <Stack direction="row" spacing={2}>
                 <Paper elevation={3} style={card} sx={{justifyContent: 'center',
@@ -237,7 +238,8 @@ const GameList = ({params}: GameParams) => {
                             renderInput={(params) => <TextField {...params} label="Sort by"/>}
                         />
                     </Stack>
-                    <div style={{display: "flex", maxWidth: "965px", minWidth: "320px"}}>
+                    <div style={{display: "flex", maxWidth: "965px", minWidth: "320px", justifyContent: 'flex-start',
+                        alignItems: 'flex-start'}}>
                         <Box sx={{
                             display: 'inline-block',
                             justifyContent: 'flex-start',

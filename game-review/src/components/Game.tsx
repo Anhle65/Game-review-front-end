@@ -130,7 +130,9 @@ const Game = () => {
         }
     }
     const deleteGame = () => {
-        if(gameReviews.length < 1 && numberOwner === 0) {
+        console.log("in delete: ",gameReviews.length < 1);
+        console.log("in delete: ",game.numberOfOwners < 1);
+        if(gameReviews.length < 1 && game.numberOfOwners < 1) {
             axios.delete('http://localhost:4941' + rootUrl + '/games/' + id, {
                 headers: {
                     "X-Authorization": token
