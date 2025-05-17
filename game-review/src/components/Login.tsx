@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { Form, Alert, Button } from 'react-bootstrap';
-import {Card, CardActions, CardContent, IconButton, Stack, Typography} from "@mui/material";
+import {
+    Card,
+    CardActions,
+    FormControl,
+    CardContent,
+    IconButton,
+    InputAdornment, InputLabel,
+    OutlinedInput,
+    Stack,
+    TextField,
+    Typography
+} from "@mui/material";
 import CSS from "csstype";
 import {rootUrl} from "../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
@@ -8,6 +19,7 @@ import axios from "axios";
 import LogoutNavBar from "./LogoutNavBar";
 import {useUserStore} from "../store";
 import LogInNavBar from "./LogInNavBar";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 
 const Login = () => {
@@ -16,15 +28,11 @@ const Login = () => {
     const [error, setError] = useState('');
     const [errorFlag, setErrorFlag] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [pwFormType, setPwFormType] = React.useState('');
     const navigate = useNavigate();
     const authorization = useUserStore();
     const token = authorization.token;
     const userId = authorization.userId;
 
-    React.useEffect(() => {
-        setPwFormType(showPassword ? 'text' : 'password');
-    }, [ showPassword ]);
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(event.target.value)
         setError('');
@@ -35,8 +43,13 @@ const Login = () => {
         setError('');
         setErrorFlag(false);
     }
+    const handleShowPassword = () => setShowPassword((show) => !show)
     const onSubmit = async () => {
         if (!token) {
+            if(!email) {
+                setError("Please enter email");
+                return;
+            }
             try {
                 const response = await
                     axios.post("http://localhost:4941" + rootUrl + '/users/login', {
@@ -83,7 +96,9 @@ const Login = () => {
         width: "300px",
         margin: "10px",
         padding: "0px",
-        backgroundColor: "lightcyan",
+        justifyContent: "center",
+        alignItems: "center"
+        // backgroundColor: "lightcyan",
     }
     return (
         <>
@@ -97,47 +112,60 @@ const Login = () => {
                     <LogoutNavBar />
                 </>
             )}
-            <div className="login-form-container">
                 <h2 className="login-title">Login</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Card sx={loginCardStyles}>
-                    <CardContent>
-                        <form>
-                            <Stack direction="column" spacing={2} sx={{
-                                justifyContent: "space-around",
-                                alignItems: "center",
-                            }}>
-                                <div className="login-form">
-                                    <label htmlFor="email">Email address:</label>
-                                    <input type="email" className="form-control" id="email"
-                                           onChange={updateEmailState}/>
-                                </div>
-                                <div className="login-form">
-                                    <label htmlFor="pwd">Password:</label>
-                                    <input type={pwFormType} className="form-control" id="pwd"
-                                           onChange={updatePasswordState}/>
-                                </div>
-                                <div className="checkbox">
-                                    <label><input type="checkbox" checked={showPassword}
-                                                  onChange={() => setShowPassword(prev => !prev)}/> Show
-                                        password</label>
-                                </div>
-                                <button type="button" className="btn btn-success" onClick={(e) => {
-                                    e.preventDefault(); // Prevent form from refreshing the page
-                                    onSubmit();
-                                }}>Log In
-                                </button>
-                                <Typography variant="subtitle2" align="center">
-                                    No account yet?
-                                    <NavLink to={'/users/register'} end>
-                                        Register
-                                    </NavLink>
-                                </Typography>
-                            </Stack>
-                        </form>
+                    <CardContent sx={{justifyContent: 'center', alignItems: 'center'}}>
+                        <Stack direction="column" spacing={2} sx={{
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}>
+                            <TextField
+                                fullWidth
+                                required
+                                type='email'
+                                id="email-required"
+                                label="Email"
+                                onChange={updateEmailState}
+                            />
+                            <FormControl variant="outlined" fullWidth>
+                                <InputLabel htmlFor="outlined-adornment-password" >Password</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    onChange={updatePasswordState}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label={
+                                                    showPassword ? 'hide the password' : 'display the password'
+                                                }
+                                                onClick={handleShowPassword}
+                                                onMouseDown={(e) => e.preventDefault()}
+                                                onMouseUp={(e) => e.preventDefault()}
+                                                edge="end"
+                                            >
+                                                {showPassword ? <Visibility /> : <VisibilityOff />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    label="Password"
+                                />
+                            </FormControl>
+                            <button type="button" className="btn btn-success" onClick={(e) => {
+                                e.preventDefault(); // Prevent form from refreshing the page
+                                onSubmit();
+                            }}>Log In
+                            </button>
+                            <Typography variant="subtitle2" align="center">
+                                No account yet?
+                                <NavLink to={'/users/register'} end>
+                                    Register
+                                </NavLink>
+                            </Typography>
+                        </Stack>
                     </CardContent>
                 </Card>
-            </div>
         </>
     );
 }

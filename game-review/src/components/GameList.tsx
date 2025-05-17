@@ -210,13 +210,13 @@ const GameList = ({params}: GameParams) => {
         }}>
             <Box sx={{
                 display: 'flex',
-                // justifyContent: 'center',
+                justifyContent: 'flex-start',
                 alignItems: 'flex-start',
                 marginTop: 2
             }}>
                 <Stack direction="row" spacing={2}>
-                <Paper elevation={3} style={card} sx={{justifyContent: 'center',
-                    alignItems: 'center'}}>
+                <Paper elevation={3} style={card} sx={{display: 'flex', justifyContent: 'flex-start',
+                    alignItems: 'flex-start'}}>
                     <Stack direction="row" spacing={2} sx={{justifyContent: 'space-between'}} padding='15px 20px 0 15px'>
                         <div>
                             <Stack direction='row'>
@@ -297,7 +297,6 @@ const GameList = ({params}: GameParams) => {
                                 min:0
                             }}
                             sx={{my: 2}}
-                            // sx={{my: 2}}
                         />
                     </ListItemIcon>
                     <br/>
