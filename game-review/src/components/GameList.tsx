@@ -248,7 +248,7 @@ const GameList = ({params}: GameParams) => {
                             {game_rows()}
                         </Box>
                     </div>
-                    {game_rows().length > 0 ? (
+                    {games.length > 0 ? (
                         <div style={{
                             display: 'flex',
                             justifyContent: 'center',

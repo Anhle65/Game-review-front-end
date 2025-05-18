@@ -17,12 +17,7 @@ const SimilarGame = (props: SimilarGameProps) => {
     const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
     React.useEffect(()=> {
-        fetchGames().then((response) => {
-            console.log('update games',games);
-                // game_rows();
-            }
-        );
-
+        fetchGames();
     }, [props])
 
     const fetchGames = async () => {

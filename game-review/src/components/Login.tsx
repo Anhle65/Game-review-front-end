@@ -10,7 +10,8 @@ import {
     OutlinedInput,
     Stack,
     TextField,
-    Typography
+    Typography,
+    Box
 } from "@mui/material";
 import CSS from "csstype";
 import {rootUrl} from "../base.routes";
@@ -115,9 +116,13 @@ const Login = () => {
                 <h2 className="login-title">Login</h2>
                 {error && <Alert variant="danger">{error}</Alert>}
                 <Card sx={loginCardStyles}>
-                    <CardContent sx={{justifyContent: 'center', alignItems: 'center'}}>
+                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <CardContent sx={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}>
                         <Stack direction="column" spacing={2} sx={{
-                            justifyContent: "center",
+                            justifyContent: "space-between",
                             alignItems: "center",
                         }}>
                             <TextField
@@ -165,6 +170,7 @@ const Login = () => {
                             </Typography>
                         </Stack>
                     </CardContent>
+                    </Box>
                 </Card>
         </>
     );

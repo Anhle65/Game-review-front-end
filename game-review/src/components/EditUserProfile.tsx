@@ -54,35 +54,46 @@ const EditUserProfile = () => {
         console.log('current password: ', currentPassword);
         console.log('password: ', password);
         console.log('cfpassword: ', confirmPassword);
+        if (firstName.length < 1) {
+            setErrorFlag(true);
+            setErrorMsg("Fist name can not be null");
+            return;
+        }
+        if (lastName.length < 1) {
+            setErrorFlag(true);
+            setErrorMsg("Last name can not be null");
+            return;
+        }
         const data:Record<string, string> = {'firstName': firstName,
             'lastName': lastName}
         if(email !== originEmail)
             data["email"] = email;
         if(editPasswordState) {
-            console.log('password inner check: ', password);
             if(!password && !currentPassword) {
                 window.scrollTo({top:0});
                 setErrorFlag(true);
                 setErrorMsg("New password and current password can't be null");
                 return;
             } else {
+                if (password.length < 6 || password.length > 64 || currentPassword.length < 6 || currentPassword.length > 64) {
+                    setErrorFlag(true);
+                    setErrorMsg("All password length must be from 6 to 64 characters");
+                    return;
+                }
                 if(password !== confirmPassword) {
                     window.scrollTo({top:0});
                     setErrorFlag(true);
                     setErrorMsg("New password must match with confirm password");
                     return;
                 }
-                else {
-                    setErrorFlag(false);
-                    data["password"] = password;
-                    data["currentPassword"] = currentPassword;
-                }
+                setErrorFlag(false);
+                data["password"] = password;
+                data["currentPassword"] = currentPassword;
             }
         }
         if(!errorFlag) {
             try {
                 if (imageFile) {
-                    console.log('image: ', image);
                     await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
                         imageFile,
                         {
@@ -113,19 +124,7 @@ const EditUserProfile = () => {
                 if (axios.isAxiosError(error)) {
                     window.scrollTo({top:0});
                     if (error.response?.status === 400) {
-                        if (firstName.length < 1) {
-                            setErrorMsg("Fist name can not be null");
-                        } else {
-                            if (lastName.length < 1) {
-                                setErrorMsg("Last name can not be null");
-                            } else {
-                                if (password.length < 6 || password.length > 64 || currentPassword.length < 6 || currentPassword.length > 64) {
-                                    setErrorMsg("All password length must be from 6 to 64 characters");
-                                } else {
-                                    setErrorMsg("Invalid email");
-                                }
-                            }
-                        }
+                        setErrorMsg("Invalid email");
                     } else {
                         if (error.response?.status === 403) {
                             const statusText = error.response.statusText;

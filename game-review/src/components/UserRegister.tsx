@@ -83,48 +83,68 @@ const UserRegister = () => {
         setErrorFlag(false);
         setError('');
         console.log("mage data: ",imageFile);
+        if (fname.length < 1) {
+            setError("Fist name can not be null");
+            setErrorFlag(true);
+            return;
+        }
+        if (lname.length < 1) {
+            setError("Last name can not be null");
+            setErrorFlag(true);
+            return;
+        }
+        if(!email){
+            setError("Email can not be null");
+            setErrorFlag(true);
+            return;
+        }
+        if (password.length < 6 || password.length > 64) {
+            setError("Password length must be from 6 to 64 characters");
+            setErrorFlag(true);
+            return;
+        }
+        if (password !== confirmPassword) {
+            setErrorFlag(true);
+            setError('Password and confirm password is not matched');
+            return;
+        }
         if (!token) {
             try {
-                if (password !== confirmPassword) {
-                    setErrorFlag(true);
-                    setError('Password and confirm password is not matched');
-                } else {
-                    await axios.post("http://localhost:4941" + rootUrl + '/users/register', {
-                        firstName: fname,
-                        lastName: lname,
-                        email: email,
-                        password: password
-                    }, {
-                        timeout: 10000
-                    });
-                    setErrorFlag(false);
-                    setError('');
-                    console.log(email);
-                    console.log('fname' + fname);
-                    console.log('lname' + lname);
+                await axios.post("http://localhost:4941" + rootUrl + '/users/register', {
+                    firstName: fname,
+                    lastName: lname,
+                    email: email,
+                    password: password
+                }, {
+                    timeout: 10000
+                });
+                setErrorFlag(false);
+                setError('');
+                console.log(email);
+                console.log('fname' + fname);
+                console.log('lname' + lname);
 
-                    const response = await axios.post("http://localhost:4941" + rootUrl + '/users/login', {
-                        email: email,
-                        password: password
-                    }, {
-                        timeout: 10000
-                    });
-                    const {userId, token} = response.data;
-                    authorization.setAuthorization(userId, token);
-                    // console.log("userId:", userId);
-                    // console.log("token:", token);
-                    if (imageFile) {
-                        await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
-                            imageFile,
-                            {
-                                headers: {
-                                    "X-Authorization": token,
-                                    "Content-Type": imageFile?.type,
-                                }
-                            })
-                    }
-                    navigate('/games/');
+                const response = await axios.post("http://localhost:4941" + rootUrl + '/users/login', {
+                    email: email,
+                    password: password
+                }, {
+                    timeout: 10000
+                });
+                const {userId, token} = response.data;
+                authorization.setAuthorization(userId, token);
+                // console.log("userId:", userId);
+                // console.log("token:", token);
+                if (imageFile) {
+                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                        imageFile,
+                        {
+                            headers: {
+                                "X-Authorization": token,
+                                "Content-Type": imageFile?.type,
+                            }
+                        })
                 }
+                navigate('/games/');
             } catch (error: any) {
                 window.scrollTo({top:0});
                 console.log(error);
@@ -135,23 +155,7 @@ const UserRegister = () => {
                 setErrorFlag(true);
                 if (axios.isAxiosError(error)) {
                     if (error.response?.status === 400) {
-                        if (fname.length < 1) {
-                            setError("Fist name can not be null");
-                        } else {
-                            if (lname.length < 1) {
-                                setError("Last name can not be null");
-                            } else {
-                                if(!email){
-                                    setError("Email can not be null");
-                                    return;
-                                }
-                                if (password.length < 6 || password.length > 64) {
-                                    setError("Password length must be from 6 to 64 characters");
-                                } else {
-                                    setError("Invalid email");
-                                }
-                            }
-                        }
+                        setError("Invalid email");
                     } else {
                         if (error.response?.status === 403) {
                             setError("Email is already used");

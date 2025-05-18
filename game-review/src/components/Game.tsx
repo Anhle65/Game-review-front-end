@@ -56,7 +56,6 @@ const Game = () => {
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
     const [gameReviews, setGameReviews] = React.useState<Review[]>([]);
-    const [numberOwner, setNumberOwner] = React.useState(0);
     const [image, setImage] = React.useState("https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png");
     const [creatorImage, setCreatorImage] = React.useState("");
     const [genres, setGenre] = React.useState<Array<Genre>> ([]);
@@ -184,11 +183,7 @@ const Game = () => {
             }
         })
             .then((response) => {
-                console.log("Owned game", response.data);
                 const gameId = response.data['games'].map((g:any) =>g.gameId);
-                setNumberOwner(response.data['games'].length);
-                console.log("Owned game id ", gameId);
-                console.log("Owners ", response.data['games'].length);
                 if(gameId.includes(parseInt(id as string,10))){
                     setAlreadyOwned(true);
                 } else {

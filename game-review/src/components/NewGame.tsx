@@ -47,6 +47,33 @@ const fileInputRef = React.useRef<HTMLInputElement>(null);
 const onCreateGame = async () => {
         console.log("Chosen platforms: ", allPlatforms.filter(p => p.isSelected));
         console.log("Chosen platforms id: ", allPlatforms.filter(p => p.isSelected).map(i => i.platformId));
+        if(!title.trim()) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have title!");
+            return;
+        }
+        if(title.trim()) {
+            if (titleExist.includes(title.trim())) {
+                setErrorFlag(true);
+                setErrorMessage("Title already exists! Please choose another name!");
+                return;
+            }
+        }
+        if (!genre) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have genre");
+            return;
+        }
+        if (allPlatforms.filter(p => p.isSelected).length < 1) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have at least 1 platform");
+            return;
+        }
+        if (!price) {
+            setErrorFlag(true);
+            setErrorMessage("Game price must be at least $0");
+            return;
+        }
         try {
             const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
                 title: title,
@@ -75,51 +102,29 @@ const onCreateGame = async () => {
         } catch (error: any) {
             window.scrollTo({top:0});
             setErrorFlag(true);
-            if (axios.isAxiosError(error)) {
-                if(title.trim()) {
-                    if (titleExist.includes(title.trim())) {
-                        setErrorFlag(true);
-                        setErrorMessage("Title already exists! Please choose another name!");
-                    } else {
-                        if(!genre) {
-                            setErrorFlag(true);
-                            setErrorMessage("Game must have genre");
-                        } else {
-                            if(allPlatforms.filter(p => p.isSelected).length < 1) {
-                                setErrorFlag(true);
-                                setErrorMessage("Game must have at least 1 platform");
-                            } else {
-                                if(!price){
-                                    setErrorFlag(true);
-                                    setErrorMessage("Game price must be at least $0");
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    setErrorFlag(true);
-                    setErrorMessage("Game must have title");
-                }
-            } else {
-                setErrorMessage("Unexpected error");
-            }
+            setErrorMessage("Unexpected error");
         }
 }
 const onUpdateGame = async () => {
+        if(title.trim().length < 1) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have title!");
+            return;
+        }
         if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
             setErrorFlag(true);
             setErrorMessage("Title already exists! Please choose another name!");
-            return
+            return;
         }
         if (!genre) {
             setErrorFlag(true);
             setErrorMessage("Game must have genre");
-            return
+            return;
         }
         if (allPlatforms.filter(p => p.isSelected).length < 1) {
             setErrorFlag(true);
             setErrorMessage("Game must have at least 1 platform");
-            return
+            return;
         }
         if (!price) {
             setErrorFlag(true);
