@@ -193,18 +193,21 @@ const EditUserProfile = () => {
             }
         })
             .then((response) => {
-            setFirstName(response.data.firstName);
-            setLastName(response.data.lastName);
-            if(response.data.email)
-                setEmail(response.data.email);
-            else {
-                setErrorMsg("You are unauthorized. Can not see other user's email");
-                setErrorFlag(true);
-                return
-            }
-            console.log("Email from back end: ", response.data.email);
-            setOriginEmail(response.data.email);
-        })
+                setErrorFlag(false);
+                setErrorMsg('');
+                setFirstName(response.data.firstName);
+                setLastName(response.data.lastName);
+                if (response.data.email) {
+                    setEmail(response.data.email);
+                }
+                else {
+                    setErrorMsg("You are unauthorized. Can not see other user's email");
+                    setErrorFlag(true);
+                    return
+                }
+                console.log("Email from back end: ", response.data.email);
+                setOriginEmail(response.data.email);
+            })
     }, [])
     React.useEffect(()=> {
         axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {

@@ -138,7 +138,7 @@ const GameListObject = (props: IGameProps) => {
                 </Typography>
                 <Stack direction="row" spacing={2} justifyContent="center">
                     <Typography variant="subtitle2" align="left"  >
-                        Genres: {gameGenre?.name}
+                        Genre: {gameGenre?.name}
                         <br/>
                         Platforms: {platformsName}
                         <br/>

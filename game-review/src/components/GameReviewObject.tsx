@@ -50,6 +50,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
                 <TextField
                     fullWidth
                     multiline={true}
+                    rows={3}
                     variant='standard'
                     type="text"
                     label="Comment:"

@@ -63,6 +63,7 @@ const Game = () => {
     const [openAddReviewDialog, setOpenAddReviewDialog] = React.useState(false);
     const [openAddWishlistDialog, setOpenAddWishlistDialog] = React.useState(false);
     const [openAddOwnDialog, setOpenAddOwnDialog] = React.useState(false);
+    const [openNewGameDialog, setOpenNewGameDialog] = React.useState(false);
     const [genreId, setGenreId] = React.useState(0);
     const [creatorId, setCreatorId] = React.useState(0);
     const genreName = genres.find(g => g.genreId === game.genreId)
@@ -84,6 +85,9 @@ const Game = () => {
     }
     const handleAddReviewDialogClose = () => {
         setOpenAddReviewDialog(false);
+    }
+    const handleNewGameDialogClose = () => {
+        setOpenNewGameDialog(false);
     }
     const handleAddWishlistDialogClose = () => {
         setOpenAddWishlistDialog(false);
@@ -206,6 +210,13 @@ const Game = () => {
             setIsAddWishlist(true);
         }
     };
+    const onClickAddNewGame = () => {
+        if (!userId) {
+            setOpenNewGameDialog(true);
+            return;
+        }
+        createGame();
+    }
     const addToWishlist = async () => {
         await axios.post("http://localhost:4941"+rootUrl+'/games/'+id+'/wishlist', {
             'gameId': id,
@@ -386,8 +397,9 @@ const Game = () => {
         }}>
             <Card sx={card}>
                 <CardMedia
+                    height="700"
                     component="img"
-                    sx={{objectFit:"cover"}}
+                    sx={{objectFit:"contain"}}
                     image={image}
                     alt="Auction hero"
                 />
@@ -441,7 +453,7 @@ const Game = () => {
                             <Box sx={{ '& > :not(style)': { m: 1 } }}>
                         <Tooltip open={openCreateMessage} onClose={()=>setOpenCreateMessage(false)} onOpen={()=>setOpenCreateMessage(true)}
                                  title="Create new game">
-                            <Fab color="primary" aria-label="add" onClick={createGame}>
+                            <Fab color="primary" aria-label="add" onClick={onClickAddNewGame}>
                                 <AddIcon />
                             </Fab>
                         </Tooltip>
@@ -599,7 +611,7 @@ const Game = () => {
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description">
-                                You need to log in to wishlist game.
+                                You need to log in to add game into wishlist.
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>
@@ -624,6 +636,26 @@ const Game = () => {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={()=>setOpenAddOwnDialog(false)}>Cancel</Button>
+                        <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
+                            Login
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                <Dialog
+                    open={openNewGameDialog}
+                    onClose={handleNewGameDialogClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description">
+                    <DialogTitle id="alert-dialog-title" color="warning">
+                        Create new game
+                    </DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            You need to log in to create a new game.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleNewGameDialogClose}>Cancel</Button>
                         <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
                             Login
                         </Button>

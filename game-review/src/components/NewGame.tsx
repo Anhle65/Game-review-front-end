@@ -460,7 +460,8 @@ return (
                     </Stack>
                     <CardMedia
                         component="img"
-                        sx={{objectFit: "cover", justifyContent: 'center', alignItems: 'center'}}
+                        height='600'
+                        sx={{objectFit: "contain", justifyContent: 'center', alignItems: 'center', width:'100%'}}
                         image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                     />
                 </Grid>
