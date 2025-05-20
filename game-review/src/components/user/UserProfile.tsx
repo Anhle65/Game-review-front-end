@@ -1,10 +1,10 @@
 import React from "react";
 import axios from "axios";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
-import LogInNavBar from "./LogInNavBar";
-import {useUserStore} from "../store";
+import LogInNavBar from "../LogInNavBar";
+import {useUserStore} from "../../store";
 
 const UserProfile = () => {
     const [fName, setfName] = React.useState('');

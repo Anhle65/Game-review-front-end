@@ -17,15 +17,15 @@ import {
     Tooltip,
     Pagination, PaginationItem, Alert, AlertTitle, Fab
 } from "@mui/material";
-import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';import {rootUrl} from "../base.routes";
+import BookmarkBorderOutlinedIcon from '@mui/icons-material/BookmarkBorderOutlined';import {rootUrl} from "../../base.routes";
 import { useNavigate, useParams} from "react-router-dom";
-import LogInNavBar from "./LogInNavBar";
-import LogoutNavBar from "./LogoutNavBar";
+import LogInNavBar from "../LogInNavBar";
+import LogoutNavBar from "../LogoutNavBar";
 import GameReviewObject from "./GameReviewObject";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {Form} from "react-bootstrap";
-import {useUserStore} from "../store";
+import {useUserStore} from "../../store";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import FavoriteIcon from "@mui/icons-material/Favorite";

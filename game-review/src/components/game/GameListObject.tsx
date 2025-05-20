@@ -11,7 +11,7 @@ import {
     Alert,
     AlertTitle
 } from "@mui/material";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 interface IGameProps {
     game: Game

@@ -1,7 +1,7 @@
 import React from "react";
 import CSS from "csstype";
 import {Avatar, Card, CardContent, CardMedia, Stack, TextField, Typography} from "@mui/material";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import axios from "axios";
 
 interface IGameReviewProps {

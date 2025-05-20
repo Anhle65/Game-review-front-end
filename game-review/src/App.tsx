@@ -2,18 +2,18 @@ import React from 'react';
 import './App.css';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import NotFound from "./components/NotFound";
-import Game from "./components/Game";
-import Login from "./components/Login";
-import NewGame from "./components/NewGame";
-import UserRegister from "./components/UserRegister";
-import UserProfile from "./components/UserProfile";
+import Game from "./components/game/Game";
+import Login from "./components/user/Login";
+import NewGame from "./components/game/NewGame";
+import UserRegister from "./components/user/UserRegister";
+import UserProfile from "./components/user/UserProfile";
 
-import GameList from "./components/GameList";
-import EditUserProfile from "./components/EditUserProfile";
-import UserGames from "./components/UserGames";
-import UserGameReview from "./components/UserGameReview";
-import UserGameWishlist from "./components/UserGameWishlist";
-import UserGameOwned from "./components/UserGameOwned";
+import GameList from "./components/game/GameList";
+import EditUserProfile from "./components/user/EditUserProfile";
+import UserGames from "./components/user/UserGames";
+import UserGameReview from "./components/user/UserGameReview";
+import UserGameWishlist from "./components/user/UserGameWishlist";
+import UserGameOwned from "./components/user/UserGameOwned";
 function App() {
   return (
     <div className="App">

@@ -14,14 +14,14 @@ import {
     Stack,
     TextField, Typography
 } from "@mui/material";
-import { rootUrl } from "../base.routes";
+import { rootUrl } from "../../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import SearchIcon from "@mui/icons-material/Search";
-import LogInNavBar from "./LogInNavBar";
-import LogoutNavBar from "./LogoutNavBar";
-import {useUserStore} from "../store";
+import LogInNavBar from "../LogInNavBar";
+import LogoutNavBar from "../LogoutNavBar";
+import {useUserStore} from "../../store";
 import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
 import {NavLink} from "react-router-dom";
 type GameParams = {

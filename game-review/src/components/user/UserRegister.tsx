@@ -1,7 +1,7 @@
 import React, { useState} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {
@@ -16,9 +16,9 @@ import {
     TextField, Tooltip,
     Typography
 } from "@mui/material";
-import LogoutNavBar from "./LogoutNavBar";
-import {useUserStore} from "../store";
-import LogInNavBar from "./LogInNavBar";
+import LogoutNavBar from "../LogoutNavBar";
+import {useUserStore} from "../../store";
+import LogInNavBar from "../LogInNavBar";
 import Avatar from "@mui/material/Avatar";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';

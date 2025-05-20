@@ -14,12 +14,12 @@ import {
     Box
 } from "@mui/material";
 import CSS from "csstype";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
-import LogoutNavBar from "./LogoutNavBar";
-import {useUserStore} from "../store";
-import LogInNavBar from "./LogInNavBar";
+import LogoutNavBar from "../LogoutNavBar";
+import {useUserStore} from "../../store";
+import LogInNavBar from "../LogInNavBar";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
 
 

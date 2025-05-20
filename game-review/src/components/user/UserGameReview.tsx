@@ -1,6 +1,6 @@
-import GameList from "./GameList";
+import GameList from "../game/GameList";
 import React from "react";
-import {useUserStore} from "../store";
+import {useUserStore} from "../../store";
 
 const UserGameReview = () => {
     const authorization = useUserStore();

@@ -1,4 +1,4 @@
-import GameList from "./GameList";
+import GameList from "../game/GameList";
 import React from "react";
 
 const UserGameWishlist = () => {

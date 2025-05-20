@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {useUserStore} from "../store";
+import {useUserStore} from "../../store";
 import {
     Button,
     Card,
@@ -13,10 +13,10 @@ import {
     TextField, Tooltip, Stack
 } from "@mui/material";
 import {Alert, CardTitle} from "react-bootstrap";
-import LogInNavBar from "./LogInNavBar";
+import LogInNavBar from "../LogInNavBar";
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import axios from "axios";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import {useNavigate} from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import CSS from "csstype";

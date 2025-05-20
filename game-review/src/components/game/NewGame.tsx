@@ -1,4 +1,4 @@
-import LogInNavBar from "./LogInNavBar";
+import LogInNavBar from "../LogInNavBar";
 import {
     Card,
     CardContent, CardMedia,
@@ -16,10 +16,10 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import React from "react";
 import axios from "axios";
 import MenuItem from "@mui/material/MenuItem";
-import {rootUrl} from "../base.routes";
+import {rootUrl} from "../../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
-import {useUserStore} from "../store";
+import {useUserStore} from "../../store";
 import {useNavigate, useParams} from "react-router-dom";
 import AttachMoneyTwoToneIcon from '@mui/icons-material/AttachMoneyTwoTone';
 const NewGame = () => {
