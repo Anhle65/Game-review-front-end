@@ -86,6 +86,9 @@ const Game = () => {
     const handleAddReviewDialogClose = () => {
         setOpenAddReviewDialog(false);
     }
+    const handleAddOwnDialogClose = () => {
+        setOpenAddOwnDialog(false);
+    }
     const handleNewGameDialogClose = () => {
         setOpenNewGameDialog(false);
     }
@@ -390,6 +393,14 @@ const Game = () => {
                 <LogoutNavBar />
             </>
         )}
+        {errorFlag ? (
+            <>
+                {window.scrollTo({top:0})}
+                <Alert severity="error">
+                    <AlertTitle>{errorMessage}</AlertTitle>
+                </Alert>
+            </>
+        ) : null}
         <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -511,13 +522,13 @@ const Game = () => {
                     <Dialog
                         open={openAddReviewDialog}
                         onClose={handleAddReviewDialogClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title" color="warning">
+                        aria-labelledby="alert-dialog-title-review"
+                        aria-describedby="alert-dialog-review">
+                        <DialogTitle id="alert-dialog-title-review" color="warning">
                             Write a review
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
+                            <DialogContentText id="alert-dialog-review">
                                 You need to log in to write review for this game.
                             </DialogContentText>
                         </DialogContent>
@@ -547,11 +558,6 @@ const Game = () => {
                             />
                         </div>
                     )}
-                    {errorFlag ? (
-                        <Alert severity="error">
-                            <AlertTitle>{errorMessage}</AlertTitle>
-                        </Alert>
-                    ) : null}
                     <Form>
                         {/*<fieldset disabled>*/}
                         <Form.Group className="mb-3">
@@ -560,7 +566,11 @@ const Game = () => {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label htmlFor="select">Rating: </Form.Label>
-                            <Form.Select id="select" onChange={(e)=> setInputRating(parseInt(e.target.value, 10))}>
+                            <Form.Select id="select" onChange={(e)=> {
+                                setErrorFlag(false);
+                                setErrorMessage('');
+                                setInputRating(parseInt(e.target.value, 10))
+                            }}>
                                 <option value = "Choose...">Choose...</option>
                                 {rating.map(i =>
                                     <option value={i} key={i}>
@@ -581,13 +591,13 @@ const Game = () => {
                     <Dialog
                         open={openDeleteDialog}
                         onClose={handleDeleteDialogClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title">
+                        aria-labelledby="alert-dialog-title-delete"
+                        aria-describedby="alert-dialog-delete">
+                        <DialogTitle id="alert-dialog-title-delete">
                             {"Delete game?"}
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
+                            <DialogContentText id="alert-dialog-delete">
                                 Are you sure you want to delete this game?
                             </DialogContentText>
                         </DialogContent>
@@ -604,13 +614,13 @@ const Game = () => {
                     <Dialog
                         open={openAddWishlistDialog}
                         onClose={handleAddWishlistDialogClose}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description">
-                        <DialogTitle id="alert-dialog-title" color="warning">
+                        aria-labelledby="alert-dialog-title-wishlist"
+                        aria-describedby="alert-dialog-wishlist">
+                        <DialogTitle id="alert-dialog-title-wishlist" color="warning">
                             Wishlist game
                         </DialogTitle>
                         <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
+                            <DialogContentText id="alert-dialog-wishlist">
                                 You need to log in to add game into wishlist.
                             </DialogContentText>
                         </DialogContent>
@@ -624,13 +634,13 @@ const Game = () => {
                 <Dialog
                     open={openAddOwnDialog}
                     onClose={()=>setOpenAddOwnDialog(false)}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description">
-                    <DialogTitle id="alert-dialog-title" color="warning">
+                    aria-labelledby="alert-dialog-title-owned"
+                    aria-describedby="alert-dialog-owned">
+                    <DialogTitle id="alert-dialog-title-owned" color="warning">
                         Own game
                     </DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText id="alert-dialog-owned">
                             You need to log in to own game.
                         </DialogContentText>
                     </DialogContent>
@@ -644,13 +654,13 @@ const Game = () => {
                 <Dialog
                     open={openNewGameDialog}
                     onClose={handleNewGameDialogClose}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description">
-                    <DialogTitle id="alert-dialog-title" color="warning">
+                    aria-labelledby="alert-dialog-title-creat-game"
+                    aria-describedby="alert-dialog-creat-game">
+                    <DialogTitle id="alert-dialog-title-creat-game" color="warning">
                         Create new game
                     </DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText id="alert-dialog-creat-game">
                             You need to log in to create a new game.
                         </DialogContentText>
                     </DialogContent>

@@ -91,62 +91,58 @@ const EditUserProfile = () => {
                 data["currentPassword"] = currentPassword;
             }
         }
-        if(!errorFlag) {
-            try {
-                if (imageFile) {
-                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
-                        imageFile,
-                        {
-                            headers: {
-                                "X-Authorization": token,
-                                "Content-Type": imageFile?.type,
-                            }
-                        })
-                } else {
-                    if(!image) {
-                        await axios.delete("http://localhost:4941" + rootUrl + '/users/' + userId + '/image', {
-                            headers: {
-                                "X-Authorization": token,
-                            }
-                        })
-                    }
-                }
-                await axios.patch("http://localhost:4941" + rootUrl + '/users/' + userId,
-                    data,
+        try {
+            if (imageFile) {
+                await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                    imageFile,
                     {
+                        headers: {
+                            "X-Authorization": token,
+                            "Content-Type": imageFile?.type,
+                        }
+                    })
+            } else {
+                if(!image) {
+                    await axios.delete("http://localhost:4941" + rootUrl + '/users/' + userId + '/image', {
                         headers: {
                             "X-Authorization": token,
                         }
                     })
-                navigate('/users/' + userId + '/profile');
-            } catch (error) {
-                setErrorFlag(true);
-                if (axios.isAxiosError(error)) {
-                    window.scrollTo({top:0});
-                    if (error.response?.status === 400) {
-                        setErrorMsg("Invalid email");
-                    } else {
-                        if (error.response?.status === 403) {
-                            const statusText = error.response.statusText;
-                            if (statusText.includes("Email already in use")) {
-                                setErrorMsg("This email is already used.");
-                            } else {
-                                setErrorMsg("New password can not be the same as old password");
-                            }
-                        } else {
-                            if(error.response?.status === 401) {
-                                setErrorMsg("Incorrect current password");
-                            } else {
-                                setErrorMsg("Internal error");
-                            }
-                        }
-                    }
-                } else {
-                    setErrorMsg("Unexpected error");
                 }
             }
-        } else {
-            setErrorMsg("Unable to update profile");
+            await axios.patch("http://localhost:4941" + rootUrl + '/users/' + userId,
+                data,
+                {
+                    headers: {
+                        "X-Authorization": token,
+                    }
+                })
+            navigate('/users/' + userId + '/profile');
+        } catch (error) {
+            setErrorFlag(true);
+            if (axios.isAxiosError(error)) {
+                window.scrollTo({top:0});
+                if (error.response?.status === 400) {
+                    setErrorMsg("Invalid email");
+                } else {
+                    if (error.response?.status === 403) {
+                        const statusText = error.response.statusText;
+                        if (statusText.includes("Email already in use")) {
+                            setErrorMsg("This email is already used.");
+                        } else {
+                            setErrorMsg("New password can not be the same as old password");
+                        }
+                    } else {
+                        if(error.response?.status === 401) {
+                            setErrorMsg("Incorrect current password");
+                        } else {
+                            setErrorMsg("Internal error");
+                        }
+                    }
+                }
+            } else {
+                setErrorMsg("Unexpected error");
+            }
         }
     }
     const updateEmailState = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -328,10 +324,16 @@ const EditUserProfile = () => {
                             </FormControl>
                             <Box sx={{flexGrow: 1, justifyContent: 'flex-start', alignItems: 'flex-start'}}>
                                 <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
-                                    <Grid size={6} sx={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
+                                    <Grid size={6}>
                             <FormControl variant="outlined">
                                 <InputLabel required={editPasswordState} htmlFor="outlined-adornment-current-password">Current Password</InputLabel>
-                                <ListItemIcon>
+                                <ListItemIcon sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    width: '100%',
+                                }}>
                                 <OutlinedInput
                                     fullWidth
                                     required
@@ -340,7 +342,7 @@ const EditUserProfile = () => {
                                     type={showCurrentPassword ? 'text' : 'password'}
                                     onChange={updateCurrentPasswordState}
                                     value={currentPassword}
-                                    sx={{display:'flex'}}
+                                    sx={{flexGrow: 1, minWidth: '250px'}}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             {editPasswordState && (
@@ -362,12 +364,13 @@ const EditUserProfile = () => {
                                     <Tooltip open={openEditMessage} onClose={()=>setOpenEditMessage(false)} onOpen={()=>setOpenEditMessage(true)}
                                         title={editPasswordState? 'Click to keep old password':'Click to update password'}>
                                         <span>
-                                        {editPasswordState && (<EditIcon fontSize="large" onClick={()=>setEditPasswordState(false)}/>)}
-                                        {!editPasswordState && (<EditOffIcon fontSize="large" onClick={()=>{setEditPasswordState(true)
+                                            {editPasswordState && (<Button onClick={()=>setEditPasswordState(false)}><EditIcon fontSize="large"/>Keep old password</Button>)}
+                                        {!editPasswordState && (<Button onClick={()=>{
+                                            setEditPasswordState(true)
                                             setCurrentPassword('');
                                             setConfirmPassword('');
-                                            setPassword('');
-                                        }}/>)}
+                                            setPassword('');}}>
+                                            <EditOffIcon fontSize="large"/>Update Password</Button>)}
                                         </span>
                                     </Tooltip>
                                 </ListItemIcon>
@@ -433,25 +436,29 @@ const EditUserProfile = () => {
                             </Box>
                         </Grid>
                         <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
-                            <input type="file" ref={fileInputRef} accept="image/png, image/jpeg, image/jpg, image/gif" onChange={(e) => {
-                                handleUploadImage(e);
-                            }}/>
-                            <Tooltip title={'Remove image'}>
-                                <CloseIcon fontSize='large' onClick={() => {
-                                    setIsRevertImage(false);
-                                    setOpenDeleteDialog(true)
+                            <Box sx={{gap: 2, display: 'flex', justifyContent: 'space-between', margin:3}}>
+                                <input type="file" ref={fileInputRef}
+                                       accept="image/png, image/jpeg, image/jpg, image/gif" onChange={(e) => {
+                                    handleUploadImage(e);
                                 }}/>
-                            </Tooltip>
-                            <Tooltip title={'Revert origin image'}>
-                                <SettingsBackupRestoreIcon fontSize='large' onClick={() => {
-                                    setIsRevertImage(true);
-                                    setOpenDeleteDialog(true);
-                                }}/>
-                            </Tooltip>
+                                <Tooltip title={'Revert origin image'}>
+                                    <SettingsBackupRestoreIcon color='primary' fontSize='large' onClick={() => {
+                                        setIsRevertImage(true);
+                                        setOpenDeleteDialog(true);
+                                    }}/>
+                                </Tooltip>
+                                <Tooltip title={'Remove image'}>
+                                    <CloseIcon fontSize='large' color='error' onClick={() => {
+                                        setIsRevertImage(false);
+                                        setOpenDeleteDialog(true)
+                                    }}/>
+                                </Tooltip>
+                            </Box>
                             <br/>
                             <CardMedia
                                 component="img"
-                                sx={{objectFit: "cover"}}
+                                height='500'
+                                sx={{objectFit: "contain", width:'100%'}}
                                 image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                             />
                         </Grid>

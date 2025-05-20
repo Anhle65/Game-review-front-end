@@ -1,11 +1,13 @@
 import React from "react";
 import axios from "axios";
 import {rootUrl} from "../../base.routes";
-import {Avatar, Card, CardContent, Stack, Typography} from "@mui/material";
+import {Button, Card, CardActions, CardContent, CardMedia, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
 import LogInNavBar from "../LogInNavBar";
 import {useUserStore} from "../../store";
-
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import EditIcon from "@mui/icons-material/Edit";
+import {useNavigate} from "react-router-dom";
 const UserProfile = () => {
     const [fName, setfName] = React.useState('');
     const [lName, setlName] = React.useState('');
@@ -14,6 +16,7 @@ const UserProfile = () => {
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
+    const navigate = useNavigate();
     React.useEffect(()=> {
         if(token && userId) {
             axios.get('http://localhost:4941' + rootUrl + "/users/" + userId, {
@@ -57,25 +60,27 @@ const UserProfile = () => {
         <>
             <LogInNavBar/>
             <Card sx={cardInformationStyles}>
+                <CardMedia
+                    component="img"
+                    height='300'
+                    sx={{objectFit: "contain", width:'100%'}}
+                    image={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+
+                />
                 <CardContent>
                     <Stack direction="row" spacing={2} sx={{
                         justifyContent: "space-around",
                         alignItems: "center",
                     }}>
-                        <Typography variant="h5" align="left">
-                            Email: {email}
-                            <br />
-                            First Name: {fName}
+                        <Typography variant="h4" align="left">
+                            {fName} {lName}
                             <br/>
-                            Last Name: {lName}
+                            <EmailOutlinedIcon fontSize='large'/> : {email}
                         </Typography>
-                        <div>
-                            <Avatar alt="User Image"
-                                    sx={{ width: 120, height: 120 }}
-                                    src={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
-                        </div>
                     </Stack>
                 </CardContent>
+                    <Button onClick={()=>navigate('/users/'+userId+'/edit')}><EditIcon fontSize='large' />Edit Information
+                    </Button>
             </Card>
         </>
     )

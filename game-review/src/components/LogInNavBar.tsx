@@ -1,7 +1,7 @@
 import Container from "@mui/material/Container";
 import Toolbar from "@mui/material/Toolbar";
 import Box from "@mui/material/Box";
-import {ListItemIcon, Stack} from "@mui/material";
+import {ListItemIcon, Stack, Typography} from "@mui/material";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
@@ -182,16 +182,20 @@ const LogInNavBar = () => {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {fName} {lName}
-                            <MenuItem onClick={handleProfileClick}>Profile</MenuItem>
+                            <Typography padding='0 0 0 10px' variant='h6'>{fName} {lName}</Typography>
+                            <MenuItem onClick={handleProfileClick}>
+                                <ListItemIcon>
+                                    <Avatar style={{ height: '30px', width: '30px' }}></Avatar>
+                                </ListItemIcon>
+                                    Profile</MenuItem>
                             <MenuItem onClick={handleEditProfile}>
                                 <ListItemIcon>
-                                    <Edit fontSize="small"/>
+                                    <Edit fontSize="medium"/>
                                 </ListItemIcon>
                                 Edit Information</MenuItem>
                             <MenuItem onClick={handleLogout}>
                                 <ListItemIcon>
-                                    <Logout fontSize="small"/>
+                                    <Logout fontSize="medium"/>
                                 </ListItemIcon>
                                 Logout</MenuItem>
                         </Menu>

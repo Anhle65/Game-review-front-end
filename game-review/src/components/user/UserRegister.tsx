@@ -146,7 +146,6 @@ const UserRegister = () => {
                 }
                 navigate('/games/');
             } catch (error: any) {
-                window.scrollTo({top:0});
                 console.log(error);
                 console.log('fname:' + fname);
                 console.log('lname:' + lname);
@@ -179,7 +178,6 @@ const UserRegister = () => {
                 if(fileSizeMB >= 5) {
                     setErrorFlag(true);
                     setError('Image size can not exceed 5MB');
-                    window.scrollTo({top:0});
                     if (fileInputRef.current) {
                         fileInputRef.current.value = '';
                     }
@@ -219,7 +217,11 @@ const UserRegister = () => {
             )}
             <div className="signup-form-container">
                 <h2 className="signup-title">Register</h2>
-                {error && <Alert variant="danger">{error}</Alert>}
+                {error && (
+                    <>
+                    {window.scrollTo({top:0})}
+                    <Alert variant="danger">{error}</Alert>
+                </>)}
                 <Card sx={signUpCardStyles}>
                     <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <CardContent>
@@ -303,7 +305,7 @@ const UserRegister = () => {
                                         handleUploadImage(e);
                                     }}/>
                                     <Tooltip title={'Remove image'}>
-                                        <CloseIcon fontSize='large' onClick={() => {
+                                        <CloseIcon color='error' fontSize='large' onClick={() => {
                                             setOpenDeleteDialog(true)
                                         }}/>
                                     </Tooltip>
