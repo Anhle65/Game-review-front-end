@@ -342,7 +342,7 @@ const EditUserProfile = () => {
                                     type={showCurrentPassword ? 'text' : 'password'}
                                     onChange={updateCurrentPasswordState}
                                     value={currentPassword}
-                                    sx={{flexGrow: 1, minWidth: '250px'}}
+                                    sx={{flexGrow: 1, minWidth: '290px'}}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             {editPasswordState && (
@@ -437,12 +437,8 @@ const EditUserProfile = () => {
                         </Grid>
                         <Grid size={6} sx={{justifyContent: 'left', alignItems: 'left'}}>
                             <Box sx={{gap: 2, display: 'flex', justifyContent: 'space-between', margin:3}}>
-                                <input type="file" ref={fileInputRef}
-                                       accept="image/png, image/jpeg, image/jpg, image/gif" onChange={(e) => {
-                                    handleUploadImage(e);
-                                }}/>
                                 <Tooltip title={'Revert origin image'}>
-                                    <SettingsBackupRestoreIcon color='primary' fontSize='large' onClick={() => {
+                                    <SettingsBackupRestoreIcon color='secondary' fontSize='large' onClick={() => {
                                         setIsRevertImage(true);
                                         setOpenDeleteDialog(true);
                                     }}/>
@@ -454,13 +450,18 @@ const EditUserProfile = () => {
                                     }}/>
                                 </Tooltip>
                             </Box>
-                            <br/>
-                            <CardMedia
-                                component="img"
-                                height='500'
-                                sx={{objectFit: "contain", width:'100%'}}
-                                image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
-                            />
+                            <input type="file" ref={fileInputRef} id='uploadImage' hidden={true}
+                                   accept="image/png, image/jpeg, image/jpg, image/gif" onChange={(e) => {
+                                handleUploadImage(e);
+                            }}/>
+                            <label htmlFor="uploadImage">
+                                <CardMedia
+                                    component="img"
+                                    height='500'
+                                    sx={{objectFit: "contain", width:'100%'}}
+                                    image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+                                />
+                            </label>
                         </Grid>
                     </Grid>
                     <button type="button" className="btn btn-success" onClick={(e) => {

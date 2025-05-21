@@ -202,7 +202,7 @@ const UserRegister = () => {
         height: "800px",
         width: "500px",
         margin: "10px",
-        padding: "0px",
+        padding: "20px",
     }
     return (
         <>{(userId && token) && (
@@ -216,7 +216,6 @@ const UserRegister = () => {
                 </>
             )}
             <div className="signup-form-container">
-                <h2 className="signup-title">Register</h2>
                 {error && (
                     <>
                     {window.scrollTo({top:0})}
@@ -225,6 +224,7 @@ const UserRegister = () => {
                 <Card sx={signUpCardStyles}>
                     <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <CardContent>
+                        <h2 className="signup-title">Register</h2>
                         <form>
                             <Stack direction="column" spacing={2}>
                                 <TextField
@@ -267,7 +267,7 @@ const UserRegister = () => {
                                                     onMouseUp={handleMouseUpPassword}
                                                     edge="end"
                                                 >
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
                                                 </IconButton>
                                             </InputAdornment>
                                         }
@@ -291,7 +291,7 @@ const UserRegister = () => {
                                                     onMouseUp={handleMouseUpPassword}
                                                     edge="end"
                                                 >
-                                                    {showCfPassword ? <VisibilityOff /> : <Visibility />}
+                                                    {showCfPassword ? <Visibility /> : <VisibilityOff />}
                                                 </IconButton>
                                             </InputAdornment>
                                         }

@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import {rootUrl} from "../../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
+import Box from "@mui/material/Box";
 interface IGameProps {
     game: Game
 }
@@ -107,7 +108,8 @@ const GameListObject = (props: IGameProps) => {
     }, [])
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "500px",
+        objectFit: "contain",
+        height: "550px",
         width: "300px",
         margin: "10px",
         padding: "0px"
@@ -131,13 +133,13 @@ const GameListObject = (props: IGameProps) => {
                 onClick={() => navigate('/games/' + game.gameId)}
             />
             <CardContent>
-                <Typography variant="h6">
+                <Typography variant="h6" sx={{fontWeight: 'bold', fontFamily: 'monospace'}}>
                     <NavLink to={'/games/' + game.gameId} end>
                         {game.title}
                     </NavLink>
                 </Typography>
-                <Stack direction="row" spacing={2} justifyContent="center">
-                    <Typography variant="subtitle2" align="left"  >
+                <Stack direction="row" spacing={1} justifyContent="space-between">
+                    <Typography variant="subtitle1" align="left" sx={{fontWeight: 'normal'}} >
                         Genre: {gameGenre?.name}
                         <br/>
                         Platforms: {platformsName}
@@ -147,10 +149,10 @@ const GameListObject = (props: IGameProps) => {
                         Created on : {new Date(game.creationDate).toLocaleDateString()}
                     </Typography>
                     <div>
-                        <Typography variant="h6" align="right">
+                        <Typography variant="h5" align="center" sx={{color: 'red', fontWeight: 'bold'}}>
                             ${game.price/100}
                         </Typography>
-                        <Avatar alt="Creator Image" src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
+                        <Avatar alt="Creator Image" sx={{ width: 70, height: 70 }} src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                     </div>
                 </Stack>
             </CardContent>

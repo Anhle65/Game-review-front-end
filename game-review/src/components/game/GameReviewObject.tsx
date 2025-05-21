@@ -9,7 +9,7 @@ interface IGameReviewProps {
 }
 const GameReviewObject = (props: IGameReviewProps) => {
     const [gameReview] = React.useState<Review> (props.gameReview);
-    // const [reviewerImage, setReviewerImage] = React.useState("");
+    const [reviewerImage, setReviewerImage] = React.useState("");
     const gameReviewCardStyles: CSS.Properties = {
         display: "inline-block",
         overflowY: "auto",
@@ -18,24 +18,24 @@ const GameReviewObject = (props: IGameReviewProps) => {
         margin: "10px",
         padding: "0px"
     }
-    // React.useEffect(()=> {
-    //     axios.get('http://localhost:4941'+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
-    //         responseType: 'blob',
-    //     })
-    //         .then((response) => {
-    //             if(response.data) {
-    //                 const imgUrl = URL.createObjectURL(response.data);
-    //                 console.log("Should not create URL");
-    //                 setReviewerImage(imgUrl);
-    //             }
-    //         }).catch((error) => {
-    //             setReviewerImage('');
-    //             if (axios.isAxiosError(error)) {
-    //                 if (error.response?.status !== 404) {
-    //                     console.error("Failed to load image", error);
-    //                 }
-    //         }})
-    // }, [])
+    React.useEffect(()=> {
+        axios.get('http://localhost:4941'+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                if(response.data) {
+                    const imgUrl = URL.createObjectURL(response.data);
+                    console.log("Should not create URL");
+                    setReviewerImage(imgUrl);
+                }
+            }).catch((error) => {
+                setReviewerImage('');
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status !== 404) {
+                        console.error("Failed to load image", error);
+                    }
+            }})
+    }, [])
     return(
         <Card sx={gameReviewCardStyles}>
             <CardContent>

@@ -96,10 +96,10 @@ const Login = () => {
         height: "500px",
         width: "300px",
         margin: "10px",
-        padding: "0px",
+        padding: "20px 0 0 0",
         justifyContent: "center",
-        alignItems: "center"
-        // backgroundColor: "lightcyan",
+        alignItems: "center",
+        border: "2px",
     }
     return (
         <>
@@ -113,14 +113,14 @@ const Login = () => {
                     <LogoutNavBar />
                 </>
             )}
-                <h2 className="login-title">Login</h2>
-                {error && <Alert variant="danger">{error}</Alert>}
+                {error && (<>{window.scrollTo({top:0})}<Alert variant="danger">{error}</Alert></>)}
                 <Card sx={loginCardStyles}>
-                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
                     <CardContent sx={{
                         justifyContent: "space-between",
                         alignItems: "center",
                     }}>
+                        <h2 className="login-title">Login</h2>
                         <Stack direction="column" spacing={2} sx={{
                             justifyContent: "space-between",
                             alignItems: "center",

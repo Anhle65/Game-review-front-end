@@ -62,20 +62,21 @@ const UserProfile = () => {
             <Card sx={cardInformationStyles}>
                 <CardMedia
                     component="img"
-                    height='300'
+                    height='400'
                     sx={{objectFit: "contain", width:'100%'}}
                     image={userImage.length !== 0 ? userImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
 
                 />
                 <CardContent>
-                    <Stack direction="row" spacing={2} sx={{
+                    <Stack direction="column" spacing={2} sx={{
                         justifyContent: "space-around",
                         alignItems: "center",
                     }}>
-                        <Typography variant="h4" align="left">
+                        <Typography variant="h4" align="left" sx={{fontFamily:'monospace', fontWeight:'bold'}}>
                             {fName} {lName}
-                            <br/>
-                            <EmailOutlinedIcon fontSize='large'/> : {email}
+                        </Typography>
+                        <Typography variant="h4" align="left" >
+                            <EmailOutlinedIcon fontSize='large'/>: {email}
                         </Typography>
                     </Stack>
                 </CardContent>

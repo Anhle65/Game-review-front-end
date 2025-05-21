@@ -376,9 +376,8 @@ const Game = () => {
     const card: CSS.Properties = {
         padding: "10px",
         margin: "20px",
-        maxWidth: "60%",
         display: "block",
-        minWidth: "900px",
+        width: "930px",
     }
 
     return(
@@ -396,7 +395,7 @@ const Game = () => {
         {errorFlag ? (
             <>
                 {window.scrollTo({top:0})}
-                <Alert severity="error">
+                <Alert severity="error" sx={{justifyContent:"center"}}>
                     <AlertTitle>{errorMessage}</AlertTitle>
                 </Alert>
             </>
@@ -415,15 +414,15 @@ const Game = () => {
                     alt="Auction hero"
                 />
                 <CardContent>
-                    <Typography variant="h2" >
+                    <Typography variant="h2" sx={{fontFamily:'courier'}}>
                         {game.title}
                     </Typography>
-                    <Typography variant="h6" align="left">
+                    <Typography aria-multiline={true} sx={{ color:'black'}} overflow='auto' variant="h4" align="left">
                         Description: {game.description}
                     </Typography>
                     <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between",
                         alignItems: "center"}}>
-                        <Typography variant="subtitle1" align="left">
+                        <Typography variant="h6" align="left" sx={{fontSize:'20px', fontWeight:'normal'}}>
                             Genre: {genreName?.name}
                             <br/>
                             Created on: {new Date(game.creationDate).toLocaleDateString()}
@@ -443,14 +442,14 @@ const Game = () => {
                         }}>
                             <Stack direction="column" spacing={2} margin="2px" sx={{justifyContent: "space-between",
                                 alignItems: "center"}}>
-                            <Typography variant="subtitle1">
+                            <Typography variant="h6" sx={{fontSize:'20px', fontWeight:'normal'}}>
                                 Creator: {game.creatorFirstName} {game.creatorLastName}
                                 <Avatar alt="Creator Image"
                                         sx={{ width: 100, height: 100 }}
                                         src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
 
                             </Typography>
-                                <Typography variant="h3">
+                                <Typography variant="h3" sx={{color: 'red'}}>
                                     ${game.price/100}
                                 </Typography>
                             </Stack>
@@ -558,8 +557,8 @@ const Game = () => {
                             />
                         </div>
                     )}
+                    <Box sx={{justifyContent:'left'}}>
                     <Form>
-                        {/*<fieldset disabled>*/}
                         <Form.Group className="mb-3">
                             <Form.Label htmlFor="textInput">Comment: </Form.Label>
                             <Form.Control id="textInput" as="textarea" rows={3} placeholder="Comment" onChange={handleInputComment}/>
@@ -587,6 +586,7 @@ const Game = () => {
                                 onSubmitForm()
                         }}>Post review</Button>
                     </Form>
+                    </Box>
                 </CardContent>
                     <Dialog
                         open={openDeleteDialog}
