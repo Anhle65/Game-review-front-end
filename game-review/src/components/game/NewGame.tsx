@@ -32,7 +32,7 @@ const [errorMessage, setErrorMessage] = React.useState("");
 const [errorFlag, setErrorFlag] = React.useState(false);
 const [allGenres, setGenres] = React.useState<Genre[]>([]);
 const [allPlatforms, setAllPlatforms] = React.useState<PlatformCheckedState[]>([]);
-const [price, setPrice] = React.useState('');
+const [price, setPrice] = React.useState('0');
 const authorization = useUserStore();
 const token = authorization.token;
 const navigate = useNavigate();
@@ -59,6 +59,11 @@ const onCreateGame = async () => {
                 return;
             }
         }
+        if(description.trim().length < 1) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have description");
+            return;
+        }
         if (!genre) {
             setErrorFlag(true);
             setErrorMessage("Game must have genre");
@@ -74,13 +79,18 @@ const onCreateGame = async () => {
             setErrorMessage("Game price must be at least $0");
             return;
         }
+        if (!imageFile) {
+            setErrorFlag(true);
+            setErrorMessage("Must have image");
+            return;
+        }
         try {
             const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
                 title: title,
                 description: description,
                 creationDate: new Date(),
                 genreId: parseInt(genre, 10),
-                price: parseInt(price, 10),
+                price: parseFloat(price)*100,
                 platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
             }, {
                 headers: {
@@ -90,17 +100,14 @@ const onCreateGame = async () => {
             const createdId = gamePost.data["gameId"]
             console.log("created data: ", gamePost);
             console.log("created id: ", createdId);
-            if (imageFile) {
-                await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
-                    headers: {
-                        "X-Authorization": token,
-                        "Content-Type": imageFile?.type,
-                    }
-                })
-            }
+            await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
+                headers: {
+                    "X-Authorization": token,
+                    "Content-Type": imageFile?.type,
+                }
+            })
             navigate(`/users/${creatorId}/myGames`);
         } catch (error: any) {
-            window.scrollTo({top:0});
             setErrorFlag(true);
             setErrorMessage("Unexpected error");
         }
@@ -114,6 +121,11 @@ const onUpdateGame = async () => {
         if(titleExist.includes(title.trim()) && title.trim() !== originTitle) {
             setErrorFlag(true);
             setErrorMessage("Title already exists! Please choose another name!");
+            return;
+        }
+        if(description.trim().length < 1) {
+            setErrorFlag(true);
+            setErrorMessage("Game must have description");
             return;
         }
         if (!genre) {
@@ -137,7 +149,7 @@ const onUpdateGame = async () => {
                 title: title,
                 description: description,
                 genreId: parseInt(genre, 10),
-                price: parseInt(price, 10),
+                price: parseFloat(price)*100,
                 platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
             }, {
                 headers: {
@@ -170,39 +182,41 @@ const getAllTitles = async () => {
 }
 React.useEffect(() => {
     getGenres();
-    getPlatforms();
     getAllTitles();
-    if(id) {
-        getGame().then( (res) => {
-            console.log("Game: ", res);
-                setTitle(res.title);
-                setOriginTitle(res.title);
-                setDescription(res.description);
-                setCreatorId(res.creatorId);
-                setGenre(res.genreId.toString());
-                setPrice((res.price).toString());
+    getPlatforms().then(() => {
+            if (id) {
+                getGame().then((res) => {
+                        console.log("Game: ", res);
+                        setTitle(res.title);
+                        setOriginTitle(res.title);
+                        setDescription(res.description);
+                        setCreatorId(res.creatorId);
+                        setGenre(res.genreId.toString());
+                        setPrice((parseFloat(res.price) / 100).toString());
+                        setAllPlatforms(prevPlatforms =>
+                            prevPlatforms.map(platform => ({
+                                ...platform,
+                                isSelected: res.platformIds.includes(platform.platformId)
+                            })))
+                    }
+                );
+                getGameImage();
+            } else {
+                setTitle("");
+                setDescription("");
+                setGenre('');
+                setPrice('0');
                 setAllPlatforms(prevPlatforms =>
                     prevPlatforms.map(platform => ({
                         ...platform,
-                        isSelected: res.platformIds.includes(platform.platformId)
+                        isSelected: false
                     })))
+                setImage('');
+                setImageFile(null);
             }
-        );
-        getGameImage();
-    } else {
-        setTitle("");
-        setDescription(" ");
-        setGenre('');
-        setPrice('');
-        setAllPlatforms(prevPlatforms =>
-            prevPlatforms.map(platform => ({
-                ...platform,
-                isSelected: false
-            })))
-        setImage('');
-        setImageFile(null);
-    }
-}, [])
+        }
+    );
+}, [id])
 
 const getGameImage = async () => {
     await axios.get("http://localhost:4941" + rootUrl + "/games/" + id + "/image", {
@@ -230,6 +244,7 @@ const getGame = async () => {
     return gameResponse.data;
 }
 const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorFlag(false);
     const { name, checked } = event.target;
     setAllPlatforms((prev) => {
         const update = prev.map((p) =>
@@ -341,7 +356,7 @@ const creatCardStyles: CSS.Properties = {
 return (
     <>
         <LogInNavBar/>
-        {errorFlag && <Alert variant="danger">Error: {errorMessage}</Alert>}
+        {errorFlag && (<>{window.scrollTo({top:0})}<Alert variant="danger">Error: {errorMessage}</Alert></>)}
         <Card sx={{...creatCardStyles, maxHeight: 'inherit', maxWidth: 'inherit', p: 2}}>
             <h1>
                 Game Information

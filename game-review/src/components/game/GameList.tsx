@@ -5,11 +5,8 @@ import {
     Alert,
     AlertTitle,
     Autocomplete,
-    Box, Checkbox,
-    Fab, FormControlLabel, FormGroup, FormLabel,
-    Grid,
+    Box, Checkbox, FormControlLabel, FormGroup, FormLabel,
     Input,
-    ListItemIcon,
     Pagination,
     PaginationItem,
     Paper,
@@ -26,7 +23,6 @@ import LogInNavBar from "../LogInNavBar";
 import LogoutNavBar from "../LogoutNavBar";
 import {useUserStore} from "../../store";
 import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
-import {NavLink} from "react-router-dom";
 type GameParams = {
     params: Record<string, string | number | boolean | any[]>;
 };
@@ -52,6 +48,7 @@ const GameList = ({params}: GameParams) => {
     const [chosenGenres, setChosenGenres] = React.useState<GenreSelectionState[]>([]);
     let filterParams = new URLSearchParams();
     const [maxPrice, setMaxPrice] = React.useState(100);
+    const [maxPriceGame, setMaxPriceGame] = React.useState(0);
     Object.entries(params).forEach(([key, value]) => {
         if (Array.isArray(value)) {
             value.forEach((v) => filterParams.append(key, String(v)));
@@ -60,6 +57,17 @@ const GameList = ({params}: GameParams) => {
         }
     });
     let url = `http://localhost:4941${rootUrl}/games`;
+    React.useEffect(()=>{
+        const getGames = () => {
+            axios.get(`http://localhost:4941${rootUrl}/games`)
+                .then((res) => {
+                    const highestPrice = Math.max(...res.data['games'].map((g: any) => g.price/100));
+                    setMaxPriceGame(highestPrice);
+                    setMaxPrice(highestPrice);
+                })
+        };
+        getGames();
+    }, [])
     const getGenres = async () => {
         await axios.get('http://localhost:4941'+ rootUrl + '/games/genres')
             .then((response) => {
@@ -145,8 +153,6 @@ const GameList = ({params}: GameParams) => {
                 })
         }
         getGames();
-        console.log("Chosen genres :", allGenres);
-        console.log("Chosen platforms: ", chosenPlatform);
         }, [characterSearching, labelSorting, chosenPlatform, chosenGenres, maxPrice]
     )
     const handleSorting = (e:ChangeEvent<HTMLInputElement>, newValue: string| null) => {
@@ -177,8 +183,8 @@ const GameList = ({params}: GameParams) => {
     const handleBlur = () => {
         if (maxPrice < 0) {
             setMaxPrice(0);
-        } else if (maxPrice > 100) {
-            setMaxPrice(100);
+        } else if (maxPrice > maxPriceGame) {
+            setMaxPrice(maxPriceGame);
         }
     };
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
@@ -236,7 +242,9 @@ const GameList = ({params}: GameParams) => {
                             onChange={(event: any, newValue: string| null) => handleSorting(event, newValue)}
                             inputValue={inputValue}
                             onInputChange={(event, newInputValue) => {
-                                setInputValue(newInputValue);
+                                if (optionSortBy.some(o => o.value === newInputValue)) {
+                                    setInputValue(newInputValue);
+                                }
                             }}
                             id="sort-by-selection"
                             options={optionSortBy.map(o => o.value)}
@@ -282,19 +290,19 @@ const GameList = ({params}: GameParams) => {
                     )}
                 </Paper>
                 </Stack>
-                <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'flex-start'}}>
+                <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'center', width: "cover", display: "block"}}>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Advanced Filter:</FormLabel>
                     <br/>
                     <Typography sx={{justifyContent:'left'}} id="input-slider" gutterBottom>
                         Max price
                     </Typography>
-                        <Stack direction='row'>
+                        <Stack direction='row' spacing={0.5} sx={{ justifyContent: 'flex-start', alignItems: 'center', width: "cover", display: "block"}}>
                         <Slider
                             value={maxPrice}
                             onChange={handleSliderChange}
                             aria-labelledby="input-slider"
                             valueLabelDisplay="auto"
-                            max={100}
+                            max={maxPriceGame}
                         />
                             <>
                         <AttachMoneyTwoToneIcon fontSize="medium"/>
@@ -306,7 +314,7 @@ const GameList = ({params}: GameParams) => {
                             inputProps={{
                                 step: 10,
                                 min: 0,
-                                max: 100,
+                                max: {maxPriceGame},
                                 type: 'number',
                                 'aria-labelledby': 'input-slider',
                             }}
