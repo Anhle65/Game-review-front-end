@@ -7,10 +7,13 @@ import {
     Autocomplete,
     Box, Checkbox,
     Fab, FormControlLabel, FormGroup, FormLabel,
+    Grid,
+    Input,
     ListItemIcon,
     Pagination,
     PaginationItem,
     Paper,
+    Slider,
     Stack,
     TextField, Typography
 } from "@mui/material";
@@ -47,9 +50,8 @@ const GameList = ({params}: GameParams) => {
     const [allGenres, setGenres] = React.useState<GenreSelectionState[]>([]);
     const [chosenPlatform, setChosenPlatforms] = React.useState<PlatformCheckedState[]>([]);
     const [chosenGenres, setChosenGenres] = React.useState<GenreSelectionState[]>([]);
-    const [price, setPrice] = React.useState('');
     let filterParams = new URLSearchParams();
-    let numberElements = 0;
+    const [maxPrice, setMaxPrice] = React.useState(100);
     Object.entries(params).forEach(([key, value]) => {
         if (Array.isArray(value)) {
             value.forEach((v) => filterParams.append(key, String(v)));
@@ -112,15 +114,12 @@ const GameList = ({params}: GameParams) => {
         getPlatforms();
         getGenres();
     }, [])
-
     React.useEffect(() => {
         setCurrentPage(1);
         if(characterSearching.trim()) {
             filterParams.append('q', characterSearching);
         }
-        if(price) {
-            filterParams.append('price', price);
-        }
+        filterParams.append('price', String(maxPrice*100));
         chosenGenres.forEach((genre) => {
             filterParams.append('genreIds', genre.genreId.toString())
         })
@@ -148,7 +147,7 @@ const GameList = ({params}: GameParams) => {
         getGames();
         console.log("Chosen genres :", allGenres);
         console.log("Chosen platforms: ", chosenPlatform);
-        }, [characterSearching, labelSorting, chosenPlatform, chosenGenres, price]
+        }, [characterSearching, labelSorting, chosenPlatform, chosenGenres, maxPrice]
     )
     const handleSorting = (e:ChangeEvent<HTMLInputElement>, newValue: string| null) => {
         const label = optionSortBy.find(o => o.value === newValue)?.label;
@@ -160,14 +159,6 @@ const GameList = ({params}: GameParams) => {
             setLabelSorting('CREATED_ASC');
         }
     }
-    const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        if (isNaN(parseInt(e.currentTarget.value, 10))) {
-            setPrice('');
-        } else {
-            setPrice(e.currentTarget.value);
-        }
-    }
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);
         window.scrollTo({top:0});
@@ -175,6 +166,21 @@ const GameList = ({params}: GameParams) => {
     const handleInputSearchingChange = (e: ChangeEvent<HTMLInputElement>) => {
         setCharacterSearching(e.target.value)
     }
+    const handleSliderChange = (event: Event, newValue: number) => {
+        setMaxPrice(newValue);
+    };
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setMaxPrice(event.target.value === '' ? 0 : Number(event.target.value));
+    };
+
+    const handleBlur = () => {
+        if (maxPrice < 0) {
+            setMaxPrice(0);
+        } else if (maxPrice > 100) {
+            setMaxPrice(100);
+        }
+    };
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
     const card: CSS.Properties = {
         padding: "10px",
@@ -279,26 +285,34 @@ const GameList = ({params}: GameParams) => {
                 <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'flex-start'}}>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Advanced Filter:</FormLabel>
                     <br/>
-                    <ListItemIcon>
-                        <AttachMoneyTwoToneIcon sx={{my: 3}} fontSize="large"/>
-                        <TextField
-                            type="number"
-                            id="price-required"
-                            label="Max Price"
-                            onChange={updatePrice}
-                            value={price}
-                            placeholder='Eg: 0 is $0, 999 is $9.99'
-                            slotProps={{
-                                inputLabel: {
-                                    shrink: true,
-                                },
-                            }}
-                            inputProps={{
-                                min:0
-                            }}
-                            sx={{my: 2}}
+                    <Typography sx={{justifyContent:'left'}} id="input-slider" gutterBottom>
+                        Max price
+                    </Typography>
+                        <Stack direction='row'>
+                        <Slider
+                            value={maxPrice}
+                            onChange={handleSliderChange}
+                            aria-labelledby="input-slider"
+                            valueLabelDisplay="auto"
+                            max={100}
                         />
-                    </ListItemIcon>
+                            <>
+                        <AttachMoneyTwoToneIcon fontSize="medium"/>
+                        <Input
+                            value={maxPrice}
+                            size="small"
+                            onChange={handleInputChange}
+                            onBlur={handleBlur}
+                            inputProps={{
+                                step: 10,
+                                min: 0,
+                                max: 100,
+                                type: 'number',
+                                'aria-labelledby': 'input-slider',
+                            }}
+                        />
+                            </>
+                        </Stack>
                     <br/>
                     <Box padding='20px 0 0 0'>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Platform compatible: </FormLabel>
