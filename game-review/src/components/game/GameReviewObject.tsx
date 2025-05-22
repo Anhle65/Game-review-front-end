@@ -44,7 +44,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
                         {gameReview.reviewerFirstName} {gameReview.reviewerLastName}
                     </Typography>
                         <div>
-                            <Avatar alt="Creator Image" src={`http://localhost:4941${rootUrl}/users/${gameReview.reviewerId}/image`} />
+                            <Avatar alt="Creator Image" src={reviewerImage.length > 0 ? reviewerImage: "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                         </div>
                 </Stack>
                 <TextField
