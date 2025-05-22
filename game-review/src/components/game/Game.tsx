@@ -295,7 +295,7 @@ const Game = () => {
                 })
             }
         getGame();
-    }, [id])
+    }, [id, isAddWishlist, alreadyOwned])
     React.useEffect(()=> {
         window.scrollTo({top:0})
         const getReviews = () => {
@@ -449,9 +449,15 @@ const Game = () => {
                                         src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
 
                             </Typography>
-                                <Typography variant="h3" sx={{color: 'red'}}>
-                                    ${game.price/100}
-                                </Typography>
+                                {game.price/100 > 0 ? (
+                                    <Typography variant="h3" align="center" sx={{fontWeight: 'bold'}}>
+                                        ${game.price/100}
+                                    </Typography>
+                                ): (
+                                    <Typography variant="h3" align="center" sx={{color:'red', fontWeight: 'bold'}}>
+                                        Free
+                                    </Typography>
+                                )}
                             </Stack>
                         </div>
                     </Stack>
