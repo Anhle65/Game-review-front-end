@@ -10,7 +10,7 @@ import {
     InputLabel, ListItemIcon,
     OutlinedInput,
     Box,
-    TextField, Tooltip, Stack
+    TextField, Tooltip
 } from "@mui/material";
 import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "../LogInNavBar";
@@ -21,7 +21,7 @@ import {useNavigate} from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import CSS from "csstype";
 import IconButton from "@mui/material/IconButton";
-import {Edit, Visibility, VisibilityOff} from "@mui/icons-material";
+import {Visibility, VisibilityOff} from "@mui/icons-material";
 import EditIcon from '@mui/icons-material/Edit';
 import EditOffIcon from '@mui/icons-material/EditOff';
 const EditUserProfile = () => {
@@ -487,8 +487,9 @@ const EditUserProfile = () => {
                         <Button onClick={handleDeleteDialogClose}>Cancel</Button>
                         <Button variant="outlined" color="error" onClick={() => {
                             if(!isRevertImage) handleRemoveImage();
-                            else {handleRevertOriginImage();
-                            console.log("revert image should be true", isRevertImage);}
+                            else {
+                                handleRevertOriginImage();
+                            }
                             setOpenDeleteDialog(false);
                         }} autoFocus>
                             {isRevertImage? 'Revert':'Remove'}

@@ -136,8 +136,6 @@ const Game = () => {
         }
     }
     const deleteGame = () => {
-        console.log("in delete: ",gameReviews.length < 1);
-        console.log("in delete: ",game.numberOfOwners < 1);
         if(gameReviews.length < 1 && game.numberOfOwners < 1) {
             axios.delete('http://localhost:4941' + rootUrl + '/games/' + id, {
                 headers: {
@@ -172,9 +170,7 @@ const Game = () => {
             }
         })
             .then((response) => {
-                console.log("Wishlist game", response.data);
                 const gameId = response.data['games'].map((g:any) =>g.gameId);
-                console.log("Wishlist game id ", gameId);
                 if(gameId.includes(parseInt(id as string,10))){
                     setIsAddWishlist(false);
                 } else {
@@ -414,7 +410,7 @@ const Game = () => {
                     alt="Auction hero"
                 />
                 <CardContent>
-                    <Typography variant="h2" sx={{fontFamily:'courier'}}>
+                    <Typography variant="h2" sx={{fontFamily:'courier', color:'blue', fontWeight:'bold'}}>
                         {game.title}
                     </Typography>
                     <Typography aria-multiline={true} sx={{ color:'black'}} overflow='auto' variant="h4" align="left">
@@ -639,7 +635,7 @@ const Game = () => {
                     </Dialog>
                 <Dialog
                     open={openAddOwnDialog}
-                    onClose={()=>setOpenAddOwnDialog(false)}
+                    onClose={handleAddOwnDialogClose}
                     aria-labelledby="alert-dialog-title-owned"
                     aria-describedby="alert-dialog-owned">
                     <DialogTitle id="alert-dialog-title-owned" color="warning">
@@ -651,7 +647,7 @@ const Game = () => {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={()=>setOpenAddOwnDialog(false)}>Cancel</Button>
+                        <Button onClick={handleAddOwnDialogClose}>Cancel</Button>
                         <Button variant="outlined" color="success" onClick={handleLogin} autoFocus>
                             Login
                         </Button>

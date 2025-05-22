@@ -31,7 +31,7 @@ const LogoutNavBar = () => {
         }
     };
     return (
-        <AppBar position="static">
+        <><AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>
@@ -61,7 +61,7 @@ const LogoutNavBar = () => {
                     </Box>
                 </Toolbar>
             </Container>
-        </AppBar>
+        </AppBar>{window.location.pathname.endsWith('games/') && (<h2 style={{padding: '15px 0 0 0'}}>Dash Board</h2>)}</>
     )
 }
 export default LogoutNavBar;

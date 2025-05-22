@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import {rootUrl} from "../../base.routes";
-import {Button, Card, CardActions, CardContent, CardMedia, Stack, Typography} from "@mui/material";
+import {Button, Card, CardContent, CardMedia, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
 import LogInNavBar from "../LogInNavBar";
 import {useUserStore} from "../../store";
@@ -80,7 +80,8 @@ const UserProfile = () => {
                         </Typography>
                     </Stack>
                 </CardContent>
-                    <Button onClick={()=>navigate('/users/'+userId+'/edit')}><EditIcon fontSize='large' />Edit Information
+                    <Button onClick={()=>navigate('/users/'+userId+'/edit')}><EditIcon fontSize='large' />
+                        <Typography variant='h6' >Edit Information</Typography>
                     </Button>
             </Card>
         </>

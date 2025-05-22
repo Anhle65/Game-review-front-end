@@ -13,8 +13,6 @@ type SimilarGameProps = {
 const SimilarGame = (props: SimilarGameProps) => {
     const [games, setGames] = React.useState<Game[]>([]);
     const {id} = useParams();
-    const [errorFlag, setErrorFlag] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
     React.useEffect(()=> {
         fetchGames();
@@ -25,7 +23,7 @@ const SimilarGame = (props: SimilarGameProps) => {
             axios.get(`http://localhost:4941/api/v1/games?creatorId=${props.creatorId}`),
             axios.get(`http://localhost:4941/api/v1/games?genreIds=${props.genreId}`),
         ]);
-        const combinedGames = [...gameByCreatorId.data.games, ...gameByGenreId.data.games];
+        const combinedGames = [...gameByCreatorId.data['games'], ...gameByGenreId.data['games']];
         const uniqueGames = Array.from(
             new Map(combinedGames.map((g) => [g.gameId, g])).values()
         );
@@ -75,7 +73,6 @@ const SimilarGame = (props: SimilarGameProps) => {
                                 justifyContent: 'flex-start',
                                 alignItems: 'flex-start',
                             }}>Similar Games:</Typography>
-                            {/*<div style={{display: "inline-block", maxWidth: "965px", minWidth: "320px"}}>*/}
                                 <Box sx={{
                                     flexGrow: 1,
                                     display: 'flex',
@@ -84,7 +81,6 @@ const SimilarGame = (props: SimilarGameProps) => {
                                 }}>
                                     {game_rows()}
                                 </Box>
-                            {/*</div>*/}
                             <div style={{
                                 display: 'flex',
                                 justifyContent: 'center',

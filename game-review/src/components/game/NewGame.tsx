@@ -1,7 +1,7 @@
 import LogInNavBar from "../LogInNavBar";
 import {
     Card,
-    CardContent, CardMedia,
+    CardMedia,
     Checkbox,
     FormControl, FormControlLabel, FormGroup, FormLabel,
     Grid,
@@ -428,9 +428,9 @@ return (
                                                 shrink: true,
                                             },
                                         }}
-                                               inputProps={{
-                                                   min: 0
-                                               }}
+                                       inputProps={{
+                                           min: 0
+                                       }}
                                         sx={{my: 2}}
                                 />
                                 </ListItemIcon>

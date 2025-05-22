@@ -216,7 +216,7 @@ const UserRegister = () => {
                 </>
             )}
             <div className="signup-form-container">
-                {error && (
+                {errorFlag && (
                     <>
                     {window.scrollTo({top:0})}
                     <Alert variant="danger">{error}</Alert>

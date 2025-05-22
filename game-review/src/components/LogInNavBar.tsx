@@ -15,14 +15,12 @@ import {rootUrl} from "../base.routes";
 import axios from "axios";
 import {useUserStore} from "../store";
 import {Edit, Logout} from "@mui/icons-material";
-import {isCryptoKey} from "node:util/types";
 
 const LogInNavBar = () => {
     const authorization = useUserStore();
     const userId = authorization.userId;
     const token = authorization.token;
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-    const [anchorElGame, setAnchorElGame] = React.useState<null | HTMLElement>(null);
     const navigate = useNavigate();
     const [userImage, setUserImage] = React.useState("");
     const [fName, setfName] = React.useState('');

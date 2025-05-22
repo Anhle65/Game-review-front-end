@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Form, Alert, Button } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import {
     Card,
-    CardActions,
     FormControl,
     CardContent,
     IconButton,
@@ -113,7 +112,7 @@ const Login = () => {
                     <LogoutNavBar />
                 </>
             )}
-                {error && (<>{window.scrollTo({top:0})}<Alert variant="danger">{error}</Alert></>)}
+                {errorFlag && (<>{window.scrollTo({top:0})}<Alert variant="danger">{error}</Alert></>)}
                 <Card sx={loginCardStyles}>
                     <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
                     <CardContent sx={{
