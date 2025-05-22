@@ -149,9 +149,16 @@ const GameListObject = (props: IGameProps) => {
                         Created on : {new Date(game.creationDate).toLocaleDateString()}
                     </Typography>
                     <div>
-                        <Typography variant="h5" align="center" sx={{color: 'red', fontWeight: 'bold'}}>
-                            ${game.price/100}
+                        {game.price/100 > 0 ? (
+                            <Typography variant="h5" align="center" sx={{fontWeight: 'bold'}}>
+                                ${game.price/100}
+                            </Typography>
+                        ): (
+                            <Typography variant="h5" align="center" sx={{color:'red', fontWeight: 'bold'}}>
+                                Free
                         </Typography>
+                        )}
+
                         <Avatar alt="Creator Image" sx={{ width: 70, height: 70 }} src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                     </div>
                 </Stack>
