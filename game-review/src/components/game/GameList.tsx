@@ -177,7 +177,7 @@ const GameList = ({params}: GameParams) => {
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setMaxPrice(event.target.value === '' ? 0 : Number(event.target.value));
+        setMaxPrice(event.target.value === '' ? 0 : Math.round(parseFloat(event.currentTarget.value) * 100) / 100);
     };
 
     const handleBlur = () => {
