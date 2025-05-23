@@ -32,7 +32,7 @@ const [errorMessage, setErrorMessage] = React.useState("");
 const [errorFlag, setErrorFlag] = React.useState(false);
 const [allGenres, setGenres] = React.useState<Genre[]>([]);
 const [allPlatforms, setAllPlatforms] = React.useState<PlatformCheckedState[]>([]);
-const [price, setPrice] = React.useState('0');
+const [price, setPrice] = React.useState(0);
 const authorization = useUserStore();
 const token = authorization.token;
 const navigate = useNavigate();
@@ -74,9 +74,9 @@ const onCreateGame = async () => {
             setErrorMessage("Game must have at least 1 platform");
             return;
         }
-        if (!price) {
+        if (typeof price !== 'number' || price < 0) {
             setErrorFlag(true);
-            setErrorMessage("Game price must be at least $0");
+            setErrorMessage("Game price can not be null");
             return;
         }
         if (!imageFile) {
@@ -90,7 +90,7 @@ const onCreateGame = async () => {
                 description: description,
                 creationDate: new Date(),
                 genreId: parseInt(genre, 10),
-                price: parseFloat(price)*100,
+                price: price * 100,
                 platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
             }, {
                 headers: {
@@ -109,7 +109,7 @@ const onCreateGame = async () => {
             navigate(`/users/${creatorId}/myGames`);
         } catch (error: any) {
             setErrorFlag(true);
-            setErrorMessage("Unexpected error");
+            setErrorMessage(error.toString());
         }
 }
 const onUpdateGame = async () => {
@@ -138,9 +138,9 @@ const onUpdateGame = async () => {
             setErrorMessage("Game must have at least 1 platform");
             return;
         }
-        if (!price) {
+        if (typeof price !== 'number' || price < 0) {
             setErrorFlag(true);
-            setErrorMessage("Game price must be at least $0");
+            setErrorMessage("Game price can not be null");
             return;
         }
         try {
@@ -149,7 +149,7 @@ const onUpdateGame = async () => {
                 title: title,
                 description: description,
                 genreId: parseInt(genre, 10),
-                price: parseFloat(price)*100,
+                price: price * 100,
                 platformIds: allPlatforms.filter(p => p.isSelected).map(i => parseInt(String(i.platformId), 10))
             }, {
                 headers: {
@@ -192,7 +192,7 @@ React.useEffect(() => {
                         setDescription(res.description);
                         setCreatorId(res.creatorId);
                         setGenre(res.genreId.toString());
-                        setPrice((parseFloat(res.price) / 100).toString());
+                        setPrice((parseFloat(res.price) / 100));
                         setAllPlatforms(prevPlatforms =>
                             prevPlatforms.map(platform => ({
                                 ...platform,
@@ -205,7 +205,7 @@ React.useEffect(() => {
                 setTitle("");
                 setDescription("");
                 setGenre('');
-                setPrice('0');
+                setPrice(0);
                 setAllPlatforms(prevPlatforms =>
                     prevPlatforms.map(platform => ({
                         ...platform,
@@ -296,13 +296,13 @@ const updateTitleState = (e: React.ChangeEvent<HTMLInputElement>) => {
 }
 const updatePrice = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (e.currentTarget.value.startsWith('-')) {
+    if (e.currentTarget.value.startsWith('-')|| !e.currentTarget.value) {
         setErrorFlag(true);
-        setPrice('');
-        setErrorMessage("Price must be at least $0");
+        setPrice(0);
+        setErrorMessage("Price will be $0 by default");
     } else {
-        setErrorFlag(false);
-        setPrice(e.currentTarget.value);
+        setErrorMessage('');
+        setPrice(Math.round(parseFloat(e.currentTarget.value) * 100) / 100);
         setErrorFlag(false);
     }
 }
@@ -422,7 +422,7 @@ return (
                                         label="Price"
                                         onChange={updatePrice}
                                         value={price}
-                                        placeholder='Eg: 0 is $0, 999 is $9.99'
+                                        placeholder='$0 by default...'
                                         slotProps={{
                                             inputLabel: {
                                                 shrink: true,
