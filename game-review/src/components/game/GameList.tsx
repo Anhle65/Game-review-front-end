@@ -189,12 +189,10 @@ const GameList = ({params}: GameParams) => {
     };
     const game_rows = () => games.slice((currentPage - 1) * 9, currentPage * 9).map((game: Game) => <GameListObject key={game.gameId + game.title} game={game}/>);
     const card: CSS.Properties = {
-        padding: "10px",
-        margin: "20px",
+        padding: "1rem",
         display: "block",
-        width: "fit-content",
-        minWidth: "1000px",
-        minHeight: '1000px'
+        // width: "100%",
+        height: '100%',
     }
     return (
         <>
@@ -214,17 +212,14 @@ const GameList = ({params}: GameParams) => {
                     {errorMessage}
                 </Alert>
             ) : null}
-        <div style={{
+        <Box sx={{
             display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexGrow: 1
-        }}>
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                marginTop: 2
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
+            marginTop: 2,
+            padding: '2rem',
+            width: '100%',
+            minWidth: { xs: "100%", sm: "100%", md: "1024px" },
             }}>
                 <Stack direction="row" spacing={2}>
                 <Paper elevation={3} style={card} sx={{display: 'flex', justifyContent: 'flex-start',
@@ -233,7 +228,7 @@ const GameList = ({params}: GameParams) => {
                         <div>
                             <Stack direction='row'>
                                 <SearchIcon fontSize='large'/>
-                                <input type='text' style={{width: "300px", overflowY: "auto"}} placeholder="Search..."
+                                <input type='text' style={{overflowY: "auto"}} placeholder="Search..."
                                        className="form-control" id="input" value={characterSearching} onChange={handleInputSearchingChange}/>
                             </Stack>
                         </div>
@@ -248,16 +243,16 @@ const GameList = ({params}: GameParams) => {
                             }}
                             id="sort-by-selection"
                             options={optionSortBy.map(o => o.value)}
-                            sx={{width: 200}}
+                            sx={{minWidth:'40%', maxWidth: '50%'}}
                             renderInput={(params) => <TextField {...params} label="Sort by"/>}
                         />
                     </Stack>
-                    <div style={{display: "flex", maxWidth: "965px", minWidth: "320px", justifyContent: 'flex-start',
+                    <div style={{display: "flex", justifyContent: 'flex-start',
                         alignItems: 'flex-start'}}>
                         <Box sx={{
-                            display: 'inline-block',
-                            justifyContent: 'flex-start',
-                            alignItems: 'flex-start',
+                            display: 'block',
+                            maxWidth: { xs: '100%', sm: '100%', md: '1024px' },
+                            mx: 'auto',
                         }}>
                             {game_rows()}
                         </Box>
@@ -290,13 +285,13 @@ const GameList = ({params}: GameParams) => {
                     )}
                 </Paper>
                 </Stack>
-                <Paper sx={{ justifyContent: 'flex-start', marginTop: 3, alignItems: 'center', width: "cover", display: "block"}}>
+                <Box sx={{marginTop: 3, alignItems: 'center', width: "fit-content", display: "block"}}>
                     <FormLabel style={{color: "black", fontSize:'large'}} color="info">Advanced Filter:</FormLabel>
                     <br/>
                     <Typography sx={{justifyContent:'left'}} id="input-slider" gutterBottom>
-                        Max price
+                        Max price: $
                     </Typography>
-                        <Stack direction='row' spacing={0.5} sx={{ justifyContent: 'flex-start', alignItems: 'center', width: "cover", display: "block"}}>
+                        <Stack direction='row' spacing={0.5} sx={{ justifyContent: 'flex-start', width: "fit-content", display: "block"}}>
                         <Slider
                             value={maxPrice}
                             onChange={handleSliderChange}
@@ -304,22 +299,19 @@ const GameList = ({params}: GameParams) => {
                             valueLabelDisplay="auto"
                             max={maxPriceGame}
                         />
-                            <>
-                        <AttachMoneyTwoToneIcon fontSize="medium"/>
-                        <Input
-                            value={maxPrice}
-                            size="small"
-                            onChange={handleInputChange}
-                            onBlur={handleBlur}
-                            inputProps={{
-                                step: 10,
-                                min: 0,
-                                max: {maxPriceGame},
-                                type: 'number',
-                                'aria-labelledby': 'input-slider',
-                            }}
-                        />
-                            </>
+                            <Input
+                                value={maxPrice}
+                                size="small"
+                                onChange={handleInputChange}
+                                onBlur={handleBlur}
+                                inputProps={{
+                                    step: 10,
+                                    min: 0,
+                                    max: {maxPriceGame},
+                                    type: 'number',
+                                    'aria-labelledby': 'input-slider',
+                                }}
+                            />
                         </Stack>
                     <br/>
                     <Box padding='20px 0 0 0'>
@@ -364,9 +356,8 @@ const GameList = ({params}: GameParams) => {
                             </FormGroup>
                         )}
                     </Box>
-                </Paper>
-            </Box>
-        </div>
+                </Box>
+        </Box>
         </>
 )
 

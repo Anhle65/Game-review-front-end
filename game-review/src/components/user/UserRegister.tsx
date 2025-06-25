@@ -199,8 +199,6 @@ const UserRegister = () => {
     }
     const signUpCardStyles: CSS.Properties = {
         display: "inline-block",
-        height: "800px",
-        width: "500px",
         margin: "10px",
         padding: "20px",
     }
@@ -221,7 +219,7 @@ const UserRegister = () => {
                     {window.scrollTo({top:0})}
                     <Alert variant="danger">{error}</Alert>
                 </>)}
-                <Card sx={signUpCardStyles}>
+                <Card sx={{signUpCardStyles, minHeight: "100vh", minWidth: "100vw"}}>
                     <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <CardContent>
                         <h2 className="signup-title">Register</h2>
@@ -238,7 +236,6 @@ const UserRegister = () => {
                                     fullWidth
                                     required
                                     id="last-name-required"
-                                    // defaultValue="Smith"
                                     onChange={updateLnameState}
                                     label="Last name"
                                 />

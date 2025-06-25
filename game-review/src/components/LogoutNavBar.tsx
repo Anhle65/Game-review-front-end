@@ -31,7 +31,8 @@ const LogoutNavBar = () => {
         }
     };
     return (
-        <><AppBar position="static">
+        <><AppBar position="static" sx={{width:'100%', display:'flex',
+        }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
                     <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>

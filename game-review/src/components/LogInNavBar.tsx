@@ -124,10 +124,11 @@ const LogInNavBar = () => {
         }
     }
     return(
-        <><AppBar position="static">
-            <Container maxWidth="xl">
+        <><AppBar position="static" sx={{width:'100%', display:'flex',
+        }}>
+            <Container>
                 <Toolbar disableGutters>
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>
+                    <Box sx={{flexGrow: 1, display: 'flex'}}>
                         <Stack direction="row" spacing={2} sx={{
                             justifyContent: "space-around",
                             alignItems: "center",

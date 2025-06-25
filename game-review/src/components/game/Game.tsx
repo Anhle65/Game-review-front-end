@@ -373,7 +373,7 @@ const Game = () => {
         padding: "10px",
         margin: "20px",
         display: "block",
-        width: "930px",
+        width: '100%'
     }
 
     return(

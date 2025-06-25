@@ -91,13 +91,11 @@ const Login = () => {
         }
     };
     const loginCardStyles: CSS.Properties = {
-        display: "inline-block",
-        height: "500px",
-        width: "300px",
+        flexGrow: 1,
+        flexDirection: "column-reverse",
+        display: "flex",
         margin: "10px",
         padding: "20px 0 0 0",
-        justifyContent: "center",
-        alignItems: "center",
         border: "2px",
     }
     return (
@@ -113,8 +111,9 @@ const Login = () => {
                 </>
             )}
                 {errorFlag && (<>{window.scrollTo({top:0})}<Alert variant="danger">{error}</Alert></>)}
-                <Card sx={loginCardStyles}>
-                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <Card sx={{loginCardStyles, minHeight: "100vh", minWidth: "100vw"}}>
+                    <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center",
+                        }}>
                     <CardContent sx={{
                         justifyContent: "space-between",
                         alignItems: "center",

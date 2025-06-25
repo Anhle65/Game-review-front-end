@@ -108,10 +108,11 @@ const GameListObject = (props: IGameProps) => {
     const gameCardStyles: CSS.Properties = {
         display: "inline-block",
         objectFit: "contain",
-        height: "550px",
-        width: "300px",
-        margin: "10px",
-        padding: "0px"
+        height: "560px",
+        width: "100%",
+        maxWidth: "300px",
+        padding: "1rem",
+        overflowWrap: 'normal'
     }
     return(
         <>
@@ -121,11 +122,11 @@ const GameListObject = (props: IGameProps) => {
                     {errorMessage}
                 </Alert>
             ) : null}
-        <Card sx={gameCardStyles}>
+        <Card sx={gameCardStyles} >
             <CardMedia
                 component="img"
-                height="300"
-                width="200"
+                height="300em"
+                width="200em"
                 sx={{objectFit:"cover"}}
                 image={image.length > 0 ? image: "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                 alt="Auction hero"
@@ -144,8 +145,6 @@ const GameListObject = (props: IGameProps) => {
                         Platforms: {platformsName}
                         <br/>
                         Creator: {game.creatorFirstName} {game.creatorLastName}
-                        <br/>
-                        Created on : {new Date(game.creationDate).toLocaleDateString()}
                     </Typography>
                     <div>
                         {game.price/100 > 0 ? (
@@ -161,6 +160,7 @@ const GameListObject = (props: IGameProps) => {
                         <Avatar alt="Creator Image" sx={{ width: 70, height: 70 }} src={creatorImage.length !== 0 ? creatorImage : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"} />
                     </div>
                 </Stack>
+                Created on : {new Date(game.creationDate).toLocaleDateString()}
             </CardContent>
         </Card>
         </>
