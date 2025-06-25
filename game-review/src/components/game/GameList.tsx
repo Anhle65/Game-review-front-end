@@ -191,7 +191,6 @@ const GameList = ({params}: GameParams) => {
     const card: CSS.Properties = {
         padding: "1rem",
         display: "block",
-        // width: "100%",
         height: '100%',
     }
     return (
@@ -214,7 +213,7 @@ const GameList = ({params}: GameParams) => {
             ) : null}
         <Box sx={{
             display: 'flex',
-            justifyContent: 'flex-start',
+            justifyContent: 'space-between',
             alignItems: 'flex-start',
             marginTop: 2,
             padding: '2rem',
@@ -252,7 +251,6 @@ const GameList = ({params}: GameParams) => {
                         <Box sx={{
                             display: 'block',
                             maxWidth: { xs: '100%', sm: '100%', md: '1024px' },
-                            mx: 'auto',
                         }}>
                             {game_rows()}
                         </Box>
@@ -262,6 +260,7 @@ const GameList = ({params}: GameParams) => {
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
+                            width: '100%'
                         }}>
                             <Pagination
                                 page={currentPage}

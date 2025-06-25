@@ -348,20 +348,17 @@ const MenuProps = {
 };
 const creatCardStyles: CSS.Properties = {
     display: "inline-block",
-    minHeight: "700px",
-    width: "65%",
-    margin: "10px",
-    padding: "0px",
+    width: "100%",
 }
 return (
     <>
         <LogInNavBar/>
         {errorFlag && (<>{window.scrollTo({top:0})}<Alert variant="danger">Error: {errorMessage}</Alert></>)}
-        <Card sx={{...creatCardStyles, maxHeight: 'inherit', maxWidth: 'inherit', p: 2}}>
+        <Card sx={{creatCardStyles, width:'100%'}}>
             <h1>
                 Game Information
             </h1>
-            <Grid container rowSpacing={2} columnSpacing={{xs: 1, sm: 2, md: 3}}>
+            <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
                 <Grid size={6}>
                     <FormControl fullWidth sx={{my: 2}} variant="outlined">
                         <TextField
@@ -397,7 +394,7 @@ return (
                         <Box sx={{flexGrow: 1, justifyContent: 'flex-start', alignItems: 'flex-start', display:'flex'}}>
                         <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
                             <Grid size={6}>
-                                <FormControl fullWidth sx={{m: 1}}>
+                                <FormControl fullWidth>
                                     <InputLabel id="select-genre">Genre</InputLabel>
                                     <Select
                                         required
@@ -438,7 +435,6 @@ return (
                             <Grid size={6} sx={{justifyContent: 'center', alignItems: 'center'}}>
                                 <FormLabel style={{color: "gray"}} color="info" required>Platform compatible: </FormLabel>
                                 <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-
                                 {allPlatforms.length > 0 && (
                                     <FormGroup>
                                         {allPlatforms.map((p) => (
@@ -460,36 +456,32 @@ return (
                             </Grid>
                         </Grid>
                         </Box>
-                </Grid>
-                <Grid size={6}>
-                    <Stack direction='row' spacing={2}>
-                        <br/>
-                        <input type="file" ref={fileInputRef} accept="image/png, image/jpg, image/jpeg, image/gif" onChange={(e) => {
-                            handleUploadImage(e);
-                        }}/>
-                        <Tooltip title={'Revert original image'}>
-                            <SettingsBackupRestoreIcon fontSize='large' onClick={() => {
-                                setOpenDeleteDialog(true)
+                    </Grid>
+                    <Grid size={6} sx={{justifyContent:'space-between'}}>
+                            <input type="file" ref={fileInputRef} accept="image/png, image/jpg, image/jpeg, image/gif" onChange={(e) => {
+                                handleUploadImage(e);
                             }}/>
-                        </Tooltip>
-                    </Stack>
-                    <CardMedia
-                        component="img"
-                        height='600'
-                        sx={{objectFit: "contain", justifyContent: 'center', alignItems: 'center', width:'100%'}}
-                        image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
-                    />
+                            <Tooltip title={'Revert original image'}>
+                                <SettingsBackupRestoreIcon fontSize='large' onClick={() => {
+                                    setOpenDeleteDialog(true)
+                                }}/>
+                            </Tooltip>
+                        <CardMedia
+                            component="img"
+                            sx={{objectFit: "contain", justifyContent: 'center', alignItems: 'center', width:'100%'}}
+                            image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
+                        />
+                    </Grid>
                 </Grid>
-            </Grid>
             {creatorId !== 0 && (
-                <button type="button" className="btn btn-success" onClick={(e) => {
+                <button style={{margin:'2rem'}} type="button" className="btn btn-success" onClick={(e) => {
                     e.preventDefault();
                     onUpdateGame();
                 }}>Update Game
                 </button>
             )}
             {creatorId === 0 && (
-                <button type="button" className="btn btn-success" onClick={(e) => {
+                <button style={{margin:'2rem'}} type="button" className="btn btn-success" onClick={(e) => {
                     e.preventDefault();
                     onCreateGame();
                 }}>Create Game

@@ -45,10 +45,9 @@ const SimilarGame = (props: SimilarGameProps) => {
 
     const card: CSS.Properties = {
         padding: "10px",
-        margin: "20px",
         display: "block",
-        width: "fit-content",
-        minWidth: "1000px"
+        width: "100%",
+        justifyContent: "flex-start"
     }
     const handlePaginationClick = (value: number) => {
         setCurrentPage(value);

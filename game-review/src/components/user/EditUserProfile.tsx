@@ -259,16 +259,15 @@ const EditUserProfile = () => {
         }
     }
     const editCardStyles: CSS.Properties = {
-        display: "inline-block",
-        minHeight: "800px",
-        width: "70%",
+        display: "flex",
+        width: "100%",
         margin: "10px",
         padding: "0px",
     }
     return (
         <>
             <LogInNavBar/>
-            <Card sx={editCardStyles}>
+            <Card sx={{editCardStyles, height:'100%'}}>
                 <CardTitle>Edit profile</CardTitle>
                 <CardContent>
                     {errorFlag && <Alert variant="danger">{errorMsg}</Alert>}
@@ -324,15 +323,12 @@ const EditUserProfile = () => {
                             </FormControl>
                             <Box sx={{flexGrow: 1, justifyContent: 'flex-start', alignItems: 'flex-start'}}>
                                 <Grid container columnSpacing={{xs: 1, sm: 2, md: 3}}>
-                                    <Grid size={6}>
+                                    <Grid size={12} sx={{display:'flex', justifyContent:'flex-start', alignItems:'flex-start'}}>
                             <FormControl variant="outlined">
                                 <InputLabel required={editPasswordState} htmlFor="outlined-adornment-current-password">Current Password</InputLabel>
                                 <ListItemIcon sx={{
                                     display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
                                     gap: 2,
-                                    width: '100%',
                                 }}>
                                 <OutlinedInput
                                     fullWidth
@@ -342,7 +338,7 @@ const EditUserProfile = () => {
                                     type={showCurrentPassword ? 'text' : 'password'}
                                     onChange={updateCurrentPasswordState}
                                     value={currentPassword}
-                                    sx={{flexGrow: 1, minWidth: '290px'}}
+                                    sx={{width: '100%'}}
                                     endAdornment={
                                         <InputAdornment position="end">
                                             {editPasswordState && (
@@ -457,14 +453,14 @@ const EditUserProfile = () => {
                             <label htmlFor="uploadImage">
                                 <CardMedia
                                     component="img"
-                                    height='500'
+                                    // height='500'
                                     sx={{objectFit: "contain", width:'100%'}}
                                     image={image.length > 0 ? image : "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                                 />
                             </label>
                         </Grid>
                     </Grid>
-                    <button type="button" className="btn btn-success" onClick={(e) => {
+                    <button style={{margin:'2rem'}} type="button" className="btn btn-success" onClick={(e) => {
                         e.preventDefault();
                         onSubmit();
                     }}>Update account

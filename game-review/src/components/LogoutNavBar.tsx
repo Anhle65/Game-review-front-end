@@ -35,7 +35,7 @@ const LogoutNavBar = () => {
         }}>
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <Box sx={{flexGrow: 1, display: {xs: 'flex', md: 'flex'}}}>
+                    <Box sx={{flexGrow: 1, display: 'flex'}}>
                         <Stack direction="row" spacing={2} sx={{
                             justifyContent: "space-around",
                             alignItems: "center",
