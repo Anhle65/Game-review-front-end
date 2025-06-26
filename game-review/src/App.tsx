@@ -35,7 +35,7 @@ function App() {
             <Route path="/users/:id/wishlisted" element={<UserGameWishlist />} />
             <Route path="/users/login" element={<Login />} />
             <Route path="/users/register" element={<UserRegister />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={<GameList params={{}} />} />
           </Routes>
         </div>
       </Router>

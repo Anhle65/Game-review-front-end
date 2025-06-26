@@ -370,10 +370,8 @@ const Game = () => {
     }, [id]);
     const gameReview_rows = () => gameReviews.slice((currentPage - 1) * 3, currentPage * 3).map((rv: Review) => <GameReviewObject key={`${game.gameId}-${rv.reviewerId}`} gameReview={rv} />);
     const card: CSS.Properties = {
-        padding: "10px",
-        margin: "20px",
         display: "block",
-        width: '100%'
+        width: "100%",
     }
 
     return(
@@ -398,22 +396,23 @@ const Game = () => {
         ) : null}
         <div style={{
             display: 'flex',
-            justifyContent: 'center',
+            padding: "1em",
+            margin: "1em",
+            justifyContent: 'flex-start',
             alignItems: 'center',
         }}>
             <Card sx={card}>
                 <CardMedia
-                    height="700"
                     component="img"
-                    sx={{objectFit:"contain"}}
+                    sx={{objectFit:"contain", width:'100%'}}
                     image={image}
                     alt="Auction hero"
                 />
                 <CardContent>
-                    <Typography variant="h2" sx={{fontFamily:'courier', color:'blue', fontWeight:'bold'}}>
+                    <Typography variant="h3" sx={{fontFamily:'courier', color:'blue', fontWeight:'bold'}}>
                         {game.title}
                     </Typography>
-                    <Typography aria-multiline={true} sx={{ color:'black'}} overflow='auto' variant="h4" align="left">
+                    <Typography aria-multiline={true} sx={{ color:'black'}} overflow='auto' variant="h5" align="left">
                         Description: {game.description}
                     </Typography>
                     <Stack direction="row" spacing={2} margin="2px" sx={{justifyContent: "space-between",
@@ -543,7 +542,7 @@ const Game = () => {
                     {gameReviews.length > 3 && (
                         <div style={{
                             display: 'flex',
-                            justifyContent: 'center',
+                            justifyContent: 'flex-start',
                             alignItems: 'center',
                         }}>
                             <Pagination
