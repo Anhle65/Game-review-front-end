@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
-import NotFound from "./components/NotFound";
 import Game from "./components/game/Game";
 import Login from "./components/user/Login";
 import NewGame from "./components/game/NewGame";
@@ -27,7 +26,6 @@ function App() {
             <Route path="/games/:id" element={<Game />} />
             <Route path="/games/user/:id" element={<GameList params={{}}/>} />
             <Route path="/users/:id/profile" element={<UserProfile />} />
-            <Route path="/users/:id/edit" element={<EditUserProfile />} />
             <Route path="/users/:id/edit" element={<EditUserProfile />} />
             <Route path="/users/:id/myGames" element={<UserGames />} />
             <Route path="/users/:id/reviewed" element={<UserGameReview />} />
