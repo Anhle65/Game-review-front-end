@@ -20,20 +20,20 @@ function App() {
         <div>
           <Routes>
             <Route path="/" element={<GameList params={{}}/>} />
-            <Route path="/games" element={<GameList params={{}}/>} />
-            <Route path="/games/create" element={<NewGame />} />
-            <Route path="/games/:id/edit" element={<NewGame />} />
-            <Route path="/games/:id" element={<Game />} />
-            <Route path="/games/user/:id" element={<GameList params={{}}/>} />
-            <Route path="/users/:id/profile" element={<UserProfile />} />
-            <Route path="/users/:id/edit" element={<EditUserProfile />} />
-            <Route path="/users/:id/myGames" element={<UserGames />} />
-            <Route path="/users/:id/reviewed" element={<UserGameReview />} />
-            <Route path="/users/:id/owned" element={<UserGameOwned />} />
-            <Route path="/users/:id/wishlisted" element={<UserGameWishlist />} />
-            <Route path="/users/login" element={<Login />} />
-            <Route path="/users/register" element={<UserRegister />} />
-            <Route path="*" element={<GameList params={{}} />} />
+            <Route path="game-review/games" element={<GameList params={{}}/>} />
+            <Route path="game-review/games/create" element={<NewGame />} />
+            <Route path="game-review/games/:id/edit" element={<NewGame />} />
+            <Route path="game-review/games/:id" element={<Game />} />
+            <Route path="game-review/games/user/:id" element={<GameList params={{}}/>} />
+            <Route path="game-review/users/:id/profile" element={<UserProfile />} />
+            <Route path="game-review/users/:id/edit" element={<EditUserProfile />} />
+            <Route path="game-review/users/:id/myGames" element={<UserGames />} />
+            <Route path="game-review/users/:id/reviewed" element={<UserGameReview />} />
+            <Route path="game-review/users/:id/owned" element={<UserGameOwned />} />
+            <Route path="game-review/users/:id/wishlisted" element={<UserGameWishlist />} />
+            <Route path="game-review/users/login" element={<Login />} />
+            <Route path="game-review/users/register" element={<UserRegister />} />
+            <Route path="game-review/*" element={<GameList params={{}} />} />
           </Routes>
         </div>
       </Router>
