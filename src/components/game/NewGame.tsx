@@ -106,7 +106,7 @@ const onCreateGame = async () => {
                     "Content-Type": imageFile?.type,
                 }
             })
-            navigate(`/users/${creatorId}/myGames`);
+            navigate(`/game-review/users/${creatorId}/myGames`);
         } catch (error: any) {
             setErrorFlag(true);
             setErrorMessage(error.toString());
@@ -164,7 +164,7 @@ const onUpdateGame = async () => {
                     }
                 })
             }
-            navigate('/games/' + id);
+            navigate('/game-review/games/' + id);
         } catch (error) {
             setErrorFlag(true);
             if (axios.isAxiosError(error)) {

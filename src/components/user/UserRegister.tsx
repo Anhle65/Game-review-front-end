@@ -144,7 +144,7 @@ const UserRegister = () => {
                             }
                         })
                 }
-                navigate('/games/');
+                navigate('/game-review/games/');
             } catch (error: any) {
                 console.log(error);
                 console.log('fname:' + fname);

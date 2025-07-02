@@ -19,7 +19,7 @@ function App() {
       <Router>
         <div>
           <Routes>
-            <Route path="/" element={<GameList params={{}}/>} />
+            <Route path="game-review/" element={<GameList params={{}}/>} />
             <Route path="game-review/games" element={<GameList params={{}}/>} />
             <Route path="game-review/games/create" element={<NewGame />} />
             <Route path="game-review/games/:id/edit" element={<NewGame />} />

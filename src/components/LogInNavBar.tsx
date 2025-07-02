@@ -35,22 +35,22 @@ const LogInNavBar = () => {
         if (window.location.pathname.endsWith('edit/') || window.location.pathname.endsWith('edit')) {
             window.location.reload();
         } else {
-            navigate('/users/'+userId+'/edit');
+            navigate('/game-review/users/'+userId+'/edit');
         }
     }
     const handleCreateGame = () => {
         if (window.location.pathname.endsWith('create/') || window.location.pathname.endsWith('create')) {
             window.location.reload();
         } else {
-            navigate('/games/create');
+            navigate('/game-review/games/create');
         }
     }
     const handleReviewedGame = () => {
-        navigate('/users/' +userId+'/reviewed');
+        navigate('/game-review/users/' +userId+'/reviewed');
     }
 
     const handleMyGameClick = () => {
-        navigate('/users/'+userId+'/myGames');
+        navigate('/game-review/users/'+userId+'/myGames');
     }
     const handleLogout = async () =>{
         console.log('authToken: ' + token);
@@ -61,7 +61,7 @@ const LogInNavBar = () => {
                 },
                 timeout: 10000
             });
-        navigate('/games');
+        navigate('/game-review/games');
         window.location.reload();
         authorization.removeAuthorization();
     }
@@ -69,7 +69,7 @@ const LogInNavBar = () => {
         setAnchorElUser(null);
     };
     const handleWishlistClick = () => {
-        navigate('/users/' +userId+'/wishlisted');
+        navigate('/game-review/users/' +userId+'/wishlisted');
     }
     const handleOwnedClick = () => {
         navigate('/users/' +userId+'/owned');
@@ -113,14 +113,14 @@ const LogInNavBar = () => {
         if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
             window.location.reload();
         } else {
-            navigate('/games');
+            navigate('/game-review/games');
         }
     };
     const handleProfileClick = () => {
         if (window.location.pathname.endsWith('profile/') || window.location.pathname.endsWith('profile')) {
             window.location.reload();
         } else {
-            navigate('/users/'+ userId +'/profile');
+            navigate('/game-review/users/'+ userId +'/profile');
         }
     }
     return(

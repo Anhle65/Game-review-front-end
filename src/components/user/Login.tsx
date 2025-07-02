@@ -63,7 +63,7 @@ const Login = () => {
                 const {userId, token} = response.data;
                 authorization.setAuthorization(userId, token);
                 console.log(userId);
-                navigate('/games/user/' + userId);
+                navigate('/game-review/games/user/' + userId);
             } catch (error: any) {
                 console.log(error);
                 console.log(email);

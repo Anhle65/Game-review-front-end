@@ -13,21 +13,21 @@ const LogoutNavBar = () => {
         if (window.location.pathname.endsWith('register/') || window.location.pathname.endsWith('register')) {
             window.location.reload();
         } else {
-            navigate('/users/register');
+            navigate('/game-review/users/register');
         }
     }
     const handleLogIn = () => {
         if (window.location.pathname.endsWith('login/') || window.location.pathname.endsWith('login')) {
             window.location.reload();
         } else {
-            navigate('/users/login');
+            navigate('/game-review/users/login');
         }
     }
     const handleDashboardClick = () => {
         if (window.location.pathname.endsWith('games/') || window.location.pathname.endsWith('games')) {
             window.location.reload();
         } else {
-            navigate('/games');
+            navigate('/game-review/games');
         }
     };
     return (

@@ -143,7 +143,7 @@ const Game = () => {
                 }
             })
                 .then(() => {
-                    navigate('/users/' + userId + '/myGames')
+                    navigate('/game-review/users/' + userId + '/myGames')
                     setErrorFlag(false);
                     setErrorMessage("");
                 })
@@ -154,14 +154,14 @@ const Game = () => {
     }
 
     const editGame = () => {
-        navigate(`/games/${id}/edit`);
+        navigate(`/game-review/games/${id}/edit`);
     }
     const createGame = () => {
         window.scrollTo({top:0});
-        navigate(`/games/create`);
+        navigate(`/game-review/games/create`);
     }
     const handleLogin = () => {
-        navigate("/users/login/");
+        navigate("/game-review/users/login/");
     }
     const getWishlistGame = async () => {
         const response = await axios.get("http://localhost:4941"+rootUrl+'/games?wishlistedByMe=true', {

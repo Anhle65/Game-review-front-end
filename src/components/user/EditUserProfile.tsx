@@ -117,7 +117,7 @@ const EditUserProfile = () => {
                         "X-Authorization": token,
                     }
                 })
-            navigate('/users/' + userId + '/profile');
+            navigate('/game-review/users/' + userId + '/profile');
         } catch (error) {
             setErrorFlag(true);
             if (axios.isAxiosError(error)) {

@@ -130,7 +130,7 @@ const GameListObject = (props: IGameProps) => {
                 sx={{objectFit:"cover"}}
                 image={image.length > 0 ? image: "https://png.pngitem.com/pimgs/s/150-1503945_transparent-user-png-default-user-image-png-png.png"}
                 alt="Auction hero"
-                onClick={() => navigate('/games/' + game.gameId)}
+                onClick={() => navigate('/game-review/games/' + game.gameId)}
             />
             <CardContent>
                 <Typography variant="h6" sx={{fontWeight: 'bold', fontFamily: 'monospace'}}>

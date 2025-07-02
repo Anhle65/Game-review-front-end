@@ -80,7 +80,7 @@ const UserProfile = () => {
                         </Typography>
                     </Stack>
                 </CardContent>
-                    <Button onClick={()=>navigate('/users/'+userId+'/edit')}><EditIcon fontSize='large' />
+                    <Button onClick={()=>navigate('/game-review/users/'+userId+'/edit')}><EditIcon fontSize='large' />
                         <Typography variant='h6' >Edit Information</Typography>
                     </Button>
             </Card>
