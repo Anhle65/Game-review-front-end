@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import {Button, Card, CardContent, CardMedia, Stack, Typography} from "@mui/material";
 import CSS from "csstype";
 import LogInNavBar from "../LogInNavBar";
@@ -19,7 +19,7 @@ const UserProfile = () => {
     const navigate = useNavigate();
     React.useEffect(()=> {
         if(token && userId) {
-            axios.get('http://localhost:4941' + rootUrl + "/users/" + userId, {
+            axios.get(domain + rootUrl + "/users/" + userId, {
                 headers: {
                     "X-Authorization": token
                 },
@@ -33,7 +33,7 @@ const UserProfile = () => {
         }
     },[userId, token])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
+        axios.get(domain + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {

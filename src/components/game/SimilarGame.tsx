@@ -6,6 +6,7 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import GameListObject from "./GameListObject";
 import CSS from "csstype";
 import {useParams} from "react-router-dom";
+import {rootUrl, domain} from "../../base.routes";
 type SimilarGameProps = {
     creatorId: number;
     genreId: number;
@@ -20,8 +21,8 @@ const SimilarGame = (props: SimilarGameProps) => {
 
     const fetchGames = async () => {
         const [gameByCreatorId, gameByGenreId] = await Promise.all([
-            axios.get(`http://localhost:4941/api/v1/games?creatorId=${props.creatorId}`),
-            axios.get(`http://localhost:4941/api/v1/games?genreIds=${props.genreId}`),
+            axios.get(`${domain}${rootUrl}/games?creatorId=${props.creatorId}`),
+            axios.get(`${domain}${rootUrl}/games?genreIds=${props.genreId}`),
         ]);
         const combinedGames = [...gameByCreatorId.data['games'], ...gameByGenreId.data['games']];
         const uniqueGames = Array.from(

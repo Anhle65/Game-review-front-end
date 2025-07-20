@@ -13,7 +13,7 @@ import {
     Box
 } from "@mui/material";
 import CSS from "csstype";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
 import LogoutNavBar from "../LogoutNavBar";
@@ -52,7 +52,7 @@ const Login = () => {
             }
             try {
                 const response = await
-                    axios.post("http://localhost:4941" + rootUrl + '/users/login', {
+                    axios.post(domain + rootUrl + '/users/login', {
                         email: email,
                         password: password
                     }, {
@@ -162,7 +162,7 @@ const Login = () => {
                             </button>
                             <Typography variant="subtitle2" align="center">
                                 No account yet?
-                                <NavLink to={'/users/register'} end>
+                                <NavLink to={'game-review/users/register'} end>
                                     Register
                                 </NavLink>
                             </Typography>

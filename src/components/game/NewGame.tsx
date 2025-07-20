@@ -16,7 +16,7 @@ import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore
 import React from "react";
 import axios from "axios";
 import MenuItem from "@mui/material/MenuItem";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {useUserStore} from "../../store";
@@ -85,7 +85,7 @@ const onCreateGame = async () => {
             return;
         }
         try {
-            const gamePost = await axios.post("http://localhost:4941" + rootUrl + "/games", {
+            const gamePost = await axios.post(domain + rootUrl + "/games", {
                 title: title,
                 description: description,
                 creationDate: new Date(),
@@ -100,7 +100,7 @@ const onCreateGame = async () => {
             const createdId = gamePost.data["gameId"]
             console.log("created data: ", gamePost);
             console.log("created id: ", createdId);
-            await axios.put("http://localhost:4941" + rootUrl + "/games/" + createdId + "/image", imageFile, {
+            await axios.put(domain + rootUrl + "/games/" + createdId + "/image", imageFile, {
                 headers: {
                     "X-Authorization": token,
                     "Content-Type": imageFile?.type,
@@ -144,7 +144,7 @@ const onUpdateGame = async () => {
             return;
         }
         try {
-            await axios.patch("http://localhost:4941" + rootUrl + "/games/" + id, {
+            await axios.patch(domain + rootUrl + "/games/" + id, {
                 gameId: id,
                 title: title,
                 description: description,
@@ -157,7 +157,7 @@ const onUpdateGame = async () => {
                 }
             })
             if (imageFile) {
-                await axios.put("http://localhost:4941" + rootUrl + "/games/" + id + "/image", imageFile, {
+                await axios.put(domain + rootUrl + "/games/" + id + "/image", imageFile, {
                     headers: {
                         "X-Authorization": token,
                         "Content-Type": imageFile?.type,
@@ -219,7 +219,7 @@ React.useEffect(() => {
 }, [id])
 
 const getGameImage = async () => {
-    await axios.get("http://localhost:4941" + rootUrl + "/games/" + id + "/image", {
+    await axios.get(domain + rootUrl + "/games/" + id + "/image", {
         responseType: 'blob',
     })
         .then((response) => {
@@ -240,7 +240,7 @@ const getGameImage = async () => {
         })
 }
 const getGame = async () => {
-    const gameResponse = await axios.get("http://localhost:4941" + rootUrl + "/games/" + id);
+    const gameResponse = await axios.get(domain + rootUrl + "/games/" + id);
     return gameResponse.data;
 }
 const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -255,7 +255,7 @@ const handlePlatformSelectChange = (event: React.ChangeEvent<HTMLInputElement>) 
 };
 
 const getGenres = async () => {
-    await axios.get('http://localhost:4941'+ rootUrl + '/games/genres')
+    await axios.get(domain+ rootUrl + '/games/genres')
         .then((response) => {
             setErrorFlag(false);
             setErrorMessage("");
@@ -267,7 +267,7 @@ const getGenres = async () => {
 }
 
 const getPlatforms = async () => {
-    await axios.get('http://localhost:4941'+ rootUrl + '/games/platforms')
+    await axios.get(domain+ rootUrl + '/games/platforms')
         .then((response) => {
             setErrorFlag(false);
             setErrorMessage("");

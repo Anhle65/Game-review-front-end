@@ -22,7 +22,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogInNavBar from "../LogInNavBar";
 import LogoutNavBar from "../LogoutNavBar";
 import {useUserStore} from "../../store";
-import AttachMoneyTwoToneIcon from "@mui/icons-material/AttachMoneyTwoTone";
 type GameParams = {
     params: Record<string, string | number | boolean | any[]>;
 };

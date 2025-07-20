@@ -1,7 +1,7 @@
 import React from "react";
 import CSS from "csstype";
 import {Avatar, Card, CardContent, Stack, TextField, Typography} from "@mui/material";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import axios from "axios";
 
 interface IGameReviewProps {
@@ -19,7 +19,7 @@ const GameReviewObject = (props: IGameReviewProps) => {
         padding: "0px"
     }
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
+        axios.get(domain+rootUrl+'/users/' + gameReview.reviewerId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {

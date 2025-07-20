@@ -11,7 +11,7 @@ import {
     Alert,
     AlertTitle
 } from "@mui/material";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import {NavLink, useNavigate} from "react-router-dom";
 interface IGameProps {
     game: Game
@@ -30,7 +30,7 @@ const GameListObject = (props: IGameProps) => {
                                                 .filter((name): name is string => !!name);  //Only keep values where name is truthy — i.e., a non-empty string, and not undefined or null.
     const platformsName = allPlatforms.join(', ');
     React.useEffect(()=> {
-        axios.get('http://localhost:4941'+rootUrl+'/users/' + game.creatorId + '/image', {
+        axios.get(domain +rootUrl+'/users/' + game.creatorId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -58,7 +58,7 @@ const GameListObject = (props: IGameProps) => {
     }, [game.creatorId]);
     React.useEffect(() => {
         const getGenres = () => {
-            axios.get('http://localhost:4941' +rootUrl+'/games/genres')
+            axios.get(domain +rootUrl+'/games/genres')
                 .then((response) => {
                     setGenres(response.data)
                     setErrorFlag(false);
@@ -71,7 +71,7 @@ const GameListObject = (props: IGameProps) => {
         getGenres()
     },[setGenres])
     React.useEffect(() => {
-        axios.get('http://localhost:4941'+rootUrl+'/games/' + game.gameId + '/image', {
+        axios.get(domain+rootUrl+'/games/' + game.gameId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -96,7 +96,7 @@ const GameListObject = (props: IGameProps) => {
     }, [game.gameId]);
     React.useEffect(() => {
         const getPlatforms = ()=> {
-            axios.get('http://localhost:4941'+rootUrl+'/games/platforms/')
+            axios.get(domain+rootUrl+'/games/platforms/')
                 .then((response) => {
                     setPlatforms(response.data);
                 }, (error)=>{

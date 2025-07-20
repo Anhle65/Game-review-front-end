@@ -16,7 +16,7 @@ import {Alert, CardTitle} from "react-bootstrap";
 import LogInNavBar from "../LogInNavBar";
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import axios from "axios";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import {useNavigate} from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import CSS from "csstype";
@@ -93,7 +93,7 @@ const EditUserProfile = () => {
         }
         try {
             if (imageFile) {
-                await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                await axios.put(domain + rootUrl + '/users/' + userId + '/image',
                     imageFile,
                     {
                         headers: {
@@ -103,14 +103,14 @@ const EditUserProfile = () => {
                     })
             } else {
                 if(!image) {
-                    await axios.delete("http://localhost:4941" + rootUrl + '/users/' + userId + '/image', {
+                    await axios.delete(domain + rootUrl + '/users/' + userId + '/image', {
                         headers: {
                             "X-Authorization": token,
                         }
                     })
                 }
             }
-            await axios.patch("http://localhost:4941" + rootUrl + '/users/' + userId,
+            await axios.patch(domain + rootUrl + '/users/' + userId,
                 data,
                 {
                     headers: {
@@ -183,7 +183,7 @@ const EditUserProfile = () => {
         setErrorFlag(false);
     }
     React.useEffect(() => {
-        axios.get('http://localhost:4941'+rootUrl+'/users/'+userId, {
+        axios.get(domain+rootUrl+'/users/'+userId, {
             headers: {
                 "X-Authorization": token
             }
@@ -206,7 +206,7 @@ const EditUserProfile = () => {
             })
     }, [])
     React.useEffect(()=> {
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
+        axios.get(domain + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {

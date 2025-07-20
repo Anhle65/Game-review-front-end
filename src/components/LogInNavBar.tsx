@@ -11,7 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import AppBar from "@mui/material/AppBar";
 import * as React from "react";
 import {useNavigate} from "react-router-dom";
-import {rootUrl} from "../base.routes";
+import {rootUrl, domain} from "../base.routes";
 import axios from "axios";
 import {useUserStore} from "../store";
 import {Edit, Logout} from "@mui/icons-material";
@@ -54,7 +54,7 @@ const LogInNavBar = () => {
     }
     const handleLogout = async () =>{
         console.log('authToken: ' + token);
-        await axios.post('http://localhost:4941'+rootUrl+'/users/logout', {},
+        await axios.post(domain+rootUrl+'/users/logout', {},
             {
                 headers: {
                     "X-Authorization": token
@@ -72,10 +72,10 @@ const LogInNavBar = () => {
         navigate('/game-review/users/' +userId+'/wishlisted');
     }
     const handleOwnedClick = () => {
-        navigate('/users/' +userId+'/owned');
+        navigate('/game-review/users/' +userId+'/owned');
     }
     React.useEffect(()=> {
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId + '/image', {
+        axios.get(domain + rootUrl + '/users/' + userId + '/image', {
             responseType: 'blob',
         })
             .then((response) => {
@@ -101,7 +101,7 @@ const LogInNavBar = () => {
         if (window.location.pathname.endsWith('reviewed/') || window.location.pathname.endsWith('reviewed')) {
             setPageName('My reviews');
         }
-        axios.get('http://localhost:4941' + rootUrl + '/users/' + userId)
+        axios.get(domain + rootUrl + '/users/' + userId)
             .then((response) => {
                 setfName(response.data.firstName);
                 setlName(response.data.lastName);

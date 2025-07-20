@@ -1,7 +1,7 @@
 import React, { useState} from "react";
 import {NavLink, useNavigate} from "react-router-dom";
 import axios from "axios";
-import {rootUrl} from "../../base.routes";
+import {rootUrl, domain} from "../../base.routes";
 import CSS from "csstype";
 import {Alert} from "react-bootstrap";
 import {
@@ -110,7 +110,7 @@ const UserRegister = () => {
         }
         if (!token) {
             try {
-                await axios.post("http://localhost:4941" + rootUrl + '/users/register', {
+                await axios.post(domain + rootUrl + '/users/register', {
                     firstName: fname,
                     lastName: lname,
                     email: email,
@@ -135,7 +135,7 @@ const UserRegister = () => {
                 // console.log("userId:", userId);
                 // console.log("token:", token);
                 if (imageFile) {
-                    await axios.put("http://localhost:4941" + rootUrl + '/users/' + userId + '/image',
+                    await axios.put(domain + rootUrl + '/users/' + userId + '/image',
                         imageFile,
                         {
                             headers: {
