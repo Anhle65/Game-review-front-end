@@ -14,7 +14,7 @@ import {
     Stack,
     TextField, Typography
 } from "@mui/material";
-import { rootUrl } from "../../base.routes";
+import { rootUrl, domain } from "../../base.routes";
 import GameListObject from "./GameListObject";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -56,10 +56,10 @@ const GameList = ({params}: GameParams) => {
             filterParams.append(key, String(value));
         }
     });
-    let url = `http://localhost:4941${rootUrl}/games`;
+    let url = `${domain}${rootUrl}/games`;
     React.useEffect(()=>{
         const getGames = () => {
-            axios.get(`http://localhost:4941${rootUrl}/games`)
+            axios.get(`${domain}${rootUrl}/games`)
                 .then((res) => {
                     const highestPrice = Math.max(...res.data['games'].map((g: any) => g.price/100));
                     setMaxPriceGame(highestPrice);
@@ -69,7 +69,7 @@ const GameList = ({params}: GameParams) => {
         getGames();
     }, [])
     const getGenres = async () => {
-        await axios.get('http://localhost:4941'+ rootUrl + '/games/genres')
+        await axios.get(domain + rootUrl + '/games/genres')
             .then((response) => {
                 setErrorFlag(false);
                 setErrorMessage("");
@@ -94,7 +94,7 @@ const GameList = ({params}: GameParams) => {
         });
     };
     const getPlatforms = async () => {
-        await axios.get('http://localhost:4941'+ rootUrl + '/games/platforms')
+        await axios.get(domain + rootUrl + '/games/platforms')
             .then((response) => {
                 setErrorFlag(false);
                 setErrorMessage("");
